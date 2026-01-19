@@ -3,26 +3,506 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>modcolony</title>
+    <title>Wonton House - Handcrafted Comfort in Every Bite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f5f5f5;
+            box-sizing: border-box;
         }
-        h1 {
-            font-size: 4rem;
-            color: #333;
-            margin: 0;
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            overflow-x: hidden;
+            color: #1a1a1a;
+            background: linear-gradient(135deg, #FFE5D9 0%, #FFD4B8 25%, #FFDCC7 50%, #FFE0B2 75%, #FFF3E0 100%);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 60px;
+            position: relative;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #D84315;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #5D4037;
+            font-weight: 500;
+            font-size: 15px;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #D84315;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #D84315;
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-signin {
+            color: #5D4037;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 20px;
+            transition: color 0.3s;
+        }
+
+        .btn-signin:hover {
+            color: #D84315;
+        }
+
+        .btn-order {
+            background: #D84315;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(216, 67, 21, 0.3);
+        }
+
+        .btn-order:hover {
+            background: #BF360C;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(216, 67, 21, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 80px 60px;
+            gap: 60px;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero-content {
+            z-index: 10;
+        }
+
+        .hero h1 {
+            font-size: 88px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 32px;
+            letter-spacing: -2px;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, #D84315 0%, #FF6F00 50%, #F4511E 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero h1 .accent {
+            color: #5D4037;
+        }
+
+        .hero-description {
+            font-size: 20px;
+            line-height: 1.7;
+            color: #5D4037;
+            margin-bottom: 40px;
+            max-width: 540px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .email-input {
+            padding: 16px 24px;
+            border-radius: 30px;
+            border: 2px solid rgba(93, 64, 55, 0.2);
+            font-size: 16px;
+            width: 300px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: #D84315;
+            background: white;
+        }
+
+        .btn-start {
+            background: #1a1a1a;
+            color: white;
+            padding: 16px 32px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-start:hover {
+            background: #333;
+            transform: translateX(4px);
+        }
+
+        .btn-start::after {
+            content: '→';
+            transition: transform 0.3s;
+        }
+
+        .btn-start:hover::after {
+            transform: translateX(4px);
+        }
+
+        /* Hero Visual */
+        .hero-visual {
+            position: relative;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            position: absolute;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+        }
+
+        .card-main {
+            width: 380px;
+            z-index: 3;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .wonton-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #FFE5D9, #FFD4B8);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .order-button {
+            background: #1a1a1a;
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .divider {
+            text-align: center;
+            color: #999;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .card-secondary {
+            width: 320px;
+            top: 80px;
+            right: -40px;
+            z-index: 2;
+            opacity: 0.95;
+        }
+
+        .stats-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #D84315;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            color: #4CAF50;
+            margin-left: 8px;
+        }
+
+        .chart-mini {
+            height: 60px;
+            background: linear-gradient(to right, rgba(216, 67, 21, 0.1), rgba(216, 67, 21, 0.2));
+            border-radius: 8px;
+            margin-top: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80%;
+            background: linear-gradient(to top, #D84315, rgba(216, 67, 21, 0.5));
+            clip-path: polygon(0% 100%, 0% 60%, 25% 70%, 50% 40%, 75% 45%, 100% 20%, 100% 100%);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                padding: 60px 40px;
+            }
+
+            .hero h1 {
+                font-size: 64px;
+            }
+
+            .hero-visual {
+                height: 500px;
+                margin-top: 60px;
+            }
+
+            nav {
+                padding: 20px 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 48px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .email-input {
+                width: 100%;
+            }
+
+            .card-main {
+                width: 100%;
+                max-width: 340px;
+            }
+
+            .card-secondary {
+                display: none;
+            }
+
+            nav {
+                padding: 20px;
+            }
+
+            .hero {
+                padding: 40px 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>modcolony</h1>
+    <nav>
+        <div class="logo">🥟 wonton</div>
+        <ul class="nav-links">
+            <li><a href="#menu">Menu</a></li>
+            <li><a href="#delivery">Delivery</a></li>
+            <li><a href="#catering">Catering</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#locations">Locations</a></li>
+        </ul>
+        <div class="nav-cta">
+            <a href="#" class="btn-signin">Sign in</a>
+            <a href="#" class="btn-order">Order now</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>
+                <span class="highlight">Handcrafted</span><br>
+                <span class="accent">comfort</span><br>
+                <span class="highlight">to satisfy your</span><br>
+                <span class="accent">cravings</span>
+            </h1>
+            <p class="hero-description">
+                Join thousands of happy customers who order our artisanal wontons.
+                Fresh ingredients, authentic recipes, and delivered straight to your door.
+                Experience comfort food reimagined.
+            </p>
+            <div class="hero-cta">
+                <input type="email" class="email-input" placeholder="Email address">
+                <button class="btn-start">Order now</button>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="card card-main">
+                <div class="card-header">
+                    <div class="wonton-icon">🥟</div>
+                    <div>
+                        <div class="card-title">Classic Pork Wontons</div>
+                        <div class="card-subtitle">12 pieces per order</div>
+                    </div>
+                </div>
+                <div class="order-button">
+                    🍎 Quick Order
+                </div>
+                <div class="divider">Or customize your order</div>
+                <div class="input-group">
+                    <label class="input-label">Delivery address</label>
+                    <input type="text" class="input-field" placeholder="123 Main Street">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Special instructions</label>
+                    <input type="text" class="input-field" placeholder="Extra spicy sauce please!">
+                </div>
+            </div>
+
+            <div class="card card-secondary">
+                <div class="stats-header">Today's Orders</div>
+                <div class="stat-item">
+                    <span class="stat-label">Total orders</span>
+                    <div>
+                        <span class="stat-value">1,247</span>
+                        <span class="stat-change">+32.8%</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Happy customers</span>
+                    <div>
+                        <span class="stat-value">892</span>
+                        <span class="stat-change">+28.4%</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Avg. rating</span>
+                    <div>
+                        <span class="stat-value">4.9 ⭐</span>
+                    </div>
+                </div>
+                <div class="chart-mini">
+                    <div class="chart-line"></div>
+                </div>
+            </div>
+        </div>
+    </section>
 </body>
 </html>
