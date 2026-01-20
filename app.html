@@ -1024,8 +1024,9 @@
 
         // Get next product ID
         function getNextProductId() {
-            if (products.length === 0) return 1;
-            return Math.max(...products.map(p => p.id)) + 1;
+            if (products.length === 0) return 11;
+            const maxId = Math.max(...products.map(p => p.id));
+            return Math.max(maxId + 1, 11);
         }
 
         // Toggle product form
@@ -1141,7 +1142,7 @@
 
             tbody.innerHTML = products.map(product => `
                 <tr>
-                    <td>${product.id}</td>
+                    <td>${String(product.id).padStart(2, '0')}</td>
                     <td>${product.nameThai}</td>
                     <td>${product.nameEn}</td>
                     <td>${product.unit}</td>
