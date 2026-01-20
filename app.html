@@ -641,13 +641,6 @@
                 colorClass: 'user-access'
             },
             {
-                id: 'product-list',
-                label: 'Product List',
-                icon: '📋',
-                roles: ['user', 'admin'],
-                colorClass: 'user-access'
-            },
-            {
                 id: 'inventory',
                 label: 'Inventory',
                 icon: '📦',
@@ -759,75 +752,6 @@
                     </p>
                 `
             },
-            'product-list': {
-                title: 'Product List',
-                breadcrumb: 'Product Management / Product List',
-                content: `
-                    <div class="product-section">
-                        <div class="section-header">
-                            <h2 class="section-title">Product Management</h2>
-                            <button class="btn btn-primary" onclick="toggleProductForm()" id="addProductBtn">
-                                <span>+</span> Add New Product
-                            </button>
-                        </div>
-
-                        <!-- Product Form -->
-                        <div id="productForm" class="product-form">
-                            <h3 style="margin-bottom: 20px; font-size: 18px;" id="formTitle">Add New Product</h3>
-                            <form onsubmit="saveProduct(event)">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label class="form-label">Product ID<span class="required">*</span></label>
-                                        <input type="number" id="productId" class="form-input" disabled required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Product Name (Thai)<span class="required">*</span></label>
-                                        <input type="text" id="productNameThai" class="form-input" placeholder="ชื่อสินค้า" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Product Name (English)<span class="required">*</span></label>
-                                        <input type="text" id="productNameEn" class="form-input" placeholder="Product name" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Unit<span class="required">*</span></label>
-                                        <input type="text" id="productUnit" class="form-input" placeholder="e.g., pieces, kg, boxes" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Status<span class="required">*</span></label>
-                                        <select id="productStatus" class="form-select" required>
-                                            <option value="Active">Active</option>
-                                            <option value="Inactive">Inactive</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-actions">
-                                    <button type="button" class="btn btn-secondary" onclick="cancelProductForm()">Cancel</button>
-                                    <button type="submit" class="btn btn-success" id="saveBtn">Save Product</button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Product List -->
-                        <div id="productListContainer">
-                            <table class="product-table" id="productTable">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Product Name (Thai)</th>
-                                        <th>Product Name (English)</th>
-                                        <th>Unit</th>
-                                        <th>Status</th>
-                                        <th id="actionsHeader">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="productTableBody">
-                                    <!-- Products will be rendered here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                `
-            },
             'inventory': {
                 title: 'Inventory',
                 breadcrumb: 'Inventory Management',
@@ -892,19 +816,68 @@
                 title: 'System Setup',
                 breadcrumb: 'Administration / Setup',
                 content: `
-                    <h2>System Setup</h2>
-                    <p style="margin-top: 16px; color: #666;">
-                        Configure system-wide settings, user permissions, and application preferences.
-                    </p>
-                    <div class="info-message" style="margin-top: 24px;">
-                        <h3>Admin Settings</h3>
-                        <p>
-                            This area is reserved for system administrators. Here you can manage global configurations,
-                            backup settings, and other administrative functions.
-                        </p>
-                        <p style="margin-top: 12px;">
-                            To manage products, please navigate to the "Product List" menu item accessible from the sidebar.
-                        </p>
+                    <div class="product-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Product Management</h2>
+                            <button class="btn btn-primary" onclick="toggleProductForm()">
+                                <span>+</span> Add New Product
+                            </button>
+                        </div>
+
+                        <!-- Product Form -->
+                        <div id="productForm" class="product-form">
+                            <h3 style="margin-bottom: 20px; font-size: 18px;" id="formTitle">Add New Product</h3>
+                            <form onsubmit="saveProduct(event)">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Product ID<span class="required">*</span></label>
+                                        <input type="number" id="productId" class="form-input" disabled required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Product Name (Thai)<span class="required">*</span></label>
+                                        <input type="text" id="productNameThai" class="form-input" placeholder="ชื่อสินค้า" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Product Name (English)<span class="required">*</span></label>
+                                        <input type="text" id="productNameEn" class="form-input" placeholder="Product name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Unit<span class="required">*</span></label>
+                                        <input type="text" id="productUnit" class="form-input" placeholder="e.g., pieces, kg, boxes" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Status<span class="required">*</span></label>
+                                        <select id="productStatus" class="form-select" required>
+                                            <option value="Active">Active</option>
+                                            <option value="Inactive">Inactive</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="cancelProductForm()">Cancel</button>
+                                    <button type="submit" class="btn btn-success" id="saveBtn">Save Product</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Product List -->
+                        <div id="productListContainer">
+                            <table class="product-table" id="productTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Product Name (Thai)</th>
+                                        <th>Product Name (English)</th>
+                                        <th>Unit</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productTableBody">
+                                    <!-- Products will be rendered here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 `
             }
@@ -930,10 +903,6 @@
             const currentMenuItem = menuConfig.find(item => item.id === currentPage);
             if (currentMenuItem && !currentMenuItem.roles.includes(currentRole)) {
                 navigateToPage('home');
-            } else if (currentPage === 'product-list') {
-                // Refresh product list UI if currently on that page
-                updateProductListUI();
-                renderProductTable();
             }
         }
 
@@ -1150,48 +1119,19 @@
             }
         }
 
-        // Update product list UI based on role
-        function updateProductListUI() {
-            const addProductBtn = document.getElementById('addProductBtn');
-            const actionsHeader = document.getElementById('actionsHeader');
-
-            if (currentRole === 'user') {
-                // Hide add product button for users
-                if (addProductBtn) {
-                    addProductBtn.style.display = 'none';
-                }
-                // Hide actions column header for users
-                if (actionsHeader) {
-                    actionsHeader.style.display = 'none';
-                }
-            } else {
-                // Show for admins
-                if (addProductBtn) {
-                    addProductBtn.style.display = 'inline-flex';
-                }
-                if (actionsHeader) {
-                    actionsHeader.style.display = 'table-cell';
-                }
-            }
-        }
-
         // Render product table
         function renderProductTable() {
             const tbody = document.getElementById('productTableBody');
 
-            if (!tbody) return; // Guard clause if not on product-list page
+            if (!tbody) return; // Guard clause if not on setup page
 
             if (products.length === 0) {
-                const colspan = currentRole === 'user' ? 5 : 6;
-                const emptyMessage = currentRole === 'user'
-                    ? 'No products available yet.'
-                    : 'No products yet. Click "Add New Product" to get started.';
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="${colspan}">
+                        <td colspan="6">
                             <div class="empty-state">
                                 <div class="empty-state-icon">📦</div>
-                                <div class="empty-state-text">${emptyMessage}</div>
+                                <div class="empty-state-text">No products yet. Click "Add New Product" to get started.</div>
                             </div>
                         </td>
                     </tr>
@@ -1210,7 +1150,7 @@
                             ${product.status}
                         </span>
                     </td>
-                    <td style="display: ${currentRole === 'user' ? 'none' : 'table-cell'}">
+                    <td>
                         <div class="action-buttons">
                             <button class="btn btn-edit btn-small" onclick="editProduct(${product.id})">Edit</button>
                             <button class="btn btn-delete btn-small" onclick="deleteProduct(${product.id})">Delete</button>
@@ -1220,19 +1160,18 @@
             `).join('');
         }
 
-        // Modified navigateToPage function to render products when navigating to product-list
+        // Modified navigateToPage function to render products when navigating to setup
         const originalNavigateToPage = navigateToPage;
-        function navigateToPage(pageId) {
+        navigateToPage = function(pageId) {
             originalNavigateToPage(pageId);
 
-            // If navigating to product-list page, render the product table and set role-based UI
-            if (pageId === 'product-list') {
+            // If navigating to setup page, render the product table
+            if (pageId === 'setup') {
                 setTimeout(() => {
-                    updateProductListUI();
                     renderProductTable();
                 }, 10);
             }
-        }
+        };
 
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
