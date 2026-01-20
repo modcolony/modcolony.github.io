@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wonton Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: #fff;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo-section {
+            padding: 24px 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #D84315;
+        }
+
+        .role-switcher {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .role-switcher label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .role-switcher select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .nav-menu {
+            padding: 16px 0;
+        }
+
+        .menu-item {
+            margin-bottom: 4px;
+        }
+
+        .menu-item-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .menu-item-main:hover {
+            background: #f5f5f5;
+        }
+
+        .menu-item-main.active {
+            background: #FF7043;
+            color: white;
+        }
+
+        .menu-item-main.active-admin {
+            background: #1976D2;
+            color: white;
+        }
+
+        .menu-item-main.user-access {
+            border-left: 3px solid #FF7043;
+        }
+
+        .menu-item-main.admin-access {
+            border-left: 3px solid #1976D2;
+        }
+
+        .menu-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .submenu-toggle {
+            transition: transform 0.2s;
+        }
+
+        .submenu-toggle.expanded {
+            transform: rotate(180deg);
+        }
+
+        .submenu {
+            display: none;
+            padding-left: 20px;
+            background: #fafafa;
+        }
+
+        .submenu.show {
+            display: block;
+        }
+
+        .submenu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submenu-item:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .submenu-item.active {
+            color: #D84315;
+            background: #fff;
+            font-weight: 500;
+        }
+
+        .submenu-item::before {
+            content: '▪';
+            margin-right: 12px;
+            color: #999;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 24px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .content-card {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .access-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
+        .access-badge.user {
+            background: #FFE0B2;
+            color: #E65100;
+        }
+
+        .access-badge.admin {
+            background: #BBDEFB;
+            color: #0D47A1;
+        }
+
+        .info-message {
+            background: #E3F2FD;
+            border-left: 4px solid #2196F3;
+            padding: 16px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+
+        .info-message h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #1565C0;
+        }
+
+        .info-message p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* Color coding reference */
+        .color-reference {
+            display: flex;
+            gap: 24px;
+            margin-top: 24px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .color-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .color-box {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+        }
+
+        .color-box.orange {
+            background: #FF7043;
+        }
+
+        .color-box.blue {
+            background: #1976D2;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo-section">
+                <div class="logo">🥟 Wonton</div>
+                <div class="role-switcher">
+                    <label for="roleSelect">Current Role:</label>
+                    <select id="roleSelect" onchange="handleRoleChange()">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <!-- Menu items will be rendered here by JavaScript -->
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="header">
+                <h1 id="pageTitle">Home</h1>
+                <div class="breadcrumb" id="breadcrumb">Dashboard / Home</div>
+            </div>
+            <div class="content-card" id="mainContent">
+                <h2>Welcome to Wonton Management System</h2>
+                <div class="color-reference">
+                    <div class="color-item">
+                        <div class="color-box orange"></div>
+                        <span>User Access</span>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-box blue"></div>
+                        <span>Admin Only</span>
+                    </div>
+                </div>
+                <div class="info-message">
+                    <h3>Role-Based Access Control</h3>
+                    <p>
+                        This system implements role-based menu access. Users with 'User' role can access Home, Product Inflow, and Product Outflow menus (highlighted in orange).
+                        Admins have full access to all menus including Dashboard, Inventory, Sale, Wage, and SETUP (highlighted in blue).
+                    </p>
+                    <p style="margin-top: 12px;">
+                        Use the role switcher in the sidebar to toggle between User and Admin views to see the difference in menu accessibility.
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Menu configuration with role-based access
+        const menuConfig = [
+            {
+                id: 'home',
+                label: 'Home',
+                icon: '🏠',
+                roles: ['user', 'admin'],
+                colorClass: 'user-access'
+            },
+            {
+                id: 'dashboard',
+                label: 'Dashboard',
+                icon: '📊',
+                roles: ['admin'],
+                colorClass: 'admin-access'
+            },
+            {
+                id: 'product-inflow',
+                label: 'Product inflow',
+                icon: '📥',
+                roles: ['user', 'admin'],
+                colorClass: 'user-access',
+                submenu: [
+                    { id: 'dumpling-production', label: 'Dumpling production' },
+                    { id: 'other-production', label: 'Other production' }
+                ]
+            },
+            {
+                id: 'product-outflow',
+                label: 'Product outflow',
+                icon: '📤',
+                roles: ['user', 'admin'],
+                colorClass: 'user-access'
+            },
+            {
+                id: 'inventory',
+                label: 'Inventory',
+                icon: '📦',
+                roles: ['admin'],
+                colorClass: 'admin-access',
+                submenu: [
+                    { id: 'inflow', label: 'Inflow' },
+                    { id: 'outflow', label: 'Outflow' },
+                    { id: 'net-change', label: 'Net change' }
+                ]
+            },
+            {
+                id: 'sale',
+                label: 'Sale',
+                icon: '💰',
+                roles: ['admin'],
+                colorClass: 'admin-access'
+            },
+            {
+                id: 'wage',
+                label: 'Wage',
+                icon: '💵',
+                roles: ['admin'],
+                colorClass: 'admin-access'
+            },
+            {
+                id: 'setup',
+                label: 'SETUP',
+                icon: '⚙️',
+                roles: ['admin'],
+                colorClass: 'admin-access'
+            }
+        ];
+
+        // Page content configuration
+        const pageContent = {
+            'home': {
+                title: 'Home',
+                breadcrumb: 'Dashboard / Home',
+                content: `
+                    <h2>Welcome to Wonton Management System</h2>
+                    <p style="margin-top: 16px; color: #666; line-height: 1.6;">
+                        This is your central hub for managing all aspects of the wonton business.
+                        Navigate through the menu to access different modules based on your role.
+                    </p>
+                `
+            },
+            'dashboard': {
+                title: 'Dashboard',
+                breadcrumb: 'Dashboard',
+                content: `
+                    <h2>Admin Dashboard</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        View overall business metrics, sales analytics, and key performance indicators.
+                    </p>
+                    <div style="margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <div style="padding: 20px; background: #f9f9f9; border-radius: 8px;">
+                            <div style="font-size: 14px; color: #666;">Total Sales</div>
+                            <div style="font-size: 28px; font-weight: 700; color: #D84315; margin-top: 8px;">$12,847</div>
+                        </div>
+                        <div style="padding: 20px; background: #f9f9f9; border-radius: 8px;">
+                            <div style="font-size: 14px; color: #666;">Orders Today</div>
+                            <div style="font-size: 28px; font-weight: 700; color: #1976D2; margin-top: 8px;">247</div>
+                        </div>
+                        <div style="padding: 20px; background: #f9f9f9; border-radius: 8px;">
+                            <div style="font-size: 14px; color: #666;">Inventory Items</div>
+                            <div style="font-size: 28px; font-weight: 700; color: #388E3C; margin-top: 8px;">1,432</div>
+                        </div>
+                    </div>
+                `
+            },
+            'product-inflow': {
+                title: 'Product Inflow',
+                breadcrumb: 'Product Management / Product Inflow',
+                content: `
+                    <h2>Product Inflow Management</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        Track and manage incoming products from production facilities.
+                    </p>
+                `
+            },
+            'dumpling-production': {
+                title: 'Dumpling Production',
+                breadcrumb: 'Product Management / Product Inflow / Dumpling Production',
+                content: `
+                    <h2>Dumpling Production</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        Monitor and record dumpling production batches, quantities, and quality metrics.
+                    </p>
+                `
+            },
+            'other-production': {
+                title: 'Other Production',
+                breadcrumb: 'Product Management / Product Inflow / Other Production',
+                content: `
+                    <h2>Other Production</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        Track production of other items such as sauces, sides, and specialty products.
+                    </p>
+                `
+            },
+            'product-outflow': {
+                title: 'Product Outflow',
+                breadcrumb: 'Product Management / Product Outflow',
+                content: `
+                    <h2>Product Outflow Management</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        Track products leaving the facility for distribution, sales, or delivery.
+                    </p>
+                `
+            },
+            'inventory': {
+                title: 'Inventory',
+                breadcrumb: 'Inventory Management',
+                content: `
+                    <h2>Inventory Overview</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        Comprehensive view of current inventory levels, stock alerts, and warehouse management.
+                    </p>
+                `
+            },
+            'inflow': {
+                title: 'Inventory Inflow',
+                breadcrumb: 'Inventory Management / Inflow',
+                content: `
+                    <h2>Inventory Inflow</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        Record and track all incoming inventory items and raw materials.
+                    </p>
+                `
+            },
+            'outflow': {
+                title: 'Inventory Outflow',
+                breadcrumb: 'Inventory Management / Outflow',
+                content: `
+                    <h2>Inventory Outflow</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        Track inventory items used in production or sold to customers.
+                    </p>
+                `
+            },
+            'net-change': {
+                title: 'Net Change',
+                breadcrumb: 'Inventory Management / Net Change',
+                content: `
+                    <h2>Inventory Net Change</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        Analyze the net change in inventory levels over time periods.
+                    </p>
+                `
+            },
+            'sale': {
+                title: 'Sales',
+                breadcrumb: 'Sales Management',
+                content: `
+                    <h2>Sales Management</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        View sales transactions, generate reports, and analyze sales performance.
+                    </p>
+                `
+            },
+            'wage': {
+                title: 'Wage Management',
+                breadcrumb: 'HR / Wage Management',
+                content: `
+                    <h2>Wage Management</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        Manage employee wages, payroll processing, and compensation records.
+                    </p>
+                `
+            },
+            'setup': {
+                title: 'System Setup',
+                breadcrumb: 'Administration / Setup',
+                content: `
+                    <h2>System Setup</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        Configure system settings, user permissions, and business parameters.
+                    </p>
+                `
+            }
+        };
+
+        // State management
+        let currentRole = 'user';
+        let currentPage = 'home';
+        let expandedMenus = new Set();
+
+        // Initialize the application
+        function init() {
+            renderMenu();
+            navigateToPage('home');
+        }
+
+        // Handle role change
+        function handleRoleChange() {
+            currentRole = document.getElementById('roleSelect').value;
+            renderMenu();
+
+            // If current page is not accessible in new role, navigate to home
+            const currentMenuItem = menuConfig.find(item => item.id === currentPage);
+            if (currentMenuItem && !currentMenuItem.roles.includes(currentRole)) {
+                navigateToPage('home');
+            }
+        }
+
+        // Render menu based on current role
+        function renderMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.innerHTML = '';
+
+            menuConfig.forEach(item => {
+                // Check if user has access to this menu item
+                if (!item.roles.includes(currentRole)) {
+                    return;
+                }
+
+                const menuItem = document.createElement('div');
+                menuItem.className = 'menu-item';
+
+                const hasSubmenu = item.submenu && item.submenu.length > 0;
+                const isExpanded = expandedMenus.has(item.id);
+
+                // Create main menu item
+                const mainItem = document.createElement('div');
+                mainItem.className = `menu-item-main ${item.colorClass}`;
+                if (currentPage === item.id) {
+                    mainItem.classList.add(item.roles.includes('admin') && !item.roles.includes('user') ? 'active-admin' : 'active');
+                }
+
+                mainItem.innerHTML = `
+                    <div class="menu-label">
+                        <span class="menu-icon">${item.icon}</span>
+                        <span>${item.label}</span>
+                    </div>
+                    ${hasSubmenu ? '<span class="submenu-toggle ' + (isExpanded ? 'expanded' : '') + '">▼</span>' : ''}
+                `;
+
+                mainItem.onclick = () => {
+                    if (hasSubmenu) {
+                        toggleSubmenu(item.id);
+                    } else {
+                        navigateToPage(item.id);
+                    }
+                };
+
+                menuItem.appendChild(mainItem);
+
+                // Create submenu if exists
+                if (hasSubmenu) {
+                    const submenu = document.createElement('div');
+                    submenu.className = 'submenu' + (isExpanded ? ' show' : '');
+
+                    item.submenu.forEach(subItem => {
+                        const submenuItem = document.createElement('div');
+                        submenuItem.className = 'submenu-item';
+                        if (currentPage === subItem.id) {
+                            submenuItem.classList.add('active');
+                        }
+                        submenuItem.textContent = subItem.label;
+                        submenuItem.onclick = (e) => {
+                            e.stopPropagation();
+                            navigateToPage(subItem.id);
+                        };
+                        submenu.appendChild(submenuItem);
+                    });
+
+                    menuItem.appendChild(submenu);
+                }
+
+                navMenu.appendChild(menuItem);
+            });
+        }
+
+        // Toggle submenu
+        function toggleSubmenu(menuId) {
+            if (expandedMenus.has(menuId)) {
+                expandedMenus.delete(menuId);
+            } else {
+                expandedMenus.add(menuId);
+            }
+            renderMenu();
+        }
+
+        // Navigate to page
+        function navigateToPage(pageId) {
+            currentPage = pageId;
+
+            const page = pageContent[pageId];
+            if (page) {
+                document.getElementById('pageTitle').textContent = page.title;
+                document.getElementById('breadcrumb').textContent = page.breadcrumb;
+                document.getElementById('mainContent').innerHTML = page.content;
+            }
+
+            // Expand parent menu if navigating to submenu item
+            menuConfig.forEach(item => {
+                if (item.submenu && item.submenu.some(sub => sub.id === pageId)) {
+                    expandedMenus.add(item.id);
+                }
+            });
+
+            renderMenu();
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
