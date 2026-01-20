@@ -1014,7 +1014,28 @@
             const stored = localStorage.getItem('wontonProducts');
             if (stored) {
                 products = JSON.parse(stored);
+                migrateProductIds();
             }
+        }
+
+        // Migrate old product IDs to start from 11
+        function migrateProductIds() {
+            if (products.length === 0) return;
+
+            // Check if migration is needed (if any product has ID < 11)
+            const needsMigration = products.some(p => p.id < 11);
+            if (!needsMigration) return;
+
+            // Sort products by current ID to maintain order
+            products.sort((a, b) => a.id - b.id);
+
+            // Renumber products starting from 11
+            products.forEach((product, index) => {
+                product.id = 11 + index;
+            });
+
+            // Save migrated products
+            saveProductsToStorage();
         }
 
         // Save products to localStorage
