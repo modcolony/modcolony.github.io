@@ -1024,8 +1024,13 @@
 
         // Get next product ID
         function getNextProductId() {
-            if (products.length === 0) return 1;
+            if (products.length === 0) return 11;
             return Math.max(...products.map(p => p.id)) + 1;
+        }
+
+        // Format product ID as 2-digit string
+        function formatProductId(id) {
+            return String(id).padStart(2, '0');
         }
 
         // Toggle product form
@@ -1041,7 +1046,7 @@
                 editingProductId = null;
                 document.getElementById('formTitle').textContent = 'Add New Product';
                 document.getElementById('saveBtn').textContent = 'Save Product';
-                document.getElementById('productId').value = getNextProductId();
+                document.getElementById('productId').value = formatProductId(getNextProductId());
             }
         }
 
@@ -1098,7 +1103,7 @@
             document.getElementById('formTitle').textContent = 'Edit Product';
             document.getElementById('saveBtn').textContent = 'Update Product';
 
-            document.getElementById('productId').value = product.id;
+            document.getElementById('productId').value = formatProductId(product.id);
             document.getElementById('productNameThai').value = product.nameThai;
             document.getElementById('productNameEn').value = product.nameEn;
             document.getElementById('productUnit').value = product.unit;
@@ -1141,7 +1146,7 @@
 
             tbody.innerHTML = products.map(product => `
                 <tr>
-                    <td>${product.id}</td>
+                    <td>${formatProductId(product.id)}</td>
                     <td>${product.nameThai}</td>
                     <td>${product.nameEn}</td>
                     <td>${product.unit}</td>
