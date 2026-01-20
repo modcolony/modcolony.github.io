@@ -350,17 +350,6 @@
             background: #F57C00;
         }
 
-        .btn-delete {
-            background: #f44336;
-            color: white;
-            padding: 6px 12px;
-            font-size: 13px;
-        }
-
-        .btn-delete:hover {
-            background: #d32f2f;
-        }
-
         .btn-small {
             padding: 6px 12px;
             font-size: 13px;
@@ -1115,15 +1104,6 @@
             document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Delete product
-        function deleteProduct(productId) {
-            if (confirm('Are you sure you want to delete this product?')) {
-                products = products.filter(p => p.id !== productId);
-                saveProductsToStorage();
-                renderProductTable();
-            }
-        }
-
         // Render product table
         function renderProductTable() {
             const tbody = document.getElementById('productTableBody');
@@ -1158,7 +1138,6 @@
                     <td>
                         <div class="action-buttons">
                             <button class="btn btn-edit btn-small" onclick="editProduct(${product.id})">Edit</button>
-                            <button class="btn btn-delete btn-small" onclick="deleteProduct(${product.id})">Delete</button>
                         </div>
                     </td>
                 </tr>
