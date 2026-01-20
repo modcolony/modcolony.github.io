@@ -1162,7 +1162,7 @@
 
         // Modified navigateToPage function to render products when navigating to setup
         const originalNavigateToPage = navigateToPage;
-        function navigateToPage(pageId) {
+        navigateToPage = function(pageId) {
             originalNavigateToPage(pageId);
 
             // If navigating to setup page, render the product table
@@ -1171,7 +1171,7 @@
                     renderProductTable();
                 }, 10);
             }
-        }
+        };
 
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
