@@ -845,6 +845,12 @@
                                         <input type="text" id="productUnit" class="form-input" placeholder="e.g., pieces, kg, boxes" required>
                                     </div>
                                     <div class="form-group">
+                                        <label class="form-label">Department<span class="required">*</span></label>
+                                        <select id="productDepartment" class="form-select" required>
+                                            <option value="">Select Department</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
                                         <label class="form-label">Status<span class="required">*</span></label>
                                         <select id="productStatus" class="form-select" required>
                                             <option value="Active">Active</option>
@@ -868,6 +874,7 @@
                                         <th>Product Name (Thai)</th>
                                         <th>Product Name (English)</th>
                                         <th>Unit</th>
+                                        <th>Department</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -1157,6 +1164,7 @@
                 form.classList.remove('show');
             } else {
                 resetProductForm();
+                updateProductDepartmentDropdown();
                 form.classList.add('show');
                 editingProductId = null;
                 document.getElementById('formTitle').textContent = 'Add New Product';
@@ -1171,6 +1179,7 @@
             document.getElementById('productNameThai').value = '';
             document.getElementById('productNameEn').value = '';
             document.getElementById('productUnit').value = '';
+            document.getElementById('productDepartment').value = '';
             document.getElementById('productStatus').value = 'Active';
         }
 
@@ -1185,11 +1194,15 @@
         function saveProduct(event) {
             event.preventDefault();
 
+            const departmentId = parseInt(document.getElementById('productDepartment').value);
+
             const product = {
                 id: parseInt(document.getElementById('productId').value),
                 nameThai: document.getElementById('productNameThai').value,
                 nameEn: document.getElementById('productNameEn').value,
                 unit: document.getElementById('productUnit').value,
+                departmentId: departmentId,
+                departmentName: getDepartmentNameById(departmentId),
                 status: document.getElementById('productStatus').value
             };
 
@@ -1222,12 +1235,37 @@
             document.getElementById('productNameThai').value = product.nameThai;
             document.getElementById('productNameEn').value = product.nameEn;
             document.getElementById('productUnit').value = product.unit;
+            updateProductDepartmentDropdown();
+            document.getElementById('productDepartment').value = product.departmentId;
             document.getElementById('productStatus').value = product.status;
 
             document.getElementById('productForm').classList.add('show');
 
             // Scroll to form
             document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Update product department dropdown
+        function updateProductDepartmentDropdown() {
+            const select = document.getElementById('productDepartment');
+            if (!select) return;
+
+            const currentValue = select.value;
+
+            // Clear and rebuild options
+            select.innerHTML = '<option value="">Select Department</option>';
+
+            departments.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept.id;
+                option.textContent = `${formatDepartmentId(dept.id)} - ${dept.name}`;
+                select.appendChild(option);
+            });
+
+            // Restore selection if it still exists
+            if (currentValue) {
+                select.value = currentValue;
+            }
         }
 
         // Render product table
@@ -1239,7 +1277,7 @@
             if (products.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6">
+                        <td colspan="7">
                             <div class="empty-state">
                                 <div class="empty-state-icon">📦</div>
                                 <div class="empty-state-text">No products yet. Click "Add New Product" to get started.</div>
@@ -1256,6 +1294,7 @@
                     <td>${product.nameThai}</td>
                     <td>${product.nameEn}</td>
                     <td>${product.unit}</td>
+                    <td>${product.departmentName || 'N/A'}</td>
                     <td>
                         <span class="status-badge status-${product.status.toLowerCase()}">
                             ${product.status}
@@ -1351,6 +1390,7 @@
             saveDepartmentsToStorage();
             renderDepartmentTable();
             updateEmployeeDepartmentDropdown();
+            updateProductDepartmentDropdown();
             cancelDepartmentForm();
         }
 
