@@ -1150,6 +1150,12 @@
             font-weight: 600;
         }
 
+        .quality-check-section .quality-toggle-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            min-width: 64px;
+        }
+
         .spreadsheet-container {
             overflow-x: auto;
         }
@@ -2003,10 +2009,6 @@
                                         <label class="control-label">Date</label>
                                         <input type="date" id="otherProductionDate" class="date-input" onchange="handleOtherDateChange()">
                                     </div>
-                                    <div class="control-group">
-                                        <label class="control-label">Batch</label>
-                                        <input type="text" id="otherBatchNumber" class="form-input" placeholder="Batch #" style="width: 120px;">
-                                    </div>
                                 </div>
                                 <div class="header-controls-right">
                                     <div class="control-group">
@@ -2042,12 +2044,13 @@
                                     <table id="otherProductionTable">
                                         <thead>
                                             <tr>
-                                                <th style="width: 23%;">Product</th>
-                                                <th style="width: 9%;">Unit</th>
-                                                <th style="width: 13%;">Amount</th>
+                                                <th style="width: 21%;">Product</th>
+                                                <th style="width: 8%;">Unit</th>
+                                                <th style="width: 12%;">Batch</th>
+                                                <th style="width: 12%;">Amount</th>
                                                 <th style="width: 18%;">Quality Status</th>
-                                                <th style="width: 27%;">Notes</th>
-                                                <th style="width: 10%;">Action</th>
+                                                <th style="width: 21%;">Notes</th>
+                                                <th style="width: 8%;">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="otherProductionTableBody">
@@ -5006,7 +5009,7 @@
             const draftProductIds = Object.keys(draft);
 
             if (draftProductIds.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: #999;">No products added yet. Use the dropdown above to add products as they are produced.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 24px; color: #999;">No products added yet. Use the dropdown above to add products as they are produced.</td></tr>';
                 populateOtherProductSelector(draft);
                 return;
             }
@@ -5025,6 +5028,7 @@
 
             tbody.innerHTML = draftProducts.map(product => {
                 const draftEntry = draft[product.id] || {};
+                const batch = draftEntry.batch || '';
                 const count = draftEntry.count || '';
                 const quality = draftEntry.quality || 'Pending';
                 const notes = draftEntry.notes || '';
@@ -5037,6 +5041,15 @@
                             <div style="font-size: 11px; color: #999;">Dept ${String(product.departmentId).padStart(2, '0')}</div>
                         </td>
                         <td>${product.unit}</td>
+                        <td>
+                            <input type="text"
+                                   id="other-batch-${product.id}"
+                                   class="form-input"
+                                   value="${batch}"
+                                   placeholder="Batch #"
+                                   onchange="handleOtherProductionChange(${product.id})"
+                                   style="width: 100%;">
+                        </td>
                         <td>
                             <input type="number"
                                    id="other-count-${product.id}"
@@ -5097,7 +5110,7 @@
 
             // Build options
             const options = availableProducts.map(product => {
-                return `<option value="${product.id}">${product.nameThai} (${product.nameEn}) - Dept ${String(product.departmentId).padStart(2, '0')}</option>`;
+                return `<option value="${product.id}">${product.nameThai} (${product.nameEn})</option>`;
             }).join('');
 
             if (availableProducts.length === 0) {
@@ -5127,6 +5140,7 @@
 
             // Add product to draft with default values
             otherProductionDraft[draftKey][productId] = {
+                batch: '',
                 count: 0,
                 quality: 'Pending',
                 notes: ''
@@ -5174,9 +5188,11 @@
 
         // Handle other production entry changes
         function handleOtherProductionChange(productId) {
+            const batchInput = document.getElementById(`other-batch-${productId}`);
             const countInput = document.getElementById(`other-count-${productId}`);
             const notesInput = document.getElementById(`other-notes-${productId}`);
 
+            const batch = batchInput ? batchInput.value.trim() : '';
             const count = parseInt(countInput.value) || 0;
             const notes = notesInput.value.trim();
 
@@ -5190,6 +5206,7 @@
             if (!otherProductionDraft[draftKey][productId]) {
                 otherProductionDraft[draftKey][productId] = {};
             }
+            otherProductionDraft[draftKey][productId].batch = batch;
             otherProductionDraft[draftKey][productId].count = count;
             otherProductionDraft[draftKey][productId].notes = notes;
             // Preserve quality status if it exists
@@ -5250,13 +5267,6 @@
         // Save other production
         function saveOtherProduction() {
             const date = document.getElementById('otherProductionDate').value;
-            const batchNumber = document.getElementById('otherBatchNumber').value.trim();
-
-            if (!batchNumber) {
-                alert('Please enter a batch number before saving.');
-                document.getElementById('otherBatchNumber').focus();
-                return;
-            }
 
             const draftKey = date;
             const draft = otherProductionDraft[draftKey] || {};
@@ -5272,6 +5282,22 @@
                 return;
             }
 
+            const missingBatchEntry = Object.keys(draft).find(productId => {
+                const entry = draft[productId];
+                return entry.count > 0 && !entry.batch;
+            });
+
+            if (missingBatchEntry) {
+                const product = getProductById(parseInt(missingBatchEntry));
+                const productName = product ? product.nameThai : 'selected product';
+                alert(`Please enter a batch number for ${productName} before saving.`);
+                const batchInput = document.getElementById(`other-batch-${missingBatchEntry}`);
+                if (batchInput) {
+                    batchInput.focus();
+                }
+                return;
+            }
+
             // Create production records from draft
             const timestamp = Date.now();
             Object.keys(draft).forEach(productId => {
@@ -5280,7 +5306,7 @@
                     otherProductionRecords.push({
                         id: timestamp + Math.random(),
                         date: date,
-                        batch: batchNumber,
+                        batch: entry.batch,
                         productId: parseInt(productId),
                         count: entry.count,
                         quality: entry.quality || 'Pending',
@@ -5309,9 +5335,6 @@
             lastSavedInfo.style.display = 'block';
 
             alert('Production saved successfully!');
-
-            // Clear batch number for next entry
-            document.getElementById('otherBatchNumber').value = '';
 
             // Re-render table
             renderOtherProductionTable({});
