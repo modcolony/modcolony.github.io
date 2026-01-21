@@ -1671,7 +1671,7 @@
 
                         <!-- Sticky Save Button -->
                         <div class="sticky-save-container">
-                            <button id="saveRoundBtn" class="btn btn-success btn-large" onclick="saveCurrentRound()">
+                            <button id="saveRoundBtn" class="btn btn-success btn-large" onclick="openInitialsModal()">
                                 💾 Save Round
                             </button>
                             <div id="lastSavedInfo" class="last-saved-info" style="display: none;">
@@ -1851,6 +1851,29 @@
                             <div class="modal-actions">
                                 <button class="btn btn-secondary" onclick="hideModal('closeDayModal')">Cancel</button>
                                 <button class="btn btn-close-day" onclick="closeDay()">Close Day</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="initialsModal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-title">Inspector Sign-off Required</div>
+                            <div class="modal-body">
+                                <p><strong>Date:</strong> <span id="initialsModalDate"></span> | <strong>Round:</strong> <span id="initialsModalRound"></span></p>
+                                <p style="margin-top: 12px;">Please enter your initials to sign-off and save this round.</p>
+                                <div class="form-group" style="margin-top: 16px;">
+                                    <label class="form-label">Inspector Initials *</label>
+                                    <input type="text" id="inspectorInitials" class="form-input" placeholder="Enter your initials (e.g., AB)" maxlength="10" style="text-transform: uppercase;">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Notes (Optional)</label>
+                                    <textarea id="initialsNotes" class="form-input" rows="3" placeholder="Add any inspection notes"></textarea>
+                                </div>
+                                <div id="initialsError" class="error-message" style="display: none; margin-top: 12px;"></div>
+                            </div>
+                            <div class="modal-actions">
+                                <button class="btn btn-secondary" onclick="hideModal('initialsModal')">Cancel</button>
+                                <button class="btn btn-success" onclick="confirmInitialsAndSave()">Sign-off & Save</button>
                             </div>
                         </div>
                     </div>
@@ -3099,7 +3122,7 @@
                 }
                 pendingNavigation = null;
             } else if (action === 'save') {
-                saveCurrentRound(() => {
+                openInitialsModal(() => {
                     isDirty = false;
                     if (pendingNavigation && pendingNavigation.action) {
                         pendingNavigation.action();
@@ -3734,22 +3757,6 @@
                 lastSavedInfo.style.display = 'block';
             }
 
-            alert('Round saved successfully!');
-
-            // Check if user has inspector privileges and round is not already signed off
-            const hasInspectorPrivileges = ['admin', 'supervisor'].includes(currentRole);
-            const newRoundState = getRoundState(currentProductionDate, currentRound);
-
-            if (hasInspectorPrivileges && newRoundState !== 'signed-off') {
-                // Show sign-off modal after save
-                setTimeout(() => {
-                    openSignoffModalAfterSave();
-                }, 500);
-            } else {
-                // Just reload the page
-                loadProductionDay();
-            }
-
             if (callback) callback();
         }
         
@@ -3844,6 +3851,89 @@
             saveAuditLog();
         }
         
+        // Variable to store callback after save
+        let saveCallback = null;
+
+        // Open initials modal before save
+        function openInitialsModal(callback) {
+            const roundState = getRoundState(currentProductionDate, currentRound);
+            const dayStatusValue = dayStatus[currentProductionDate] || 'Open';
+
+            // Check if round is signed off
+            if (roundState === 'signed-off' && currentRole !== 'admin') {
+                alert('This round is signed off. Only admins can edit signed-off rounds.');
+                return;
+            }
+
+            // Check if day is closed
+            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
+                alert('This day is closed. Only admins can edit closed days.');
+                return;
+            }
+
+            // Store callback for later
+            saveCallback = callback;
+
+            // Populate date and round info
+            document.getElementById('initialsModalDate').textContent = currentProductionDate;
+            document.getElementById('initialsModalRound').textContent = currentRound;
+
+            // Clear previous inputs
+            document.getElementById('inspectorInitials').value = '';
+            document.getElementById('initialsNotes').value = '';
+            document.getElementById('initialsError').style.display = 'none';
+
+            showModal('initialsModal');
+        }
+
+        // Confirm initials and save round with sign-off
+        function confirmInitialsAndSave() {
+            const initials = document.getElementById('inspectorInitials').value.trim().toUpperCase();
+            const notes = document.getElementById('initialsNotes').value.trim();
+            const errorDiv = document.getElementById('initialsError');
+
+            if (!initials) {
+                errorDiv.textContent = 'Please enter your initials to sign-off.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            if (initials.length < 2) {
+                errorDiv.textContent = 'Initials must be at least 2 characters.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Hide modal
+            hideModal('initialsModal');
+
+            // Create sign-off record with initials
+            const signoff = {
+                date: currentProductionDate,
+                round: currentRound,
+                inspectorInitials: initials,
+                signedOffAt: Date.now(),
+                notes: notes
+            };
+
+            roundSignoffs.push(signoff);
+            saveRoundSignoffs();
+
+            // Save the round
+            saveCurrentRound(() => {
+                alert('Round saved and signed-off successfully!');
+
+                // Execute callback if provided (for navigation guard)
+                if (saveCallback) {
+                    saveCallback();
+                    saveCallback = null;
+                } else {
+                    // Normal flow - reload the page
+                    loadProductionDay();
+                }
+            });
+        }
+
         // Open sign-off modal after save (called automatically)
         function openSignoffModalAfterSave() {
             // Populate date and round info
