@@ -2007,190 +2007,204 @@
                 title: 'System Setup',
                 breadcrumb: 'Administration / Setup',
                 content: `
-                    <div class="product-section">
-                        <div class="section-header">
-                            <h2 class="section-title">Product Management</h2>
-                            <button class="btn btn-primary" onclick="toggleProductForm()">
-                                <span>+</span> Add New Product
-                            </button>
-                        </div>
+                    <!-- Tab Navigation -->
+                    <div class="tab-container">
+                        <button class="tab-btn active" onclick="switchSetupTab('product')">Product Management</button>
+                        <button class="tab-btn" onclick="switchSetupTab('department')">Department Management</button>
+                        <button class="tab-btn" onclick="switchSetupTab('employee')">Employee Management</button>
+                    </div>
 
-                        <!-- Product Form -->
-                        <div id="productForm" class="product-form">
-                            <h3 style="margin-bottom: 20px; font-size: 18px;" id="formTitle">Add New Product</h3>
-                            <form onsubmit="saveProduct(event)">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label class="form-label">Product ID<span class="required">*</span></label>
-                                        <input type="number" id="productId" class="form-input" disabled required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Product Name (Thai)<span class="required">*</span></label>
-                                        <input type="text" id="productNameThai" class="form-input" placeholder="ชื่อสินค้า" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Product Name (English)<span class="required">*</span></label>
-                                        <input type="text" id="productNameEn" class="form-input" placeholder="Product name" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Unit<span class="required">*</span></label>
-                                        <input type="text" id="productUnit" class="form-input" placeholder="e.g., pieces, kg, boxes" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Department<span class="required">*</span></label>
-                                        <select id="productDepartment" class="form-select" required>
-                                            <option value="">Select Department</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Status<span class="required">*</span></label>
-                                        <select id="productStatus" class="form-select" required>
-                                            <option value="Active">Active</option>
-                                            <option value="Inactive">Inactive</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-actions">
-                                    <button type="button" class="btn btn-secondary" onclick="cancelProductForm()">Cancel</button>
-                                    <button type="submit" class="btn btn-success" id="saveBtn">Save Product</button>
-                                </div>
-                            </form>
-                        </div>
+                    <!-- Product Management Tab -->
+                    <div id="product-tab" class="tab-content active">
+                        <div class="product-section">
+                            <div class="section-header">
+                                <h2 class="section-title">Product Management</h2>
+                                <button class="btn btn-primary" onclick="toggleProductForm()">
+                                    <span>+</span> Add New Product
+                                </button>
+                            </div>
 
-                        <!-- Product List -->
-                        <div id="productListContainer">
-                            <table class="product-table" id="productTable">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Product Name (Thai)</th>
-                                        <th>Product Name (English)</th>
-                                        <th>Unit</th>
-                                        <th>Department</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="productTableBody">
-                                    <!-- Products will be rendered here -->
-                                </tbody>
-                            </table>
+                            <!-- Product Form -->
+                            <div id="productForm" class="product-form">
+                                <h3 style="margin-bottom: 20px; font-size: 18px;" id="formTitle">Add New Product</h3>
+                                <form onsubmit="saveProduct(event)">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label class="form-label">Product ID<span class="required">*</span></label>
+                                            <input type="number" id="productId" class="form-input" disabled required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Product Name (Thai)<span class="required">*</span></label>
+                                            <input type="text" id="productNameThai" class="form-input" placeholder="ชื่อสินค้า" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Product Name (English)<span class="required">*</span></label>
+                                            <input type="text" id="productNameEn" class="form-input" placeholder="Product name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Unit<span class="required">*</span></label>
+                                            <input type="text" id="productUnit" class="form-input" placeholder="e.g., pieces, kg, boxes" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Department<span class="required">*</span></label>
+                                            <select id="productDepartment" class="form-select" required>
+                                                <option value="">Select Department</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Status<span class="required">*</span></label>
+                                            <select id="productStatus" class="form-select" required>
+                                                <option value="Active">Active</option>
+                                                <option value="Inactive">Inactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="button" class="btn btn-secondary" onclick="cancelProductForm()">Cancel</button>
+                                        <button type="submit" class="btn btn-success" id="saveBtn">Save Product</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Product List -->
+                            <div id="productListContainer">
+                                <table class="product-table" id="productTable">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Product Name (Thai)</th>
+                                            <th>Product Name (English)</th>
+                                            <th>Unit</th>
+                                            <th>Department</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productTableBody">
+                                        <!-- Products will be rendered here -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Department Management Section -->
-                    <div class="product-section">
-                        <div class="section-header">
-                            <h2 class="section-title">Department Management</h2>
-                            <button class="btn btn-primary" onclick="toggleDepartmentForm()">
-                                <span>+</span> Add New Department
-                            </button>
-                        </div>
+                    <!-- Department Management Tab -->
+                    <div id="department-tab" class="tab-content">
+                        <div class="product-section">
+                            <div class="section-header">
+                                <h2 class="section-title">Department Management</h2>
+                                <button class="btn btn-primary" onclick="toggleDepartmentForm()">
+                                    <span>+</span> Add New Department
+                                </button>
+                            </div>
 
-                        <!-- Department Form -->
-                        <div id="departmentForm" class="product-form">
-                            <h3 style="margin-bottom: 20px; font-size: 18px;" id="departmentFormTitle">Add New Department</h3>
-                            <form onsubmit="saveDepartment(event)">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label class="form-label">Department ID<span class="required">*</span></label>
-                                        <input type="number" id="departmentId" class="form-input" disabled required>
+                            <!-- Department Form -->
+                            <div id="departmentForm" class="product-form">
+                                <h3 style="margin-bottom: 20px; font-size: 18px;" id="departmentFormTitle">Add New Department</h3>
+                                <form onsubmit="saveDepartment(event)">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label class="form-label">Department ID<span class="required">*</span></label>
+                                            <input type="number" id="departmentId" class="form-input" disabled required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Department Name<span class="required">*</span></label>
+                                            <input type="text" id="departmentName" class="form-input" placeholder="Department name" required>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Department Name<span class="required">*</span></label>
-                                        <input type="text" id="departmentName" class="form-input" placeholder="Department name" required>
+                                    <div class="form-actions">
+                                        <button type="button" class="btn btn-secondary" onclick="cancelDepartmentForm()">Cancel</button>
+                                        <button type="submit" class="btn btn-success" id="departmentSaveBtn">Save Department</button>
                                     </div>
-                                </div>
-                                <div class="form-actions">
-                                    <button type="button" class="btn btn-secondary" onclick="cancelDepartmentForm()">Cancel</button>
-                                    <button type="submit" class="btn btn-success" id="departmentSaveBtn">Save Department</button>
-                                </div>
-                            </form>
-                        </div>
+                                </form>
+                            </div>
 
-                        <!-- Department List -->
-                        <div id="departmentListContainer">
-                            <table class="product-table" id="departmentTable">
-                                <thead>
-                                    <tr>
-                                        <th>Department ID</th>
-                                        <th>Department Name</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="departmentTableBody">
-                                    <!-- Departments will be rendered here -->
-                                </tbody>
-                            </table>
+                            <!-- Department List -->
+                            <div id="departmentListContainer">
+                                <table class="product-table" id="departmentTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Department ID</th>
+                                            <th>Department Name</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="departmentTableBody">
+                                        <!-- Departments will be rendered here -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Employee Management Section -->
-                    <div class="product-section">
-                        <div class="section-header">
-                            <h2 class="section-title">Employee Management</h2>
-                            <button class="btn btn-primary" onclick="toggleEmployeeForm()">
-                                <span>+</span> Add New Employee
-                            </button>
-                        </div>
+                    <!-- Employee Management Tab -->
+                    <div id="employee-tab" class="tab-content">
+                        <div class="product-section">
+                            <div class="section-header">
+                                <h2 class="section-title">Employee Management</h2>
+                                <button class="btn btn-primary" onclick="toggleEmployeeForm()">
+                                    <span>+</span> Add New Employee
+                                </button>
+                            </div>
 
-                        <!-- Employee Form -->
-                        <div id="employeeForm" class="product-form">
-                            <h3 style="margin-bottom: 20px; font-size: 18px;" id="employeeFormTitle">Add New Employee</h3>
-                            <form onsubmit="saveEmployee(event)">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label class="form-label">Employee ID<span class="required">*</span></label>
-                                        <input type="number" id="employeeId" class="form-input" disabled required>
+                            <!-- Employee Form -->
+                            <div id="employeeForm" class="product-form">
+                                <h3 style="margin-bottom: 20px; font-size: 18px;" id="employeeFormTitle">Add New Employee</h3>
+                                <form onsubmit="saveEmployee(event)">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label class="form-label">Employee ID<span class="required">*</span></label>
+                                            <input type="number" id="employeeId" class="form-input" disabled required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Name in Thai<span class="required">*</span></label>
+                                            <input type="text" id="employeeNameThai" class="form-input" placeholder="ชื่อพนักงาน" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Name in Other Language<span class="required">*</span></label>
+                                            <input type="text" id="employeeNameOther" class="form-input" placeholder="Employee name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Department<span class="required">*</span></label>
+                                            <select id="employeeDepartment" class="form-select" required>
+                                                <option value="">Select Department</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Status<span class="required">*</span></label>
+                                            <select id="employeeStatus" class="form-select" required>
+                                                <option value="Active">Active</option>
+                                                <option value="On leave">On leave</option>
+                                                <option value="Resigned">Resigned</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Name in Thai<span class="required">*</span></label>
-                                        <input type="text" id="employeeNameThai" class="form-input" placeholder="ชื่อพนักงาน" required>
+                                    <div class="form-actions">
+                                        <button type="button" class="btn btn-secondary" onclick="cancelEmployeeForm()">Cancel</button>
+                                        <button type="submit" class="btn btn-success" id="employeeSaveBtn">Save Employee</button>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Name in Other Language<span class="required">*</span></label>
-                                        <input type="text" id="employeeNameOther" class="form-input" placeholder="Employee name" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Department<span class="required">*</span></label>
-                                        <select id="employeeDepartment" class="form-select" required>
-                                            <option value="">Select Department</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Status<span class="required">*</span></label>
-                                        <select id="employeeStatus" class="form-select" required>
-                                            <option value="Active">Active</option>
-                                            <option value="On leave">On leave</option>
-                                            <option value="Resigned">Resigned</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-actions">
-                                    <button type="button" class="btn btn-secondary" onclick="cancelEmployeeForm()">Cancel</button>
-                                    <button type="submit" class="btn btn-success" id="employeeSaveBtn">Save Employee</button>
-                                </div>
-                            </form>
-                        </div>
+                                </form>
+                            </div>
 
-                        <!-- Employee List -->
-                        <div id="employeeListContainer">
-                            <table class="product-table" id="employeeTable">
-                                <thead>
-                                    <tr>
-                                        <th>Employee ID</th>
-                                        <th>Name (Thai)</th>
-                                        <th>Name (Other Language)</th>
-                                        <th>Department ID</th>
-                                        <th>Department</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="employeeTableBody">
-                                    <!-- Employees will be rendered here -->
-                                </tbody>
-                            </table>
+                            <!-- Employee List -->
+                            <div id="employeeListContainer">
+                                <table class="product-table" id="employeeTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Employee ID</th>
+                                            <th>Name (Thai)</th>
+                                            <th>Name (Other Language)</th>
+                                            <th>Department ID</th>
+                                            <th>Department</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="employeeTableBody">
+                                        <!-- Employees will be rendered here -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 `
@@ -4089,13 +4103,13 @@
             const tabBtns = document.querySelectorAll('.tab-btn');
             tabBtns.forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-        
+
             // Update tab content
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
             document.getElementById(`${tabName}-tab`).classList.add('active');
-        
+
             // Load data for specific tabs
             if (tabName === 'reports') {
                 loadYearView();
@@ -4103,7 +4117,21 @@
                 populateSearchDropdowns();
             }
         }
-        
+
+        // Switch setup tab
+        function switchSetupTab(tabName) {
+            // Update tab buttons
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
         // ========== REPORTS ==========
         
         // Show report view
