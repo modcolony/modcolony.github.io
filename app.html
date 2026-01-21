@@ -1089,6 +1089,48 @@
             display: flex;
             gap: 12px;
             align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .quality-toggles {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .quality-toggle-btn {
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .quality-toggle-btn:hover:not(:disabled) {
+            border-color: #999;
+        }
+
+        .quality-toggle-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .quality-toggle-btn.active.ok {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            color: white;
+            font-weight: 600;
+        }
+
+        .quality-toggle-btn.active.not-ok {
+            background: #F44336;
+            border-color: #F44336;
+            color: white;
+            font-weight: 600;
         }
 
         .spreadsheet-container {
@@ -3350,7 +3392,7 @@
         
                                         return `
                                             <tr>
-                                                <td>${prod.nameThai}</td>
+                                                <td>${prod.nameThai}${prod.nameEn ? ' / ' + prod.nameEn : ''}</td>
                                                 <td>
                                                     <input type="number"
                                                         class="entry-input"
@@ -3380,10 +3422,20 @@
                             <h4>Quality Check for this Employee (Current Round)</h4>
                             <div class="quality-select-row">
                                 <label>Status:</label>
-                                <select class="entry-select" id="quality_status_${emp.id}"
-                                    onchange="updateQualityDraft(${emp.id})" ${!isEditable ? 'disabled' : ''}>
-                                    ${getQualityOptions(emp.id)}
-                                </select>
+                                <div class="quality-toggles">
+                                    <button type="button" class="quality-toggle-btn ok ${getQualityStatus(emp.id) === 'OK' ? 'active' : ''}"
+                                        id="quality_ok_${emp.id}"
+                                        onclick="setQualityStatus(${emp.id}, 'OK')"
+                                        ${!isEditable ? 'disabled' : ''}>
+                                        ✓ OK
+                                    </button>
+                                    <button type="button" class="quality-toggle-btn not-ok ${getQualityStatus(emp.id) === 'Not OK' ? 'active' : ''}"
+                                        id="quality_notok_${emp.id}"
+                                        onclick="setQualityStatus(${emp.id}, 'Not OK')"
+                                        ${!isEditable ? 'disabled' : ''}>
+                                        ✗ Not OK
+                                    </button>
+                                </div>
                                 <label style="margin-left: 16px;">Notes:</label>
                                 <input type="text" class="entry-input" id="quality_notes_${emp.id}"
                                     value="${getQualityNotes(emp.id)}"
@@ -3417,11 +3469,11 @@
             }
         }
         
-        // Get quality options for employee
-        function getQualityOptions(employeeId) {
+        // Get quality status for employee
+        function getQualityStatus(employeeId) {
             const draftKey = `${currentProductionDate}_${currentRound}`;
             const currentDraft = draftData[draftKey] || {};
-        
+
             let status = 'Pending';
             if (currentDraft[`quality_${employeeId}`]) {
                 status = currentDraft[`quality_${employeeId}`].status;
@@ -3433,12 +3485,51 @@
                 );
                 if (saved) status = saved.status;
             }
-        
-            return `
-                <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
-                <option value="OK" ${status === 'OK' ? 'selected' : ''}>OK</option>
-                <option value="Not OK" ${status === 'Not OK' ? 'selected' : ''}>Not OK</option>
-            `;
+
+            return status;
+        }
+
+        // Set quality status for employee (for toggle buttons)
+        function setQualityStatus(employeeId, newStatus) {
+            const okBtn = document.getElementById(`quality_ok_${employeeId}`);
+            const notOkBtn = document.getElementById(`quality_notok_${employeeId}`);
+
+            // Toggle the clicked button
+            if (newStatus === 'OK') {
+                if (okBtn.classList.contains('active')) {
+                    // Clicking active OK button sets to Pending
+                    okBtn.classList.remove('active');
+                    newStatus = 'Pending';
+                } else {
+                    // Set to OK
+                    okBtn.classList.add('active');
+                    notOkBtn.classList.remove('active');
+                }
+            } else if (newStatus === 'Not OK') {
+                if (notOkBtn.classList.contains('active')) {
+                    // Clicking active Not OK button sets to Pending
+                    notOkBtn.classList.remove('active');
+                    newStatus = 'Pending';
+                } else {
+                    // Set to Not OK
+                    notOkBtn.classList.add('active');
+                    okBtn.classList.remove('active');
+                }
+            }
+
+            // Update the draft data
+            const notesInput = document.getElementById(`quality_notes_${employeeId}`);
+            const draftKey = `${currentProductionDate}_${currentRound}`;
+            if (!draftData[draftKey]) draftData[draftKey] = {};
+
+            draftData[draftKey][`quality_${employeeId}`] = {
+                status: newStatus,
+                notes: notesInput ? notesInput.value : ''
+            };
+
+            isDirty = true;
+            saveDraftData();
+            updateDraftIndicator();
         }
         
         // Get quality notes for employee
@@ -3515,17 +3606,26 @@
         
         // Update quality draft
         function updateQualityDraft(employeeId) {
-            const statusSelect = document.getElementById(`quality_status_${employeeId}`);
+            // Get current status from buttons
+            const okBtn = document.getElementById(`quality_ok_${employeeId}`);
+            const notOkBtn = document.getElementById(`quality_notok_${employeeId}`);
             const notesInput = document.getElementById(`quality_notes_${employeeId}`);
-        
+
+            let status = 'Pending';
+            if (okBtn && okBtn.classList.contains('active')) {
+                status = 'OK';
+            } else if (notOkBtn && notOkBtn.classList.contains('active')) {
+                status = 'Not OK';
+            }
+
             const draftKey = `${currentProductionDate}_${currentRound}`;
             if (!draftData[draftKey]) draftData[draftKey] = {};
-        
+
             draftData[draftKey][`quality_${employeeId}`] = {
-                status: statusSelect ? statusSelect.value : 'Pending',
+                status: status,
                 notes: notesInput ? notesInput.value : ''
             };
-        
+
             isDirty = true;
             saveDraftData();
             updateDraftIndicator();
@@ -3563,7 +3663,7 @@
             let html = '<table><thead><tr>';
             html += '<th class="employee-col">Employee</th>';
             eligibleProducts.forEach(prod => {
-                html += `<th>${prod.nameThai}</th>`;
+                html += `<th>${prod.nameThai}${prod.nameEn ? ' / ' + prod.nameEn : ''}</th>`;
             });
             html += '<th>Quality</th>';
             html += '</tr></thead><tbody>';
@@ -3701,7 +3801,7 @@
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.innerHTML = `
-                    <div class="product-card-name">${prod.nameThai}</div>
+                    <div class="product-card-name">${prod.nameThai}${prod.nameEn ? ' / ' + prod.nameEn : ''}</div>
                     <div class="product-card-value">${total}</div>
                     <div class="product-card-label">packs (this round)</div>
                 `;
@@ -4416,7 +4516,7 @@
             let html = '<table><thead><tr>';
             html += '<th class="employee-col">Employee</th>';
             eligibleProducts.forEach(prod => {
-                html += `<th>${prod.nameThai}</th>`;
+                html += `<th>${prod.nameThai}${prod.nameEn ? ' / ' + prod.nameEn : ''}</th>`;
             });
             html += '<th>Quality</th>';
             html += '</tr></thead><tbody>';
