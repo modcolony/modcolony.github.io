@@ -4992,46 +4992,85 @@
 
             // Load draft data for this date
             const draftKey = date;
-            const draft = otherProductionDraft[draftKey] || {};
+            const draftEntries = getOtherProductionDraftEntries(draftKey);
 
             // Render the table
-            renderOtherProductionTable(draft);
+            renderOtherProductionTable(draftEntries);
 
             // Update UI status
             updateOtherProductionStatusUI();
         }
 
+        // Normalize draft entries (supports legacy object format)
+        function normalizeOtherProductionDraftEntries(draft) {
+            if (Array.isArray(draft)) {
+                return draft;
+            }
+            if (!draft || typeof draft !== 'object') {
+                return [];
+            }
+
+            return Object.keys(draft).map(productId => {
+                const entry = draft[productId] || {};
+                return {
+                    id: Date.now() + Math.random(),
+                    productId: parseInt(productId),
+                    batch: entry.batch || '',
+                    count: entry.count || 0,
+                    quality: entry.quality || 'Pending',
+                    notes: entry.notes || ''
+                };
+            });
+        }
+
+        function getOtherProductionDraftEntries(draftKey) {
+            const rawDraft = otherProductionDraft[draftKey];
+            const entries = normalizeOtherProductionDraftEntries(rawDraft);
+
+            if (!Array.isArray(rawDraft)) {
+                if (entries.length > 0) {
+                    otherProductionDraft[draftKey] = entries;
+                } else {
+                    delete otherProductionDraft[draftKey];
+                }
+                saveOtherProductionDraft();
+            }
+
+            return entries;
+        }
+
         // Render other production table
-        function renderOtherProductionTable(draft = {}) {
+        function renderOtherProductionTable(draftEntries = []) {
             const tbody = document.getElementById('otherProductionTableBody');
 
-            // Get only products that are in the draft (i.e., have been added)
-            const draftProductIds = Object.keys(draft);
-
-            if (draftProductIds.length === 0) {
+            if (!draftEntries || draftEntries.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 24px; color: #999;">No products added yet. Use the dropdown above to add products as they are produced.</td></tr>';
-                populateOtherProductSelector(draft);
+                populateOtherProductSelector();
                 return;
             }
 
-            // Get product details for each product in draft
-            const draftProducts = draftProductIds
-                .map(id => products.find(p => p.id === parseInt(id)))
-                .filter(p => p) // Filter out any undefined products
+            const sortedEntries = draftEntries
+                .map((entry, index) => {
+                    const product = products.find(p => p.id === entry.productId);
+                    return { entry, product, index };
+                })
+                .filter(item => item.product)
                 .sort((a, b) => {
-                    // Sort by department first, then by product name
-                    if (a.departmentId !== b.departmentId) {
-                        return a.departmentId - b.departmentId;
+                    if (a.product.departmentId !== b.product.departmentId) {
+                        return a.product.departmentId - b.product.departmentId;
                     }
-                    return a.nameThai.localeCompare(b.nameThai);
+                    const nameCompare = a.product.nameThai.localeCompare(b.product.nameThai);
+                    if (nameCompare !== 0) {
+                        return nameCompare;
+                    }
+                    return a.index - b.index;
                 });
 
-            tbody.innerHTML = draftProducts.map(product => {
-                const draftEntry = draft[product.id] || {};
-                const batch = draftEntry.batch || '';
-                const count = draftEntry.count || '';
-                const quality = draftEntry.quality || 'Pending';
-                const notes = draftEntry.notes || '';
+            tbody.innerHTML = sortedEntries.map(({ entry, product }) => {
+                const batch = entry.batch || '';
+                const count = entry.count || '';
+                const quality = entry.quality || 'Pending';
+                const notes = entry.notes || '';
 
                 return `
                     <tr>
@@ -5043,51 +5082,51 @@
                         <td>${product.unit}</td>
                         <td>
                             <input type="text"
-                                   id="other-batch-${product.id}"
+                                   id="other-batch-${entry.id}"
                                    class="form-input"
                                    value="${batch}"
                                    placeholder="Batch #"
-                                   onchange="handleOtherProductionChange(${product.id})"
+                                   onchange="handleOtherProductionChange(${entry.id})"
                                    style="width: 100%;">
                         </td>
                         <td>
                             <input type="number"
-                                   id="other-count-${product.id}"
+                                   id="other-count-${entry.id}"
                                    class="form-input"
                                    value="${count}"
                                    min="0"
                                    placeholder="0"
-                                   onchange="handleOtherProductionChange(${product.id})"
+                                   onchange="handleOtherProductionChange(${entry.id})"
                                    style="width: 100%;">
                         </td>
                         <td>
                             <div class="quality-toggle-group">
                                 <button class="quality-toggle-btn ${quality === 'OK' ? 'active ok' : ''}"
-                                        onclick="setOtherQualityStatus(${product.id}, 'OK')">
+                                        onclick="setOtherQualityStatus(${entry.id}, 'OK')">
                                     ✓ OK
                                 </button>
                                 <button class="quality-toggle-btn ${quality === 'Not OK' ? 'active not-ok' : ''}"
-                                        onclick="setOtherQualityStatus(${product.id}, 'Not OK')">
+                                        onclick="setOtherQualityStatus(${entry.id}, 'Not OK')">
                                     ✗ Not OK
                                 </button>
                                 <button class="quality-toggle-btn ${quality === 'Pending' ? 'active pending' : ''}"
-                                        onclick="setOtherQualityStatus(${product.id}, 'Pending')">
+                                        onclick="setOtherQualityStatus(${entry.id}, 'Pending')">
                                     ⏱ Pending
                                 </button>
                             </div>
                         </td>
                         <td>
                             <input type="text"
-                                   id="other-notes-${product.id}"
+                                   id="other-notes-${entry.id}"
                                    class="form-input"
                                    value="${notes}"
                                    placeholder="Optional notes"
-                                   onchange="handleOtherProductionChange(${product.id})"
+                                   onchange="handleOtherProductionChange(${entry.id})"
                                    style="width: 100%;">
                         </td>
                         <td style="text-align: center;">
                             <button class="btn-icon-danger"
-                                    onclick="removeOtherProductFromEntry(${product.id})"
+                                    onclick="removeOtherProductFromEntry(${entry.id})"
                                     title="Remove product">
                                 🗑️
                             </button>
@@ -5097,29 +5136,21 @@
             }).join('');
 
             // Update the product selector dropdown
-            populateOtherProductSelector(draft);
+            populateOtherProductSelector();
         }
 
-        // Populate product selector dropdown with products not yet added
-        function populateOtherProductSelector(draft = {}) {
+        // Populate product selector dropdown with all eligible products
+        function populateOtherProductSelector() {
             const selector = document.getElementById('otherProductSelector');
             const eligibleProducts = getOtherProductionEligibleProducts();
 
-            // Filter out products already in draft
-            const availableProducts = eligibleProducts.filter(p => !draft[p.id]);
-
             // Build options
-            const options = availableProducts.map(product => {
+            const options = eligibleProducts.map(product => {
                 return `<option value="${product.id}">${product.nameThai} (${product.nameEn})</option>`;
             }).join('');
 
-            if (availableProducts.length === 0) {
-                selector.innerHTML = '<option value="">-- All products added --</option>';
-                selector.disabled = true;
-            } else {
-                selector.innerHTML = '<option value="">-- Select Product to Add --</option>' + options;
-                selector.disabled = false;
-            }
+            selector.innerHTML = '<option value="">-- Select Product to Add --</option>' + options;
+            selector.disabled = false;
         }
 
         // Add a product to the entry
@@ -5134,63 +5165,70 @@
 
             // Get current draft for this date
             const draftKey = currentOtherProductionDate;
-            if (!otherProductionDraft[draftKey]) {
-                otherProductionDraft[draftKey] = {};
-            }
+            const draftEntries = getOtherProductionDraftEntries(draftKey);
 
             // Add product to draft with default values
-            otherProductionDraft[draftKey][productId] = {
+            draftEntries.push({
+                id: Date.now() + Math.random(),
+                productId: productId,
                 batch: '',
                 count: 0,
                 quality: 'Pending',
                 notes: ''
-            };
+            });
 
             // Save to localStorage
+            otherProductionDraft[draftKey] = draftEntries;
             localStorage.setItem('otherProductionDraft', JSON.stringify(otherProductionDraft));
 
             // Re-render table
             renderOtherProductionTable(otherProductionDraft[draftKey]);
+
+            // Mark as dirty
+            otherIsDirty = true;
+            updateOtherProductionStatusUI();
 
             // Reset selector
             selector.value = '';
         }
 
         // Remove a product from the entry
-        function removeOtherProductFromEntry(productId) {
-            const product = products.find(p => p.id === productId);
+        function removeOtherProductFromEntry(entryId) {
+            const draftKey = currentOtherProductionDate;
+            const draftEntries = getOtherProductionDraftEntries(draftKey);
+            const entry = draftEntries.find(item => item.id === entryId);
+            if (!entry) return;
+
+            const product = products.find(p => p.id === entry.productId);
             if (!product) return;
 
             if (!confirm(`Remove ${product.nameThai} from this entry?`)) {
                 return;
             }
 
-            // Get current draft for this date
-            const draftKey = currentOtherProductionDate;
-            if (otherProductionDraft[draftKey]) {
-                delete otherProductionDraft[draftKey][productId];
-
-                // If draft is now empty, remove the date key entirely
-                if (Object.keys(otherProductionDraft[draftKey]).length === 0) {
-                    delete otherProductionDraft[draftKey];
-                }
-
-                // Save to localStorage
-                localStorage.setItem('otherProductionDraft', JSON.stringify(otherProductionDraft));
-
-                // Re-render table
-                renderOtherProductionTable(otherProductionDraft[draftKey] || {});
-
-                // Update status UI
-                updateOtherProductionStatusUI();
+            const remainingEntries = draftEntries.filter(item => item.id !== entryId);
+            if (remainingEntries.length === 0) {
+                delete otherProductionDraft[draftKey];
+            } else {
+                otherProductionDraft[draftKey] = remainingEntries;
             }
+
+            // Save to localStorage
+            localStorage.setItem('otherProductionDraft', JSON.stringify(otherProductionDraft));
+
+            // Re-render table
+            renderOtherProductionTable(otherProductionDraft[draftKey] || []);
+
+            // Update status UI
+            otherIsDirty = true;
+            updateOtherProductionStatusUI();
         }
 
         // Handle other production entry changes
-        function handleOtherProductionChange(productId) {
-            const batchInput = document.getElementById(`other-batch-${productId}`);
-            const countInput = document.getElementById(`other-count-${productId}`);
-            const notesInput = document.getElementById(`other-notes-${productId}`);
+        function handleOtherProductionChange(entryId) {
+            const batchInput = document.getElementById(`other-batch-${entryId}`);
+            const countInput = document.getElementById(`other-count-${entryId}`);
+            const notesInput = document.getElementById(`other-notes-${entryId}`);
 
             const batch = batchInput ? batchInput.value.trim() : '';
             const count = parseInt(countInput.value) || 0;
@@ -5198,23 +5236,24 @@
 
             // Get current draft for this date
             const draftKey = currentOtherProductionDate;
+            const draftEntries = getOtherProductionDraftEntries(draftKey);
             if (!otherProductionDraft[draftKey]) {
-                otherProductionDraft[draftKey] = {};
+                otherProductionDraft[draftKey] = draftEntries;
             }
 
-            // Update draft (always keep the entry since products are explicitly added)
-            if (!otherProductionDraft[draftKey][productId]) {
-                otherProductionDraft[draftKey][productId] = {};
+            const entry = draftEntries.find(item => item.id === entryId);
+            if (!entry) {
+                return;
             }
-            otherProductionDraft[draftKey][productId].batch = batch;
-            otherProductionDraft[draftKey][productId].count = count;
-            otherProductionDraft[draftKey][productId].notes = notes;
-            // Preserve quality status if it exists
-            if (!otherProductionDraft[draftKey][productId].quality) {
-                otherProductionDraft[draftKey][productId].quality = 'Pending';
+            entry.batch = batch;
+            entry.count = count;
+            entry.notes = notes;
+            if (!entry.quality) {
+                entry.quality = 'Pending';
             }
 
             // Save draft
+            otherProductionDraft[draftKey] = draftEntries;
             saveOtherProductionDraft();
 
             // Mark as dirty
@@ -5223,20 +5262,19 @@
         }
 
         // Set other production quality status
-        function setOtherQualityStatus(productId, status) {
+        function setOtherQualityStatus(entryId, status) {
             // Get current draft for this date
             const draftKey = currentOtherProductionDate;
-            if (!otherProductionDraft[draftKey]) {
-                otherProductionDraft[draftKey] = {};
-            }
-            if (!otherProductionDraft[draftKey][productId]) {
-                otherProductionDraft[draftKey][productId] = {};
-            }
-
+            const draftEntries = getOtherProductionDraftEntries(draftKey);
             // Update quality status
-            otherProductionDraft[draftKey][productId].quality = status;
+            const entry = draftEntries.find(item => item.id === entryId);
+            if (!entry) {
+                return;
+            }
+            entry.quality = status;
 
             // Save draft
+            otherProductionDraft[draftKey] = draftEntries;
             saveOtherProductionDraft();
 
             // Re-render table to update button states
@@ -5269,11 +5307,10 @@
             const date = document.getElementById('otherProductionDate').value;
 
             const draftKey = date;
-            const draft = otherProductionDraft[draftKey] || {};
+            const draftEntries = getOtherProductionDraftEntries(draftKey);
 
             // Check if there are any entries
-            const hasEntries = Object.keys(draft).some(productId => {
-                const entry = draft[productId];
+            const hasEntries = draftEntries.some(entry => {
                 return entry.count > 0;
             });
 
@@ -5282,16 +5319,13 @@
                 return;
             }
 
-            const missingBatchEntry = Object.keys(draft).find(productId => {
-                const entry = draft[productId];
-                return entry.count > 0 && !entry.batch;
-            });
+            const missingBatchEntry = draftEntries.find(entry => entry.count > 0 && !entry.batch);
 
             if (missingBatchEntry) {
-                const product = getProductById(parseInt(missingBatchEntry));
+                const product = getProductById(missingBatchEntry.productId);
                 const productName = product ? product.nameThai : 'selected product';
                 alert(`Please enter a batch number for ${productName} before saving.`);
-                const batchInput = document.getElementById(`other-batch-${missingBatchEntry}`);
+                const batchInput = document.getElementById(`other-batch-${missingBatchEntry.id}`);
                 if (batchInput) {
                     batchInput.focus();
                 }
@@ -5300,14 +5334,13 @@
 
             // Create production records from draft
             const timestamp = Date.now();
-            Object.keys(draft).forEach(productId => {
-                const entry = draft[productId];
+            draftEntries.forEach(entry => {
                 if (entry.count > 0) {
                     otherProductionRecords.push({
                         id: timestamp + Math.random(),
                         date: date,
                         batch: entry.batch,
-                        productId: parseInt(productId),
+                        productId: entry.productId,
                         count: entry.count,
                         quality: entry.quality || 'Pending',
                         notes: entry.notes || '',
@@ -5337,7 +5370,7 @@
             alert('Production saved successfully!');
 
             // Re-render table
-            renderOtherProductionTable({});
+            renderOtherProductionTable([]);
         }
 
         // Handle other production date change
