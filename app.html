@@ -355,6 +355,23 @@
             font-size: 13px;
         }
 
+        .btn-icon-danger {
+            background: transparent;
+            color: #f44336;
+            border: 1px solid #f44336;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .btn-icon-danger:hover {
+            background: #f44336;
+            color: white;
+            transform: scale(1.1);
+        }
+
         .product-form {
             background: #f9f9f9;
             padding: 24px;
@@ -2004,22 +2021,33 @@
 
                         <!-- Info Note -->
                         <div class="info-note">
-                            ℹ️ <strong>Note:</strong> Products from all departments except Dept 01 (Dumpling) are shown. Changes are auto-saved as draft.
+                            ℹ️ <strong>Note:</strong> Add products as they are produced. Changes are auto-saved as draft.
                         </div>
 
                         <!-- Flat Table Entry -->
                         <div class="entry-content-wrapper">
                             <div style="flex: 1;">
-                                <h3 style="margin-bottom: 16px;">Production Entry</h3>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                    <h3 style="margin: 0;">Production Entry</h3>
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        <select id="otherProductSelector" class="form-input" style="width: 300px;">
+                                            <option value="">-- Select Product to Add --</option>
+                                        </select>
+                                        <button class="btn btn-primary" onclick="addOtherProductToEntry()" style="white-space: nowrap;">
+                                            ➕ Add Product
+                                        </button>
+                                    </div>
+                                </div>
                                 <div class="report-table">
                                     <table id="otherProductionTable">
                                         <thead>
                                             <tr>
-                                                <th style="width: 25%;">Product</th>
-                                                <th style="width: 10%;">Unit</th>
-                                                <th style="width: 15%;">Amount</th>
-                                                <th style="width: 20%;">Quality Status</th>
-                                                <th style="width: 30%;">Notes</th>
+                                                <th style="width: 23%;">Product</th>
+                                                <th style="width: 9%;">Unit</th>
+                                                <th style="width: 13%;">Amount</th>
+                                                <th style="width: 18%;">Quality Status</th>
+                                                <th style="width: 27%;">Notes</th>
+                                                <th style="width: 10%;">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="otherProductionTableBody">
@@ -4972,15 +5000,30 @@
 
         // Render other production table
         function renderOtherProductionTable(draft = {}) {
-            const eligibleProducts = getOtherProductionEligibleProducts();
             const tbody = document.getElementById('otherProductionTableBody');
 
-            if (eligibleProducts.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #999;">No products found. Please add products from departments other than Dept 01 in the SETUP page.</td></tr>';
+            // Get only products that are in the draft (i.e., have been added)
+            const draftProductIds = Object.keys(draft);
+
+            if (draftProductIds.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: #999;">No products added yet. Use the dropdown above to add products as they are produced.</td></tr>';
+                populateOtherProductSelector(draft);
                 return;
             }
 
-            tbody.innerHTML = eligibleProducts.map(product => {
+            // Get product details for each product in draft
+            const draftProducts = draftProductIds
+                .map(id => products.find(p => p.id === parseInt(id)))
+                .filter(p => p) // Filter out any undefined products
+                .sort((a, b) => {
+                    // Sort by department first, then by product name
+                    if (a.departmentId !== b.departmentId) {
+                        return a.departmentId - b.departmentId;
+                    }
+                    return a.nameThai.localeCompare(b.nameThai);
+                });
+
+            tbody.innerHTML = draftProducts.map(product => {
                 const draftEntry = draft[product.id] || {};
                 const count = draftEntry.count || '';
                 const quality = draftEntry.quality || 'Pending';
@@ -5029,9 +5072,104 @@
                                    onchange="handleOtherProductionChange(${product.id})"
                                    style="width: 100%;">
                         </td>
+                        <td style="text-align: center;">
+                            <button class="btn-icon-danger"
+                                    onclick="removeOtherProductFromEntry(${product.id})"
+                                    title="Remove product">
+                                🗑️
+                            </button>
+                        </td>
                     </tr>
                 `;
             }).join('');
+
+            // Update the product selector dropdown
+            populateOtherProductSelector(draft);
+        }
+
+        // Populate product selector dropdown with products not yet added
+        function populateOtherProductSelector(draft = {}) {
+            const selector = document.getElementById('otherProductSelector');
+            const eligibleProducts = getOtherProductionEligibleProducts();
+
+            // Filter out products already in draft
+            const availableProducts = eligibleProducts.filter(p => !draft[p.id]);
+
+            // Build options
+            const options = availableProducts.map(product => {
+                return `<option value="${product.id}">${product.nameThai} (${product.nameEn}) - Dept ${String(product.departmentId).padStart(2, '0')}</option>`;
+            }).join('');
+
+            if (availableProducts.length === 0) {
+                selector.innerHTML = '<option value="">-- All products added --</option>';
+                selector.disabled = true;
+            } else {
+                selector.innerHTML = '<option value="">-- Select Product to Add --</option>' + options;
+                selector.disabled = false;
+            }
+        }
+
+        // Add a product to the entry
+        function addOtherProductToEntry() {
+            const selector = document.getElementById('otherProductSelector');
+            const productId = parseInt(selector.value);
+
+            if (!productId) {
+                alert('Please select a product to add.');
+                return;
+            }
+
+            // Get current draft for this date
+            const draftKey = currentOtherProductionDate;
+            if (!otherProductionDraft[draftKey]) {
+                otherProductionDraft[draftKey] = {};
+            }
+
+            // Add product to draft with default values
+            otherProductionDraft[draftKey][productId] = {
+                count: 0,
+                quality: 'Pending',
+                notes: ''
+            };
+
+            // Save to localStorage
+            localStorage.setItem('otherProductionDraft', JSON.stringify(otherProductionDraft));
+
+            // Re-render table
+            renderOtherProductionTable(otherProductionDraft[draftKey]);
+
+            // Reset selector
+            selector.value = '';
+        }
+
+        // Remove a product from the entry
+        function removeOtherProductFromEntry(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            if (!confirm(`Remove ${product.nameThai} from this entry?`)) {
+                return;
+            }
+
+            // Get current draft for this date
+            const draftKey = currentOtherProductionDate;
+            if (otherProductionDraft[draftKey]) {
+                delete otherProductionDraft[draftKey][productId];
+
+                // If draft is now empty, remove the date key entirely
+                if (Object.keys(otherProductionDraft[draftKey]).length === 0) {
+                    delete otherProductionDraft[draftKey];
+                }
+
+                // Save to localStorage
+                localStorage.setItem('otherProductionDraft', JSON.stringify(otherProductionDraft));
+
+                // Re-render table
+                renderOtherProductionTable(otherProductionDraft[draftKey] || {});
+
+                // Update status UI
+                updateOtherProductionStatusUI();
+            }
         }
 
         // Handle other production entry changes
@@ -5048,21 +5186,15 @@
                 otherProductionDraft[draftKey] = {};
             }
 
-            // Update draft
-            if (count > 0 || notes) {
-                if (!otherProductionDraft[draftKey][productId]) {
-                    otherProductionDraft[draftKey][productId] = {};
-                }
-                otherProductionDraft[draftKey][productId].count = count;
-                otherProductionDraft[draftKey][productId].notes = notes;
-                // Preserve quality status if it exists
-                if (!otherProductionDraft[draftKey][productId].quality) {
-                    otherProductionDraft[draftKey][productId].quality = 'Pending';
-                }
-            } else if (!otherProductionDraft[draftKey][productId]?.quality ||
-                       otherProductionDraft[draftKey][productId].quality === 'Pending') {
-                // Remove entry if count is 0 and no notes and quality is pending
-                delete otherProductionDraft[draftKey][productId];
+            // Update draft (always keep the entry since products are explicitly added)
+            if (!otherProductionDraft[draftKey][productId]) {
+                otherProductionDraft[draftKey][productId] = {};
+            }
+            otherProductionDraft[draftKey][productId].count = count;
+            otherProductionDraft[draftKey][productId].notes = notes;
+            // Preserve quality status if it exists
+            if (!otherProductionDraft[draftKey][productId].quality) {
+                otherProductionDraft[draftKey][productId].quality = 'Pending';
             }
 
             // Save draft
