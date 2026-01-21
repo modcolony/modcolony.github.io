@@ -485,6 +485,16 @@
             color: #C62828;
         }
 
+        .status-on-leave {
+            background: #FFF3E0;
+            color: #EF6C00;
+        }
+
+        .status-resigned {
+            background: #F5F5F5;
+            color: #616161;
+        }
+
         .action-buttons {
             display: flex;
             gap: 8px;
@@ -868,6 +878,122 @@
                             </table>
                         </div>
                     </div>
+
+                    <!-- Department Management Section -->
+                    <div class="product-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Department Management</h2>
+                            <button class="btn btn-primary" onclick="toggleDepartmentForm()">
+                                <span>+</span> Add New Department
+                            </button>
+                        </div>
+
+                        <!-- Department Form -->
+                        <div id="departmentForm" class="product-form">
+                            <h3 style="margin-bottom: 20px; font-size: 18px;" id="departmentFormTitle">Add New Department</h3>
+                            <form onsubmit="saveDepartment(event)">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Department ID<span class="required">*</span></label>
+                                        <input type="number" id="departmentId" class="form-input" disabled required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Department Name<span class="required">*</span></label>
+                                        <input type="text" id="departmentName" class="form-input" placeholder="Department name" required>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="cancelDepartmentForm()">Cancel</button>
+                                    <button type="submit" class="btn btn-success" id="departmentSaveBtn">Save Department</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Department List -->
+                        <div id="departmentListContainer">
+                            <table class="product-table" id="departmentTable">
+                                <thead>
+                                    <tr>
+                                        <th>Department ID</th>
+                                        <th>Department Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="departmentTableBody">
+                                    <!-- Departments will be rendered here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Employee Management Section -->
+                    <div class="product-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Employee Management</h2>
+                            <button class="btn btn-primary" onclick="toggleEmployeeForm()">
+                                <span>+</span> Add New Employee
+                            </button>
+                        </div>
+
+                        <!-- Employee Form -->
+                        <div id="employeeForm" class="product-form">
+                            <h3 style="margin-bottom: 20px; font-size: 18px;" id="employeeFormTitle">Add New Employee</h3>
+                            <form onsubmit="saveEmployee(event)">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Employee ID<span class="required">*</span></label>
+                                        <input type="number" id="employeeId" class="form-input" disabled required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Name in Thai<span class="required">*</span></label>
+                                        <input type="text" id="employeeNameThai" class="form-input" placeholder="ชื่อพนักงาน" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Name in Other Language<span class="required">*</span></label>
+                                        <input type="text" id="employeeNameOther" class="form-input" placeholder="Employee name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Department<span class="required">*</span></label>
+                                        <select id="employeeDepartment" class="form-select" required>
+                                            <option value="">Select Department</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Status<span class="required">*</span></label>
+                                        <select id="employeeStatus" class="form-select" required>
+                                            <option value="Active">Active</option>
+                                            <option value="On leave">On leave</option>
+                                            <option value="Resigned">Resigned</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="cancelEmployeeForm()">Cancel</button>
+                                    <button type="submit" class="btn btn-success" id="employeeSaveBtn">Save Employee</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Employee List -->
+                        <div id="employeeListContainer">
+                            <table class="product-table" id="employeeTable">
+                                <thead>
+                                    <tr>
+                                        <th>Employee ID</th>
+                                        <th>Name (Thai)</th>
+                                        <th>Name (Other Language)</th>
+                                        <th>Department ID</th>
+                                        <th>Department</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="employeeTableBody">
+                                    <!-- Employees will be rendered here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 `
             }
         };
@@ -1144,6 +1270,326 @@
             `).join('');
         }
 
+        // Department Management Functions
+        let departments = [];
+        let editingDepartmentId = null;
+
+        // Load departments from localStorage
+        function loadDepartments() {
+            const stored = localStorage.getItem('wontonDepartments');
+            if (stored) {
+                departments = JSON.parse(stored);
+            }
+        }
+
+        // Save departments to localStorage
+        function saveDepartmentsToStorage() {
+            localStorage.setItem('wontonDepartments', JSON.stringify(departments));
+        }
+
+        // Get next department ID
+        function getNextDepartmentId() {
+            if (departments.length === 0) return 1;
+            return Math.max(...departments.map(d => d.id)) + 1;
+        }
+
+        // Format department ID as 2-digit string
+        function formatDepartmentId(id) {
+            return String(id).padStart(2, '0');
+        }
+
+        // Toggle department form
+        function toggleDepartmentForm() {
+            const form = document.getElementById('departmentForm');
+            const isVisible = form.classList.contains('show');
+
+            if (isVisible) {
+                form.classList.remove('show');
+            } else {
+                resetDepartmentForm();
+                form.classList.add('show');
+                editingDepartmentId = null;
+                document.getElementById('departmentFormTitle').textContent = 'Add New Department';
+                document.getElementById('departmentSaveBtn').textContent = 'Save Department';
+                document.getElementById('departmentId').value = formatDepartmentId(getNextDepartmentId());
+            }
+        }
+
+        // Reset department form
+        function resetDepartmentForm() {
+            document.getElementById('departmentId').value = '';
+            document.getElementById('departmentName').value = '';
+        }
+
+        // Cancel department form
+        function cancelDepartmentForm() {
+            document.getElementById('departmentForm').classList.remove('show');
+            resetDepartmentForm();
+            editingDepartmentId = null;
+        }
+
+        // Save department
+        function saveDepartment(event) {
+            event.preventDefault();
+
+            const department = {
+                id: parseInt(document.getElementById('departmentId').value),
+                name: document.getElementById('departmentName').value
+            };
+
+            if (editingDepartmentId !== null) {
+                // Update existing department
+                const index = departments.findIndex(d => d.id === editingDepartmentId);
+                if (index !== -1) {
+                    departments[index] = department;
+                }
+            } else {
+                // Add new department
+                departments.push(department);
+            }
+
+            saveDepartmentsToStorage();
+            renderDepartmentTable();
+            updateEmployeeDepartmentDropdown();
+            cancelDepartmentForm();
+        }
+
+        // Edit department
+        function editDepartment(departmentId) {
+            const department = departments.find(d => d.id === departmentId);
+            if (!department) return;
+
+            editingDepartmentId = departmentId;
+            document.getElementById('departmentFormTitle').textContent = 'Edit Department';
+            document.getElementById('departmentSaveBtn').textContent = 'Update Department';
+
+            document.getElementById('departmentId').value = formatDepartmentId(department.id);
+            document.getElementById('departmentName').value = department.name;
+
+            document.getElementById('departmentForm').classList.add('show');
+
+            // Scroll to form
+            document.getElementById('departmentForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Render department table
+        function renderDepartmentTable() {
+            const tbody = document.getElementById('departmentTableBody');
+
+            if (!tbody) return; // Guard clause if not on setup page
+
+            if (departments.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🏢</div>
+                                <div class="empty-state-text">No departments yet. Click "Add New Department" to get started.</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = departments.map(department => `
+                <tr>
+                    <td>${formatDepartmentId(department.id)}</td>
+                    <td>${department.name}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-edit btn-small" onclick="editDepartment(${department.id})">Edit</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Employee Management Functions
+        let employees = [];
+        let editingEmployeeId = null;
+
+        // Load employees from localStorage
+        function loadEmployees() {
+            const stored = localStorage.getItem('wontonEmployees');
+            if (stored) {
+                employees = JSON.parse(stored);
+            }
+        }
+
+        // Save employees to localStorage
+        function saveEmployeesToStorage() {
+            localStorage.setItem('wontonEmployees', JSON.stringify(employees));
+        }
+
+        // Get next employee ID
+        function getNextEmployeeId() {
+            if (employees.length === 0) return 1;
+            return Math.max(...employees.map(e => e.id)) + 1;
+        }
+
+        // Format employee ID as 2-digit string
+        function formatEmployeeId(id) {
+            return String(id).padStart(2, '0');
+        }
+
+        // Update employee department dropdown
+        function updateEmployeeDepartmentDropdown() {
+            const select = document.getElementById('employeeDepartment');
+            if (!select) return;
+
+            const currentValue = select.value;
+
+            // Clear and rebuild options
+            select.innerHTML = '<option value="">Select Department</option>';
+
+            departments.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept.id;
+                option.textContent = `${formatDepartmentId(dept.id)} - ${dept.name}`;
+                select.appendChild(option);
+            });
+
+            // Restore selection if it still exists
+            if (currentValue) {
+                select.value = currentValue;
+            }
+        }
+
+        // Get department name by ID
+        function getDepartmentNameById(deptId) {
+            const dept = departments.find(d => d.id === deptId);
+            return dept ? dept.name : 'N/A';
+        }
+
+        // Toggle employee form
+        function toggleEmployeeForm() {
+            const form = document.getElementById('employeeForm');
+            const isVisible = form.classList.contains('show');
+
+            if (isVisible) {
+                form.classList.remove('show');
+            } else {
+                resetEmployeeForm();
+                updateEmployeeDepartmentDropdown();
+                form.classList.add('show');
+                editingEmployeeId = null;
+                document.getElementById('employeeFormTitle').textContent = 'Add New Employee';
+                document.getElementById('employeeSaveBtn').textContent = 'Save Employee';
+                document.getElementById('employeeId').value = formatEmployeeId(getNextEmployeeId());
+            }
+        }
+
+        // Reset employee form
+        function resetEmployeeForm() {
+            document.getElementById('employeeId').value = '';
+            document.getElementById('employeeNameThai').value = '';
+            document.getElementById('employeeNameOther').value = '';
+            document.getElementById('employeeDepartment').value = '';
+            document.getElementById('employeeStatus').value = 'Active';
+        }
+
+        // Cancel employee form
+        function cancelEmployeeForm() {
+            document.getElementById('employeeForm').classList.remove('show');
+            resetEmployeeForm();
+            editingEmployeeId = null;
+        }
+
+        // Save employee
+        function saveEmployee(event) {
+            event.preventDefault();
+
+            const departmentId = parseInt(document.getElementById('employeeDepartment').value);
+
+            const employee = {
+                id: parseInt(document.getElementById('employeeId').value),
+                nameThai: document.getElementById('employeeNameThai').value,
+                nameOther: document.getElementById('employeeNameOther').value,
+                departmentId: departmentId,
+                departmentName: getDepartmentNameById(departmentId),
+                status: document.getElementById('employeeStatus').value
+            };
+
+            if (editingEmployeeId !== null) {
+                // Update existing employee
+                const index = employees.findIndex(e => e.id === editingEmployeeId);
+                if (index !== -1) {
+                    employees[index] = employee;
+                }
+            } else {
+                // Add new employee
+                employees.push(employee);
+            }
+
+            saveEmployeesToStorage();
+            renderEmployeeTable();
+            cancelEmployeeForm();
+        }
+
+        // Edit employee
+        function editEmployee(employeeId) {
+            const employee = employees.find(e => e.id === employeeId);
+            if (!employee) return;
+
+            editingEmployeeId = employeeId;
+            document.getElementById('employeeFormTitle').textContent = 'Edit Employee';
+            document.getElementById('employeeSaveBtn').textContent = 'Update Employee';
+
+            document.getElementById('employeeId').value = formatEmployeeId(employee.id);
+            document.getElementById('employeeNameThai').value = employee.nameThai;
+            document.getElementById('employeeNameOther').value = employee.nameOther;
+            updateEmployeeDepartmentDropdown();
+            document.getElementById('employeeDepartment').value = employee.departmentId;
+            document.getElementById('employeeStatus').value = employee.status;
+
+            document.getElementById('employeeForm').classList.add('show');
+
+            // Scroll to form
+            document.getElementById('employeeForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Render employee table
+        function renderEmployeeTable() {
+            const tbody = document.getElementById('employeeTableBody');
+
+            if (!tbody) return; // Guard clause if not on setup page
+
+            if (employees.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">👥</div>
+                                <div class="empty-state-text">No employees yet. Click "Add New Employee" to get started.</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = employees.map(employee => `
+                <tr>
+                    <td>${formatEmployeeId(employee.id)}</td>
+                    <td>${employee.nameThai}</td>
+                    <td>${employee.nameOther}</td>
+                    <td>${formatDepartmentId(employee.departmentId)}</td>
+                    <td>${employee.departmentName}</td>
+                    <td>
+                        <span class="status-badge status-${employee.status.toLowerCase().replace(' ', '-')}">
+                            ${employee.status}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-edit btn-small" onclick="editEmployee(${employee.id})">Edit</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
         // Modified navigateToPage function to render products when navigating to setup
         const originalNavigateToPage = navigateToPage;
         navigateToPage = function(pageId) {
@@ -1153,6 +1599,8 @@
             if (pageId === 'setup') {
                 setTimeout(() => {
                     renderProductTable();
+                    renderDepartmentTable();
+                    renderEmployeeTable();
                 }, 10);
             }
         };
@@ -1160,6 +1608,8 @@
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
             loadProducts();
+            loadDepartments();
+            loadEmployees();
             init();
         });
     </script>
