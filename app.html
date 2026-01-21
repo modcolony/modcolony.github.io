@@ -1703,10 +1703,9 @@
                                     <thead>
                                         <tr>
                                             <th>Year</th>
-                                            <th>Total Packs</th>
+                                            <th>Product Breakdown</th>
                                             <th>Days Recorded</th>
                                             <th>Employees</th>
-                                            <th>Products</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -1727,9 +1726,8 @@
                                     <thead>
                                         <tr>
                                             <th>Month</th>
-                                            <th>Total Packs</th>
+                                            <th>Product Breakdown</th>
                                             <th>Days Recorded</th>
-                                            <th>Avg per Day</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -1751,7 +1749,7 @@
                                         <tr>
                                             <th>Date</th>
                                             <th>Status</th>
-                                            <th>Total Packs</th>
+                                            <th>Product Breakdown</th>
                                             <th>Rounds</th>
                                             <th>Entries</th>
                                             <th>Action</th>
@@ -2979,18 +2977,26 @@
         function loadProductionDay() {
             const date = document.getElementById('productionDate').value;
             currentProductionDate = date;
-        
+
             // Get rounds for this date
             const rounds = getDateRounds(date);
             if (rounds.length === 0) {
                 currentRound = 1;
             } else if (!rounds.includes(currentRound)) {
-                currentRound = rounds[rounds.length - 1]; // Latest round
+                // Check if currentRound is a new round (next in sequence)
+                const maxRound = Math.max(...rounds);
+                const isNewRound = currentRound === maxRound + 1;
+
+                // Only reset to latest round if we're not explicitly adding a new round
+                if (!isNewRound) {
+                    currentRound = rounds[rounds.length - 1]; // Latest round
+                }
+                // Otherwise, keep currentRound as is (for new rounds)
             }
-        
+
             // Load draft for current round
             loadDraftForCurrentRound();
-        
+
             // Render UI
             renderRounds(rounds);
             updateDayStatusUI();
@@ -4029,43 +4035,59 @@
         function loadYearView() {
             const tbody = document.getElementById('yearViewBody');
             if (!tbody) return;
-        
+
             // Group records by year
             const yearData = {};
             productionRecords.forEach(r => {
                 const year = r.date.substring(0, 4);
                 if (!yearData[year]) {
                     yearData[year] = {
-                        totalPacks: 0,
+                        productCounts: {},
                         dates: new Set(),
-                        employees: new Set(),
-                        products: new Set()
+                        employees: new Set()
                     };
                 }
-                yearData[year].totalPacks += r.count;
+                // Group by product
+                if (!yearData[year].productCounts[r.productId]) {
+                    yearData[year].productCounts[r.productId] = 0;
+                }
+                yearData[year].productCounts[r.productId] += r.count;
                 yearData[year].dates.add(r.date);
                 yearData[year].employees.add(r.employeeId);
-                yearData[year].products.add(r.productId);
             });
-        
+
             // Render table
             const years = Object.keys(yearData).sort((a, b) => b - a);
-        
+
             if (years.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">No production records yet.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No production records yet.</td></tr>';
                 return;
             }
-        
-            tbody.innerHTML = years.map(year => `
+
+            tbody.innerHTML = years.map(year => {
+                // Format product breakdown
+                const productBreakdown = Object.entries(yearData[year].productCounts)
+                    .map(([productId, count]) => {
+                        const product = getProductById(parseInt(productId));
+                        const productName = product ? product.nameThai : `Product ${productId}`;
+                        return `${productName}: ${count.toLocaleString()}`;
+                    })
+                    .join('<br>');
+
+                // Calculate total
+                const totalPacks = Object.values(yearData[year].productCounts).reduce((sum, count) => sum + count, 0);
+                const productBreakdownWithTotal = `${productBreakdown}<br><strong>Total: ${totalPacks.toLocaleString()} packs</strong>`;
+
+                return `
                 <tr class="clickable-row" onclick="drillDownToMonth('${year}')">
                     <td><strong>${year}</strong></td>
-                    <td>${yearData[year].totalPacks.toLocaleString()} packs</td>
+                    <td style="line-height: 1.6;">${productBreakdownWithTotal}</td>
                     <td>${yearData[year].dates.size} days</td>
                     <td>${yearData[year].employees.size} employees</td>
-                    <td>${yearData[year].products.size} products</td>
                     <td><button class="btn btn-primary btn-small" onclick="event.stopPropagation(); drillDownToMonth('${year}')">View Details →</button></td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
         }
         
         // Drill down to month view
@@ -4080,42 +4102,58 @@
         function loadMonthView(year) {
             const tbody = document.getElementById('monthViewBody');
             if (!tbody) return;
-        
+
             // Group records by month
             const monthData = {};
             const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        
+
             productionRecords
                 .filter(r => r.date.startsWith(year))
                 .forEach(r => {
                     const month = r.date.substring(5, 7);
                     if (!monthData[month]) {
                         monthData[month] = {
-                            totalPacks: 0,
+                            productCounts: {},
                             dates: new Set()
                         };
                     }
-                    monthData[month].totalPacks += r.count;
+                    // Group by product
+                    if (!monthData[month].productCounts[r.productId]) {
+                        monthData[month].productCounts[r.productId] = 0;
+                    }
+                    monthData[month].productCounts[r.productId] += r.count;
                     monthData[month].dates.add(r.date);
                 });
-        
+
             // Render table
             const months = Object.keys(monthData).sort();
-        
+
             if (months.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No production records for this year.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">No production records for this year.</td></tr>';
                 return;
             }
-        
+
             tbody.innerHTML = months.map(month => {
                 const monthNum = parseInt(month);
-                const avgPerDay = (monthData[month].totalPacks / monthData[month].dates.size).toFixed(0);
+
+                // Format product breakdown
+                const productBreakdown = Object.entries(monthData[month].productCounts)
+                    .map(([productId, count]) => {
+                        const product = getProductById(parseInt(productId));
+                        const productName = product ? product.nameThai : `Product ${productId}`;
+                        return `${productName}: ${count.toLocaleString()}`;
+                    })
+                    .join('<br>');
+
+                // Calculate total
+                const totalPacks = Object.values(monthData[month].productCounts).reduce((sum, count) => sum + count, 0);
+                const productBreakdownWithTotal = `${productBreakdown}<br><strong>Total: ${totalPacks.toLocaleString()} packs</strong>`;
+
                 return `
                     <tr class="clickable-row" onclick="drillDownToDay('${year}', '${month}')">
                         <td><strong>${monthNames[monthNum - 1]} ${year}</strong></td>
-                        <td>${monthData[month].totalPacks.toLocaleString()} packs</td>
+                        <td style="line-height: 1.6;">${productBreakdownWithTotal}</td>
                         <td>${monthData[month].dates.size} days</td>
-                        <td>${avgPerDay} packs/day</td>
                         <td><button class="btn btn-primary btn-small" onclick="event.stopPropagation(); drillDownToDay('${year}', '${month}')">View Details →</button></td>
                     </tr>
                 `;
@@ -4135,44 +4173,61 @@
         function loadDayView(year, month) {
             const tbody = document.getElementById('dayViewBody');
             if (!tbody) return;
-        
+
             // Group records by date
             const dateData = {};
-        
+
             productionRecords
                 .filter(r => r.date.startsWith(`${year}-${month}`))
                 .forEach(r => {
                     if (!dateData[r.date]) {
                         dateData[r.date] = {
-                            totalPacks: 0,
+                            productCounts: {},
                             rounds: new Set(),
                             entries: 0
                         };
                     }
-                    dateData[r.date].totalPacks += r.count;
+                    // Group by product
+                    if (!dateData[r.date].productCounts[r.productId]) {
+                        dateData[r.date].productCounts[r.productId] = 0;
+                    }
+                    dateData[r.date].productCounts[r.productId] += r.count;
                     dateData[r.date].rounds.add(r.round);
                     dateData[r.date].entries++;
                 });
-        
+
             // Render table
             const dates = Object.keys(dateData).sort((a, b) => b.localeCompare(a));
-        
+
             if (dates.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">No production records for this month.</td></tr>';
                 return;
             }
-        
+
             tbody.innerHTML = dates.map(date => {
                 const status = dayStatus[date] || 'Open';
                 const statusBadge = status === 'Open'
                     ? '<span style="color: #4CAF50;">● Open</span>'
                     : '<span style="color: #666;">● Closed</span>';
-        
+
+                // Format product breakdown
+                const productBreakdown = Object.entries(dateData[date].productCounts)
+                    .map(([productId, count]) => {
+                        const product = getProductById(parseInt(productId));
+                        const productName = product ? product.nameThai : `Product ${productId}`;
+                        return `${productName}: ${count.toLocaleString()}`;
+                    })
+                    .join('<br>');
+
+                // Calculate total
+                const totalPacks = Object.values(dateData[date].productCounts).reduce((sum, count) => sum + count, 0);
+                const productBreakdownWithTotal = `${productBreakdown}<br><strong>Total: ${totalPacks.toLocaleString()} packs</strong>`;
+
                 return `
                     <tr>
                         <td><strong>${date}</strong></td>
                         <td>${statusBadge}</td>
-                        <td>${dateData[date].totalPacks.toLocaleString()} packs</td>
+                        <td style="line-height: 1.6;">${productBreakdownWithTotal}</td>
                         <td>${dateData[date].rounds.size} rounds</td>
                         <td>${dateData[date].entries} entries</td>
                         <td><button class="btn btn-primary btn-small" onclick="jumpToDate('${date}')">View →</button></td>
