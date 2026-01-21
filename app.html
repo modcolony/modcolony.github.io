@@ -1969,10 +1969,211 @@
                 title: 'Other Production',
                 breadcrumb: 'Product Management / Product Inflow / Other Production',
                 content: `
-                    <h2>Other Production</h2>
-                    <p style="margin-top: 16px; color: #666;">
-                        Track production of other items such as sauces, sides, and specialty products.
-                    </p>
+                    <!-- Tab Navigation -->
+                    <div class="tab-container">
+                        <button class="tab-btn active" onclick="switchOtherProductionTab('entry')">Entry</button>
+                        <button class="tab-btn" onclick="switchOtherProductionTab('reports')">Reports</button>
+                        <button class="tab-btn" onclick="switchOtherProductionTab('search')">Search</button>
+                    </div>
+
+                    <!-- Entry Tab -->
+                    <div id="other-entry-tab" class="tab-content active">
+                        <!-- Header Controls -->
+                        <div class="production-sticky-header" id="otherProductionStickyHeader">
+                            <div class="production-header-row">
+                                <div class="header-controls-left">
+                                    <div class="control-group">
+                                        <label class="control-label">Date</label>
+                                        <input type="date" id="otherProductionDate" class="date-input" onchange="handleOtherDateChange()">
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label">Batch</label>
+                                        <input type="text" id="otherBatchNumber" class="form-input" placeholder="Batch #" style="width: 120px;">
+                                    </div>
+                                </div>
+                                <div class="header-controls-right">
+                                    <div class="control-group">
+                                        <label class="control-label">Status</label>
+                                        <span id="otherStatusBadge" class="round-status-badge draft">
+                                            <span>●</span> <span id="otherStatusText">Draft</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info Note -->
+                        <div class="info-note">
+                            ℹ️ <strong>Note:</strong> Products from all departments except Dept 01 (Dumpling) are shown. Changes are auto-saved as draft.
+                        </div>
+
+                        <!-- Flat Table Entry -->
+                        <div class="entry-content-wrapper">
+                            <div style="flex: 1;">
+                                <h3 style="margin-bottom: 16px;">Production Entry</h3>
+                                <div class="report-table">
+                                    <table id="otherProductionTable">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 25%;">Product</th>
+                                                <th style="width: 10%;">Unit</th>
+                                                <th style="width: 15%;">Amount</th>
+                                                <th style="width: 20%;">Quality Status</th>
+                                                <th style="width: 30%;">Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="otherProductionTableBody">
+                                            <!-- Product rows will be rendered here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Save Button -->
+                                <div style="margin-top: 24px; display: flex; gap: 12px; align-items: center;">
+                                    <button id="saveOtherProductionBtn" class="btn btn-success btn-large" onclick="saveOtherProduction()">
+                                        💾 Save Production
+                                    </button>
+                                    <div id="otherDraftIndicator" class="draft-indicator" style="display: none;">
+                                        ⚠️ Unsaved changes
+                                    </div>
+                                    <div id="otherLastSavedInfo" class="last-saved-info" style="display: none;">
+                                        Last saved: <span id="otherLastSavedTime">Never</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reports Tab -->
+                    <div id="other-reports-tab" class="tab-content">
+                        <!-- Dashboard Navigation -->
+                        <div class="dashboard-nav" id="otherDashboardNav">
+                            <div class="nav-chip active" onclick="showOtherReportView('year')">📅 Year View</div>
+                            <div class="nav-chip" onclick="showOtherReportView('month')">📆 Month View</div>
+                            <div class="nav-chip" onclick="showOtherReportView('day')">📋 Day View</div>
+                        </div>
+
+                        <!-- Year View -->
+                        <div id="other-year-view" class="report-view" style="display: block;">
+                            <h3 style="margin-bottom: 16px;">Yearly Summary</h3>
+                            <div class="report-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Year</th>
+                                            <th>Product Breakdown</th>
+                                            <th>Days Recorded</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="otherYearViewBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Month View -->
+                        <div id="other-month-view" class="report-view" style="display: none;">
+                            <div style="margin-bottom: 16px;">
+                                <button class="btn btn-secondary btn-small" onclick="showOtherReportView('year')">← Back to Year View</button>
+                            </div>
+                            <h3 style="margin-bottom: 16px;">Monthly Summary - <span id="otherSelectedYear"></span></h3>
+                            <div class="report-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Month</th>
+                                            <th>Product Breakdown</th>
+                                            <th>Days Recorded</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="otherMonthViewBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Day View -->
+                        <div id="other-day-view" class="report-view" style="display: none;">
+                            <div style="margin-bottom: 16px;">
+                                <button class="btn btn-secondary btn-small" onclick="showOtherReportView('month')">← Back to Month View</button>
+                            </div>
+                            <h3 style="margin-bottom: 16px;">Daily Summary - <span id="otherSelectedMonth"></span></h3>
+                            <div class="report-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Batch</th>
+                                            <th>Product Breakdown</th>
+                                            <th>Quality</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="otherDayViewBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search Tab -->
+                    <div id="other-search-tab" class="tab-content">
+                        <div class="search-section">
+                            <h3 style="margin-bottom: 16px;">Search Production Records</h3>
+                            <div class="search-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Date From</label>
+                                    <input type="date" id="otherSearchDateFrom" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Date To</label>
+                                    <input type="date" id="otherSearchDateTo" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Product</label>
+                                    <select id="otherSearchProduct" class="form-select">
+                                        <option value="">All Products</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Quality Status</label>
+                                    <select id="otherSearchQualityStatus" class="form-select">
+                                        <option value="">All</option>
+                                        <option value="OK">OK</option>
+                                        <option value="Not OK">Not OK</option>
+                                        <option value="Pending">Pending</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <button class="btn btn-primary" onclick="performOtherSearch()">🔍 Search</button>
+                                <button class="btn btn-secondary" onclick="clearOtherSearch()">Clear</button>
+                            </div>
+                        </div>
+
+                        <!-- Search Results -->
+                        <div id="otherSearchResults" style="display: none;">
+                            <h3 style="margin-bottom: 16px;">Search Results</h3>
+                            <div class="report-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Batch</th>
+                                            <th>Product</th>
+                                            <th>Amount</th>
+                                            <th>Quality</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="otherSearchResultsBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 `
             },
             'product-outflow': {
@@ -2896,6 +3097,13 @@
             if (pageId === 'dumpling-production') {
                 setTimeout(() => {
                     initProductionPage();
+                }, 10);
+            }
+
+            // If navigating to other production page, initialize it
+            if (pageId === 'other-production') {
+                setTimeout(() => {
+                    initOtherProductionPage();
                 }, 10);
             }
         };
@@ -4683,6 +4891,639 @@
         }
         
         // ========== END DUMPLING PRODUCTION FEATURE ==========
+
+        // ========== OTHER PRODUCTION FEATURE ==========
+
+        // Other production state
+        let otherProductionRecords = [];
+        let otherProductionDraft = {};
+        let currentOtherProductionDate = '';
+        let otherIsDirty = false;
+        let otherReportContext = { selectedYear: null, selectedMonth: null };
+
+        // Load other production data from localStorage
+        function loadOtherProductionData() {
+            const storedRecords = localStorage.getItem('otherProductionRecords');
+            if (storedRecords) {
+                otherProductionRecords = JSON.parse(storedRecords);
+            }
+
+            const storedDraft = localStorage.getItem('otherProductionDraft');
+            if (storedDraft) {
+                otherProductionDraft = JSON.parse(storedDraft);
+            }
+        }
+
+        // Save other production data to localStorage
+        function saveOtherProductionRecords() {
+            localStorage.setItem('otherProductionRecords', JSON.stringify(otherProductionRecords));
+        }
+
+        function saveOtherProductionDraft() {
+            localStorage.setItem('otherProductionDraft', JSON.stringify(otherProductionDraft));
+        }
+
+        // Get eligible products for other production (all except Dept 01)
+        function getOtherProductionEligibleProducts() {
+            return products.filter(p => p.departmentId !== 1 && p.status === 'Active')
+                .sort((a, b) => {
+                    // Sort by department first, then by product name
+                    if (a.departmentId !== b.departmentId) {
+                        return a.departmentId - b.departmentId;
+                    }
+                    return a.nameThai.localeCompare(b.nameThai);
+                });
+        }
+
+        // Initialize other production page
+        function initOtherProductionPage() {
+            loadOtherProductionData();
+
+            // Set date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('otherProductionDate').value = today;
+            currentOtherProductionDate = today;
+
+            // Load the production day
+            loadOtherProductionDay();
+
+            // Initialize search dropdowns
+            populateOtherSearchDropdowns();
+
+            // Load year view for reports
+            loadOtherYearView();
+        }
+
+        // Load other production day
+        function loadOtherProductionDay() {
+            const date = document.getElementById('otherProductionDate').value;
+            currentOtherProductionDate = date;
+
+            // Load draft data for this date
+            const draftKey = date;
+            const draft = otherProductionDraft[draftKey] || {};
+
+            // Render the table
+            renderOtherProductionTable(draft);
+
+            // Update UI status
+            updateOtherProductionStatusUI();
+        }
+
+        // Render other production table
+        function renderOtherProductionTable(draft = {}) {
+            const eligibleProducts = getOtherProductionEligibleProducts();
+            const tbody = document.getElementById('otherProductionTableBody');
+
+            if (eligibleProducts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #999;">No products found. Please add products from departments other than Dept 01 in the SETUP page.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = eligibleProducts.map(product => {
+                const draftEntry = draft[product.id] || {};
+                const count = draftEntry.count || '';
+                const quality = draftEntry.quality || 'Pending';
+                const notes = draftEntry.notes || '';
+
+                return `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">${product.nameThai}</div>
+                            <div style="font-size: 12px; color: #666;">${product.nameEn}</div>
+                            <div style="font-size: 11px; color: #999;">Dept ${String(product.departmentId).padStart(2, '0')}</div>
+                        </td>
+                        <td>${product.unit}</td>
+                        <td>
+                            <input type="number"
+                                   id="other-count-${product.id}"
+                                   class="form-input"
+                                   value="${count}"
+                                   min="0"
+                                   placeholder="0"
+                                   onchange="handleOtherProductionChange(${product.id})"
+                                   style="width: 100%;">
+                        </td>
+                        <td>
+                            <div class="quality-toggle-group">
+                                <button class="quality-toggle-btn ${quality === 'OK' ? 'active ok' : ''}"
+                                        onclick="setOtherQualityStatus(${product.id}, 'OK')">
+                                    ✓ OK
+                                </button>
+                                <button class="quality-toggle-btn ${quality === 'Not OK' ? 'active not-ok' : ''}"
+                                        onclick="setOtherQualityStatus(${product.id}, 'Not OK')">
+                                    ✗ Not OK
+                                </button>
+                                <button class="quality-toggle-btn ${quality === 'Pending' ? 'active pending' : ''}"
+                                        onclick="setOtherQualityStatus(${product.id}, 'Pending')">
+                                    ⏱ Pending
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text"
+                                   id="other-notes-${product.id}"
+                                   class="form-input"
+                                   value="${notes}"
+                                   placeholder="Optional notes"
+                                   onchange="handleOtherProductionChange(${product.id})"
+                                   style="width: 100%;">
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Handle other production entry changes
+        function handleOtherProductionChange(productId) {
+            const countInput = document.getElementById(`other-count-${productId}`);
+            const notesInput = document.getElementById(`other-notes-${productId}`);
+
+            const count = parseInt(countInput.value) || 0;
+            const notes = notesInput.value.trim();
+
+            // Get current draft for this date
+            const draftKey = currentOtherProductionDate;
+            if (!otherProductionDraft[draftKey]) {
+                otherProductionDraft[draftKey] = {};
+            }
+
+            // Update draft
+            if (count > 0 || notes) {
+                if (!otherProductionDraft[draftKey][productId]) {
+                    otherProductionDraft[draftKey][productId] = {};
+                }
+                otherProductionDraft[draftKey][productId].count = count;
+                otherProductionDraft[draftKey][productId].notes = notes;
+                // Preserve quality status if it exists
+                if (!otherProductionDraft[draftKey][productId].quality) {
+                    otherProductionDraft[draftKey][productId].quality = 'Pending';
+                }
+            } else if (!otherProductionDraft[draftKey][productId]?.quality ||
+                       otherProductionDraft[draftKey][productId].quality === 'Pending') {
+                // Remove entry if count is 0 and no notes and quality is pending
+                delete otherProductionDraft[draftKey][productId];
+            }
+
+            // Save draft
+            saveOtherProductionDraft();
+
+            // Mark as dirty
+            otherIsDirty = true;
+            updateOtherProductionStatusUI();
+        }
+
+        // Set other production quality status
+        function setOtherQualityStatus(productId, status) {
+            // Get current draft for this date
+            const draftKey = currentOtherProductionDate;
+            if (!otherProductionDraft[draftKey]) {
+                otherProductionDraft[draftKey] = {};
+            }
+            if (!otherProductionDraft[draftKey][productId]) {
+                otherProductionDraft[draftKey][productId] = {};
+            }
+
+            // Update quality status
+            otherProductionDraft[draftKey][productId].quality = status;
+
+            // Save draft
+            saveOtherProductionDraft();
+
+            // Re-render table to update button states
+            renderOtherProductionTable(otherProductionDraft[draftKey]);
+
+            // Mark as dirty
+            otherIsDirty = true;
+            updateOtherProductionStatusUI();
+        }
+
+        // Update other production status UI
+        function updateOtherProductionStatusUI() {
+            const statusBadge = document.getElementById('otherStatusBadge');
+            const statusText = document.getElementById('otherStatusText');
+            const draftIndicator = document.getElementById('otherDraftIndicator');
+
+            if (otherIsDirty) {
+                statusBadge.className = 'round-status-badge draft';
+                statusText.textContent = 'Draft';
+                draftIndicator.style.display = 'block';
+            } else {
+                statusBadge.className = 'round-status-badge saved';
+                statusText.textContent = 'Saved';
+                draftIndicator.style.display = 'none';
+            }
+        }
+
+        // Save other production
+        function saveOtherProduction() {
+            const date = document.getElementById('otherProductionDate').value;
+            const batchNumber = document.getElementById('otherBatchNumber').value.trim();
+
+            if (!batchNumber) {
+                alert('Please enter a batch number before saving.');
+                document.getElementById('otherBatchNumber').focus();
+                return;
+            }
+
+            const draftKey = date;
+            const draft = otherProductionDraft[draftKey] || {};
+
+            // Check if there are any entries
+            const hasEntries = Object.keys(draft).some(productId => {
+                const entry = draft[productId];
+                return entry.count > 0;
+            });
+
+            if (!hasEntries) {
+                alert('Please enter at least one product quantity before saving.');
+                return;
+            }
+
+            // Create production records from draft
+            const timestamp = Date.now();
+            Object.keys(draft).forEach(productId => {
+                const entry = draft[productId];
+                if (entry.count > 0) {
+                    otherProductionRecords.push({
+                        id: timestamp + Math.random(),
+                        date: date,
+                        batch: batchNumber,
+                        productId: parseInt(productId),
+                        count: entry.count,
+                        quality: entry.quality || 'Pending',
+                        notes: entry.notes || '',
+                        createdAt: timestamp,
+                        updatedAt: timestamp
+                    });
+                }
+            });
+
+            // Save to localStorage
+            saveOtherProductionRecords();
+
+            // Clear draft for this date
+            delete otherProductionDraft[draftKey];
+            saveOtherProductionDraft();
+
+            // Update UI
+            otherIsDirty = false;
+            updateOtherProductionStatusUI();
+
+            // Show success message
+            const lastSavedInfo = document.getElementById('otherLastSavedInfo');
+            const lastSavedTime = document.getElementById('otherLastSavedTime');
+            lastSavedTime.textContent = new Date().toLocaleTimeString();
+            lastSavedInfo.style.display = 'block';
+
+            alert('Production saved successfully!');
+
+            // Clear batch number for next entry
+            document.getElementById('otherBatchNumber').value = '';
+
+            // Re-render table
+            renderOtherProductionTable({});
+        }
+
+        // Handle other production date change
+        function handleOtherDateChange() {
+            if (otherIsDirty) {
+                const confirmChange = confirm('You have unsaved changes. Do you want to discard them and change the date?');
+                if (!confirmChange) {
+                    // Revert date back
+                    document.getElementById('otherProductionDate').value = currentOtherProductionDate;
+                    return;
+                }
+            }
+
+            otherIsDirty = false;
+            loadOtherProductionDay();
+        }
+
+        // Switch other production tab
+        function switchOtherProductionTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('#other-entry-tab, #other-reports-tab, #other-search-tab').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(`other-${tab}-tab`).classList.add('active');
+
+            // Set active button
+            event.target.classList.add('active');
+
+            // Initialize tab-specific content
+            if (tab === 'reports') {
+                loadOtherYearView();
+            } else if (tab === 'search') {
+                populateOtherSearchDropdowns();
+            }
+        }
+
+        // ========== OTHER PRODUCTION REPORTS ==========
+
+        // Show other report view
+        function showOtherReportView(view) {
+            // Hide all views
+            document.querySelectorAll('#other-year-view, #other-month-view, #other-day-view').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            // Remove active class from nav chips
+            document.querySelectorAll('#otherDashboardNav .nav-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+
+            // Show selected view
+            document.getElementById(`other-${view}-view`).style.display = 'block';
+
+            // Set active nav chip
+            event.target.classList.add('active');
+
+            // Load data for view
+            if (view === 'year') {
+                loadOtherYearView();
+            }
+        }
+
+        // Load other year view
+        function loadOtherYearView() {
+            const yearData = {};
+
+            otherProductionRecords.forEach(record => {
+                const year = record.date.substring(0, 4);
+                if (!yearData[year]) {
+                    yearData[year] = {
+                        products: {},
+                        dates: new Set()
+                    };
+                }
+
+                const product = getProductById(record.productId);
+                const productKey = product ? product.nameThai : 'Unknown';
+                yearData[year].products[productKey] = (yearData[year].products[productKey] || 0) + record.count;
+                yearData[year].dates.add(record.date);
+            });
+
+            const tbody = document.getElementById('otherYearViewBody');
+            const years = Object.keys(yearData).sort().reverse();
+
+            if (years.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 24px; color: #999;">No production records found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = years.map(year => {
+                const data = yearData[year];
+                const productBreakdown = Object.entries(data.products)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([name, count]) => `${name}: ${count}`)
+                    .join('<br>');
+
+                return `
+                    <tr>
+                        <td><strong>${year}</strong></td>
+                        <td>${productBreakdown}</td>
+                        <td>${data.dates.size} days</td>
+                        <td>
+                            <button class="btn btn-secondary btn-small" onclick="loadOtherMonthView('${year}')">View Details</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Load other month view
+        function loadOtherMonthView(year) {
+            otherReportContext.selectedYear = year;
+            document.getElementById('otherSelectedYear').textContent = year;
+
+            const monthData = {};
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            otherProductionRecords
+                .filter(r => r.date.startsWith(year))
+                .forEach(record => {
+                    const month = record.date.substring(5, 7);
+                    if (!monthData[month]) {
+                        monthData[month] = {
+                            products: {},
+                            dates: new Set()
+                        };
+                    }
+
+                    const product = getProductById(record.productId);
+                    const productKey = product ? product.nameThai : 'Unknown';
+                    monthData[month].products[productKey] = (monthData[month].products[productKey] || 0) + record.count;
+                    monthData[month].dates.add(record.date);
+                });
+
+            const tbody = document.getElementById('otherMonthViewBody');
+            const months = Object.keys(monthData).sort();
+
+            if (months.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 24px; color: #999;">No production records found for this year</td></tr>';
+                showOtherReportView('month');
+                return;
+            }
+
+            tbody.innerHTML = months.map(month => {
+                const data = monthData[month];
+                const monthName = monthNames[parseInt(month) - 1];
+                const productBreakdown = Object.entries(data.products)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([name, count]) => `${name}: ${count}`)
+                    .join('<br>');
+
+                return `
+                    <tr>
+                        <td><strong>${monthName} ${year}</strong></td>
+                        <td>${productBreakdown}</td>
+                        <td>${data.dates.size} days</td>
+                        <td>
+                            <button class="btn btn-secondary btn-small" onclick="loadOtherDayView('${year}', '${month}')">View Details</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            showOtherReportView('month');
+        }
+
+        // Load other day view
+        function loadOtherDayView(year, month) {
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            otherReportContext.selectedMonth = `${monthNames[parseInt(month) - 1]} ${year}`;
+            document.getElementById('otherSelectedMonth').textContent = otherReportContext.selectedMonth;
+
+            const dayData = {};
+
+            otherProductionRecords
+                .filter(r => r.date.startsWith(`${year}-${month}`))
+                .forEach(record => {
+                    const key = `${record.date}_${record.batch}`;
+                    if (!dayData[key]) {
+                        dayData[key] = {
+                            date: record.date,
+                            batch: record.batch,
+                            products: {},
+                            qualityStatuses: new Set()
+                        };
+                    }
+
+                    const product = getProductById(record.productId);
+                    const productKey = product ? product.nameThai : 'Unknown';
+                    dayData[key].products[productKey] = (dayData[key].products[productKey] || 0) + record.count;
+                    dayData[key].qualityStatuses.add(record.quality);
+                });
+
+            const tbody = document.getElementById('otherDayViewBody');
+            const entries = Object.values(dayData).sort((a, b) => b.date.localeCompare(a.date));
+
+            if (entries.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #999;">No production records found for this month</td></tr>';
+                showOtherReportView('day');
+                return;
+            }
+
+            tbody.innerHTML = entries.map(data => {
+                const productBreakdown = Object.entries(data.products)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([name, count]) => `${name}: ${count}`)
+                    .join('<br>');
+
+                const qualityBadges = Array.from(data.qualityStatuses)
+                    .map(q => {
+                        const color = q === 'OK' ? '#4CAF50' : q === 'Not OK' ? '#f44336' : '#FF9800';
+                        return `<span style="padding: 2px 8px; background: ${color}; color: white; border-radius: 4px; font-size: 11px; margin-right: 4px;">${q}</span>`;
+                    })
+                    .join('');
+
+                return `
+                    <tr>
+                        <td>${data.date}</td>
+                        <td><strong>${data.batch}</strong></td>
+                        <td>${productBreakdown}</td>
+                        <td>${qualityBadges}</td>
+                        <td>
+                            <button class="btn btn-secondary btn-small" onclick="viewOtherDayDetail('${data.date}', '${data.batch}')">View Detail</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            showOtherReportView('day');
+        }
+
+        // View other day detail
+        function viewOtherDayDetail(date, batch) {
+            const records = otherProductionRecords.filter(r => r.date === date && r.batch === batch);
+
+            if (records.length === 0) {
+                alert('No records found for this date and batch.');
+                return;
+            }
+
+            let detail = `Production Detail for ${date} - Batch ${batch}\n\n`;
+            records.forEach(record => {
+                const product = getProductById(record.productId);
+                const productName = product ? `${product.nameThai} (${product.nameEn})` : 'Unknown';
+                detail += `${productName}: ${record.count} ${product?.unit || ''}\n`;
+                detail += `Quality: ${record.quality}\n`;
+                if (record.notes) {
+                    detail += `Notes: ${record.notes}\n`;
+                }
+                detail += '\n';
+            });
+
+            alert(detail);
+        }
+
+        // ========== OTHER PRODUCTION SEARCH ==========
+
+        // Populate other search dropdowns
+        function populateOtherSearchDropdowns() {
+            const productSelect = document.getElementById('otherSearchProduct');
+            const eligibleProducts = getOtherProductionEligibleProducts();
+
+            productSelect.innerHTML = '<option value="">All Products</option>' +
+                eligibleProducts.map(p => `<option value="${p.id}">${p.nameThai} (${p.nameEn})</option>`).join('');
+        }
+
+        // Perform other production search
+        function performOtherSearch() {
+            const dateFrom = document.getElementById('otherSearchDateFrom').value;
+            const dateTo = document.getElementById('otherSearchDateTo').value;
+            const productId = document.getElementById('otherSearchProduct').value;
+            const qualityStatus = document.getElementById('otherSearchQualityStatus').value;
+
+            let results = otherProductionRecords;
+
+            // Filter by date range
+            if (dateFrom) {
+                results = results.filter(r => r.date >= dateFrom);
+            }
+            if (dateTo) {
+                results = results.filter(r => r.date <= dateTo);
+            }
+
+            // Filter by product
+            if (productId) {
+                results = results.filter(r => r.productId === parseInt(productId));
+            }
+
+            // Filter by quality status
+            if (qualityStatus) {
+                results = results.filter(r => r.quality === qualityStatus);
+            }
+
+            // Sort by date descending
+            results.sort((a, b) => b.date.localeCompare(a.date));
+
+            // Display results
+            const tbody = document.getElementById('otherSearchResultsBody');
+            const resultsDiv = document.getElementById('otherSearchResults');
+
+            if (results.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: #999;">No records found</td></tr>';
+            } else {
+                tbody.innerHTML = results.map(record => {
+                    const product = getProductById(record.productId);
+                    const productName = product ? `${product.nameThai} (${product.nameEn})` : 'Unknown';
+                    const qualityColor = record.quality === 'OK' ? '#4CAF50' : record.quality === 'Not OK' ? '#f44336' : '#FF9800';
+
+                    return `
+                        <tr>
+                            <td>${record.date}</td>
+                            <td>${record.batch}</td>
+                            <td>${productName}</td>
+                            <td>${record.count} ${product?.unit || ''}</td>
+                            <td><span style="padding: 4px 12px; background: ${qualityColor}; color: white; border-radius: 4px; font-size: 12px;">${record.quality}</span></td>
+                            <td>${record.notes || '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            resultsDiv.style.display = 'block';
+        }
+
+        // Clear other production search
+        function clearOtherSearch() {
+            document.getElementById('otherSearchDateFrom').value = '';
+            document.getElementById('otherSearchDateTo').value = '';
+            document.getElementById('otherSearchProduct').value = '';
+            document.getElementById('otherSearchQualityStatus').value = '';
+            document.getElementById('otherSearchResults').style.display = 'none';
+        }
+
+        // ========== END OTHER PRODUCTION FEATURE ==========
 
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
