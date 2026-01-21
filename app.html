@@ -2017,13 +2017,23 @@
                                             <span>●</span> <span id="otherStatusText">Draft</span>
                                         </span>
                                     </div>
+                                    <div class="control-group">
+                                        <label class="control-label">Day Status</label>
+                                        <span id="otherDayStatusBadge" class="day-status-badge open">
+                                            <span>●</span> <span id="otherDayStatusText">Open</span>
+                                        </span>
+                                    </div>
+                                    <div class="control-group" id="otherDayActions" style="display: none;">
+                                        <button class="btn btn-close-day btn-small" onclick="closeOtherProductionDay()">🔒 Close Day</button>
+                                        <button class="btn btn-secondary btn-small" onclick="reopenOtherProductionDay()">🔓 Reopen</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Info Note -->
                         <div class="info-note">
-                            ℹ️ <strong>Note:</strong> Add products as they are produced. Changes are auto-saved as draft.
+                            ℹ️ <strong>Note:</strong> Add products as they are produced. Saved entries stay visible here for the full day. Admins close the day to lock edits.
                         </div>
 
                         <!-- Flat Table Entry -->
@@ -2136,8 +2146,8 @@
                                     <thead>
                                         <tr>
                                             <th>Date</th>
-                                            <th>Batch</th>
-                                            <th>Product Breakdown</th>
+                                            <th>Product</th>
+                                            <th>Batch Breakdown</th>
                                             <th>Quality</th>
                                             <th>Action</th>
                                         </tr>
@@ -2505,6 +2515,11 @@
             const currentMenuItem = menuConfig.find(item => item.id === currentPage);
             if (currentMenuItem && !currentMenuItem.roles.includes(currentRole)) {
                 navigateToPage('home');
+            }
+
+            if (currentPage === 'other-production') {
+                updateOtherProductionStatusUI();
+                renderOtherProductionTable(otherProductionDraft[currentOtherProductionDate] || []);
             }
         }
 
@@ -4928,6 +4943,7 @@
         // Other production state
         let otherProductionRecords = [];
         let otherProductionDraft = {};
+        let otherProductionDayStatus = {};
         let currentOtherProductionDate = '';
         let otherIsDirty = false;
         let otherReportContext = { selectedYear: null, selectedMonth: null };
@@ -4943,6 +4959,11 @@
             if (storedDraft) {
                 otherProductionDraft = JSON.parse(storedDraft);
             }
+
+            const storedDayStatus = localStorage.getItem('otherProductionDayStatus');
+            if (storedDayStatus) {
+                otherProductionDayStatus = JSON.parse(storedDayStatus);
+            }
         }
 
         // Save other production data to localStorage
@@ -4952,6 +4973,10 @@
 
         function saveOtherProductionDraft() {
             localStorage.setItem('otherProductionDraft', JSON.stringify(otherProductionDraft));
+        }
+
+        function saveOtherProductionDayStatus() {
+            localStorage.setItem('otherProductionDayStatus', JSON.stringify(otherProductionDayStatus));
         }
 
         // Get eligible products for other production (all except Dept 01)
@@ -4990,12 +5015,10 @@
             const date = document.getElementById('otherProductionDate').value;
             currentOtherProductionDate = date;
 
-            // Load draft data for this date
-            const draftKey = date;
-            const draftEntries = getOtherProductionDraftEntries(draftKey);
+            const entries = buildOtherProductionEntriesForDate(date);
 
             // Render the table
-            renderOtherProductionTable(draftEntries);
+            renderOtherProductionTable(entries);
 
             // Update UI status
             updateOtherProductionStatusUI();
@@ -5004,7 +5027,11 @@
         // Normalize draft entries (supports legacy object format)
         function normalizeOtherProductionDraftEntries(draft) {
             if (Array.isArray(draft)) {
-                return draft;
+                return draft.map(entry => ({
+                    ...entry,
+                    recordId: entry.recordId || null,
+                    isSaved: entry.isSaved || false
+                }));
             }
             if (!draft || typeof draft !== 'object') {
                 return [];
@@ -5018,7 +5045,9 @@
                     batch: entry.batch || '',
                     count: entry.count || 0,
                     quality: entry.quality || 'Pending',
-                    notes: entry.notes || ''
+                    notes: entry.notes || '',
+                    recordId: entry.recordId || null,
+                    isSaved: entry.isSaved || false
                 };
             });
         }
@@ -5039,9 +5068,77 @@
             return entries;
         }
 
+        function buildOtherProductionEntriesForDate(date) {
+            const savedRecords = otherProductionRecords.filter(record => record.date === date);
+            const draftEntries = getOtherProductionDraftEntries(date);
+            const mergedEntries = [];
+            const usedSavedIds = new Set();
+
+            draftEntries.forEach(entry => {
+                if (entry.recordId) {
+                    const record = savedRecords.find(r => r.id === entry.recordId);
+                    if (record) {
+                        usedSavedIds.add(record.id);
+                        mergedEntries.push({
+                            ...entry,
+                            productId: record.productId,
+                            batch: entry.batch ?? record.batch,
+                            count: entry.count ?? record.count,
+                            quality: entry.quality || record.quality,
+                            notes: entry.notes ?? record.notes,
+                            recordId: record.id,
+                            isSaved: true
+                        });
+                        return;
+                    }
+                }
+
+                const match = savedRecords.find(r => r.productId === entry.productId && r.batch === entry.batch);
+                if (match) {
+                    usedSavedIds.add(match.id);
+                    mergedEntries.push({
+                        ...entry,
+                        recordId: match.id,
+                        isSaved: true
+                    });
+                } else {
+                    mergedEntries.push({
+                        ...entry,
+                        recordId: entry.recordId || null,
+                        isSaved: entry.isSaved || false
+                    });
+                }
+            });
+
+            savedRecords.forEach(record => {
+                if (usedSavedIds.has(record.id)) {
+                    return;
+                }
+                mergedEntries.push({
+                    id: record.id,
+                    recordId: record.id,
+                    productId: record.productId,
+                    batch: record.batch,
+                    count: record.count,
+                    quality: record.quality || 'Pending',
+                    notes: record.notes || '',
+                    isSaved: true
+                });
+            });
+
+            if (mergedEntries.length > 0) {
+                otherProductionDraft[date] = mergedEntries;
+                saveOtherProductionDraft();
+            }
+
+            return mergedEntries;
+        }
+
         // Render other production table
         function renderOtherProductionTable(draftEntries = []) {
             const tbody = document.getElementById('otherProductionTableBody');
+            const dayStatusValue = otherProductionDayStatus[currentOtherProductionDate] || 'Open';
+            const isEditable = dayStatusValue === 'Open' || currentRole === 'admin';
 
             if (!draftEntries || draftEntries.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 24px; color: #999;">No products added yet. Use the dropdown above to add products as they are produced.</td></tr>';
@@ -5072,12 +5169,16 @@
                 const quality = entry.quality || 'Pending';
                 const notes = entry.notes || '';
 
+                const canDelete = isEditable && (currentRole === 'admin' || !entry.isSaved);
+                const savedTag = entry.isSaved ? '<span style="display: inline-block; margin-top: 6px; padding: 2px 6px; background: #E3F2FD; color: #1976D2; border-radius: 10px; font-size: 11px;">Saved</span>' : '';
+
                 return `
                     <tr>
                         <td>
                             <div style="font-weight: 600;">${product.nameThai}</div>
                             <div style="font-size: 12px; color: #666;">${product.nameEn}</div>
                             <div style="font-size: 11px; color: #999;">Dept ${String(product.departmentId).padStart(2, '0')}</div>
+                            ${savedTag}
                         </td>
                         <td>${product.unit}</td>
                         <td>
@@ -5087,6 +5188,7 @@
                                    value="${batch}"
                                    placeholder="Batch #"
                                    onchange="handleOtherProductionChange(${entry.id})"
+                                   ${isEditable ? '' : 'disabled'}
                                    style="width: 100%;">
                         </td>
                         <td>
@@ -5097,20 +5199,24 @@
                                    min="0"
                                    placeholder="0"
                                    onchange="handleOtherProductionChange(${entry.id})"
+                                   ${isEditable ? '' : 'disabled'}
                                    style="width: 100%;">
                         </td>
                         <td>
                             <div class="quality-toggle-group">
                                 <button class="quality-toggle-btn ${quality === 'OK' ? 'active ok' : ''}"
-                                        onclick="setOtherQualityStatus(${entry.id}, 'OK')">
+                                        onclick="setOtherQualityStatus(${entry.id}, 'OK')"
+                                        ${isEditable ? '' : 'disabled'}>
                                     ✓ OK
                                 </button>
                                 <button class="quality-toggle-btn ${quality === 'Not OK' ? 'active not-ok' : ''}"
-                                        onclick="setOtherQualityStatus(${entry.id}, 'Not OK')">
+                                        onclick="setOtherQualityStatus(${entry.id}, 'Not OK')"
+                                        ${isEditable ? '' : 'disabled'}>
                                     ✗ Not OK
                                 </button>
                                 <button class="quality-toggle-btn ${quality === 'Pending' ? 'active pending' : ''}"
-                                        onclick="setOtherQualityStatus(${entry.id}, 'Pending')">
+                                        onclick="setOtherQualityStatus(${entry.id}, 'Pending')"
+                                        ${isEditable ? '' : 'disabled'}>
                                     ⏱ Pending
                                 </button>
                             </div>
@@ -5122,14 +5228,18 @@
                                    value="${notes}"
                                    placeholder="Optional notes"
                                    onchange="handleOtherProductionChange(${entry.id})"
+                                   ${isEditable ? '' : 'disabled'}
                                    style="width: 100%;">
                         </td>
                         <td style="text-align: center;">
-                            <button class="btn-icon-danger"
-                                    onclick="removeOtherProductFromEntry(${entry.id})"
-                                    title="Remove product">
-                                🗑️
-                            </button>
+                            ${canDelete
+                                ? `<button class="btn-icon-danger"
+                                           onclick="removeOtherProductFromEntry(${entry.id})"
+                                           title="Remove product">
+                                       🗑️
+                                   </button>`
+                                : `<span title="${isEditable ? 'Saved entries can only be removed by admins.' : 'Day is closed.'}" style="color: #999;">🔒</span>`
+                            }
                         </td>
                     </tr>
                 `;
@@ -5143,6 +5253,8 @@
         function populateOtherProductSelector() {
             const selector = document.getElementById('otherProductSelector');
             const eligibleProducts = getOtherProductionEligibleProducts();
+            const dayStatusValue = otherProductionDayStatus[currentOtherProductionDate] || 'Open';
+            const isEditable = dayStatusValue === 'Open' || currentRole === 'admin';
 
             // Build options
             const options = eligibleProducts.map(product => {
@@ -5150,11 +5262,16 @@
             }).join('');
 
             selector.innerHTML = '<option value="">-- Select Product to Add --</option>' + options;
-            selector.disabled = false;
+            selector.disabled = !isEditable;
         }
 
         // Add a product to the entry
         function addOtherProductToEntry() {
+            const dayStatusValue = otherProductionDayStatus[currentOtherProductionDate] || 'Open';
+            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
+                alert('This day is closed. Only admins can add products.');
+                return;
+            }
             const selector = document.getElementById('otherProductSelector');
             const productId = parseInt(selector.value);
 
@@ -5174,7 +5291,9 @@
                 batch: '',
                 count: 0,
                 quality: 'Pending',
-                notes: ''
+                notes: '',
+                recordId: null,
+                isSaved: false
             });
 
             // Save to localStorage
@@ -5194,16 +5313,31 @@
 
         // Remove a product from the entry
         function removeOtherProductFromEntry(entryId) {
+            const dayStatusValue = otherProductionDayStatus[currentOtherProductionDate] || 'Open';
+            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
+                alert('This day is closed. Only admins can remove entries.');
+                return;
+            }
             const draftKey = currentOtherProductionDate;
             const draftEntries = getOtherProductionDraftEntries(draftKey);
             const entry = draftEntries.find(item => item.id === entryId);
             if (!entry) return;
+
+            if (entry.isSaved && currentRole !== 'admin') {
+                alert('Saved entries can only be removed by admins.');
+                return;
+            }
 
             const product = products.find(p => p.id === entry.productId);
             if (!product) return;
 
             if (!confirm(`Remove ${product.nameThai} from this entry?`)) {
                 return;
+            }
+
+            if (entry.isSaved && entry.recordId) {
+                otherProductionRecords = otherProductionRecords.filter(record => record.id !== entry.recordId);
+                saveOtherProductionRecords();
             }
 
             const remainingEntries = draftEntries.filter(item => item.id !== entryId);
@@ -5226,6 +5360,11 @@
 
         // Handle other production entry changes
         function handleOtherProductionChange(entryId) {
+            const dayStatusValue = otherProductionDayStatus[currentOtherProductionDate] || 'Open';
+            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
+                alert('This day is closed. Only admins can edit entries.');
+                return;
+            }
             const batchInput = document.getElementById(`other-batch-${entryId}`);
             const countInput = document.getElementById(`other-count-${entryId}`);
             const notesInput = document.getElementById(`other-notes-${entryId}`);
@@ -5263,6 +5402,11 @@
 
         // Set other production quality status
         function setOtherQualityStatus(entryId, status) {
+            const dayStatusValue = otherProductionDayStatus[currentOtherProductionDate] || 'Open';
+            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
+                alert('This day is closed. Only admins can edit entries.');
+                return;
+            }
             // Get current draft for this date
             const draftKey = currentOtherProductionDate;
             const draftEntries = getOtherProductionDraftEntries(draftKey);
@@ -5290,6 +5434,12 @@
             const statusBadge = document.getElementById('otherStatusBadge');
             const statusText = document.getElementById('otherStatusText');
             const draftIndicator = document.getElementById('otherDraftIndicator');
+            const dayStatusBadge = document.getElementById('otherDayStatusBadge');
+            const dayStatusText = document.getElementById('otherDayStatusText');
+            const dayActions = document.getElementById('otherDayActions');
+            const saveBtn = document.getElementById('saveOtherProductionBtn');
+            const selector = document.getElementById('otherProductSelector');
+            const dayStatusValue = otherProductionDayStatus[currentOtherProductionDate] || 'Open';
 
             if (otherIsDirty) {
                 statusBadge.className = 'round-status-badge draft';
@@ -5300,10 +5450,21 @@
                 statusText.textContent = 'Saved';
                 draftIndicator.style.display = 'none';
             }
+
+            dayStatusBadge.className = `day-status-badge ${dayStatusValue.toLowerCase()}`;
+            dayStatusText.textContent = dayStatusValue;
+            dayActions.style.display = currentRole === 'admin' ? 'flex' : 'none';
+            saveBtn.disabled = dayStatusValue === 'Closed' && currentRole !== 'admin';
+            selector.disabled = dayStatusValue === 'Closed' && currentRole !== 'admin';
         }
 
         // Save other production
         function saveOtherProduction() {
+            const dayStatusValue = otherProductionDayStatus[currentOtherProductionDate] || 'Open';
+            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
+                alert('This day is closed. Only admins can save changes.');
+                return;
+            }
             const date = document.getElementById('otherProductionDate').value;
 
             const draftKey = date;
@@ -5332,12 +5493,37 @@
                 return;
             }
 
-            // Create production records from draft
+            const zeroedSavedEntry = draftEntries.find(entry => entry.isSaved && entry.count === 0);
+            if (zeroedSavedEntry && currentRole !== 'admin') {
+                const product = getProductById(zeroedSavedEntry.productId);
+                const productName = product ? product.nameThai : 'saved product';
+                alert(`"${productName}" is already saved. Set a positive amount or ask an admin to remove it.`);
+                return;
+            }
+
+            // Create/update production records from draft
             const timestamp = Date.now();
+            const recordIndexMap = new Map();
+            otherProductionRecords.forEach((record, index) => {
+                recordIndexMap.set(record.id, index);
+            });
+
             draftEntries.forEach(entry => {
-                if (entry.count > 0) {
+                if (entry.recordId && recordIndexMap.has(entry.recordId)) {
+                    const recordIndex = recordIndexMap.get(entry.recordId);
+                    otherProductionRecords[recordIndex] = {
+                        ...otherProductionRecords[recordIndex],
+                        batch: entry.batch,
+                        count: entry.count,
+                        quality: entry.quality || 'Pending',
+                        notes: entry.notes || '',
+                        updatedAt: timestamp
+                    };
+                    entry.isSaved = true;
+                } else if (entry.count > 0) {
+                    const newId = timestamp + Math.random();
                     otherProductionRecords.push({
-                        id: timestamp + Math.random(),
+                        id: newId,
                         date: date,
                         batch: entry.batch,
                         productId: entry.productId,
@@ -5347,14 +5533,16 @@
                         createdAt: timestamp,
                         updatedAt: timestamp
                     });
+                    entry.recordId = newId;
+                    entry.isSaved = true;
                 }
             });
 
             // Save to localStorage
             saveOtherProductionRecords();
 
-            // Clear draft for this date
-            delete otherProductionDraft[draftKey];
+            // Save draft for this date (keep entries visible)
+            otherProductionDraft[draftKey] = draftEntries;
             saveOtherProductionDraft();
 
             // Update UI
@@ -5370,7 +5558,7 @@
             alert('Production saved successfully!');
 
             // Re-render table
-            renderOtherProductionTable([]);
+            renderOtherProductionTable(otherProductionDraft[draftKey]);
         }
 
         // Handle other production date change
@@ -5386,6 +5574,31 @@
 
             otherIsDirty = false;
             loadOtherProductionDay();
+        }
+
+        function closeOtherProductionDay() {
+            if (currentRole !== 'admin') {
+                alert('Only admins can close the day.');
+                return;
+            }
+            if (!confirm('Close this production day? Entries will be locked for normal users.')) {
+                return;
+            }
+            otherProductionDayStatus[currentOtherProductionDate] = 'Closed';
+            saveOtherProductionDayStatus();
+            updateOtherProductionStatusUI();
+            renderOtherProductionTable(otherProductionDraft[currentOtherProductionDate] || []);
+        }
+
+        function reopenOtherProductionDay() {
+            if (currentRole !== 'admin') {
+                alert('Only admins can reopen the day.');
+                return;
+            }
+            otherProductionDayStatus[currentOtherProductionDate] = 'Open';
+            saveOtherProductionDayStatus();
+            updateOtherProductionStatusUI();
+            renderOtherProductionTable(otherProductionDraft[currentOtherProductionDate] || []);
         }
 
         // Switch other production tab
@@ -5555,24 +5768,29 @@
             otherProductionRecords
                 .filter(r => r.date.startsWith(`${year}-${month}`))
                 .forEach(record => {
-                    const key = `${record.date}_${record.batch}`;
+                    const key = `${record.date}_${record.productId}`;
                     if (!dayData[key]) {
+                        const product = getProductById(record.productId);
                         dayData[key] = {
                             date: record.date,
-                            batch: record.batch,
-                            products: {},
+                            productId: record.productId,
+                            productName: product ? product.nameThai : 'Unknown',
+                            batches: {},
                             qualityStatuses: new Set()
                         };
                     }
 
-                    const product = getProductById(record.productId);
-                    const productKey = product ? product.nameThai : 'Unknown';
-                    dayData[key].products[productKey] = (dayData[key].products[productKey] || 0) + record.count;
+                    const batchKey = record.batch || 'Unassigned';
+                    dayData[key].batches[batchKey] = (dayData[key].batches[batchKey] || 0) + record.count;
                     dayData[key].qualityStatuses.add(record.quality);
                 });
 
             const tbody = document.getElementById('otherDayViewBody');
-            const entries = Object.values(dayData).sort((a, b) => b.date.localeCompare(a.date));
+            const entries = Object.values(dayData).sort((a, b) => {
+                const dateCompare = b.date.localeCompare(a.date);
+                if (dateCompare !== 0) return dateCompare;
+                return a.productName.localeCompare(b.productName);
+            });
 
             if (entries.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #999;">No production records found for this month</td></tr>';
@@ -5581,10 +5799,9 @@
             }
 
             tbody.innerHTML = entries.map(data => {
-                const productBreakdown = Object.entries(data.products)
-                    .sort((a, b) => b[1] - a[1])
-                    .map(([name, count]) => `${name}: ${count}`)
-                    .join('<br>');
+                const batchBreakdown = Object.entries(data.batches)
+                    .map(([batch, count]) => `<div><strong>${batch}</strong>: ${count}</div>`)
+                    .join('');
 
                 const qualityBadges = Array.from(data.qualityStatuses)
                     .map(q => {
@@ -5596,11 +5813,11 @@
                 return `
                     <tr>
                         <td>${data.date}</td>
-                        <td><strong>${data.batch}</strong></td>
-                        <td>${productBreakdown}</td>
+                        <td><strong>${data.productName}</strong></td>
+                        <td>${batchBreakdown}</td>
                         <td>${qualityBadges}</td>
                         <td>
-                            <button class="btn btn-secondary btn-small" onclick="viewOtherDayDetail('${data.date}', '${data.batch}')">View Detail</button>
+                            <button class="btn btn-secondary btn-small" onclick="viewOtherDayDetail('${data.date}', '${data.productId}')">View Detail</button>
                         </td>
                     </tr>
                 `;
@@ -5610,22 +5827,36 @@
         }
 
         // View other day detail
-        function viewOtherDayDetail(date, batch) {
-            const records = otherProductionRecords.filter(r => r.date === date && r.batch === batch);
+        function viewOtherDayDetail(date, productId) {
+            const records = otherProductionRecords.filter(r => r.date === date && r.productId === parseInt(productId));
 
             if (records.length === 0) {
-                alert('No records found for this date and batch.');
+                alert('No records found for this date and product.');
                 return;
             }
 
-            let detail = `Production Detail for ${date} - Batch ${batch}\n\n`;
+            const product = getProductById(parseInt(productId));
+            const productName = product ? `${product.nameThai} (${product.nameEn})` : 'Unknown';
+            let detail = `Production Detail for ${date} - ${productName}\n\n`;
+
+            const batchSummary = {};
             records.forEach(record => {
-                const product = getProductById(record.productId);
-                const productName = product ? `${product.nameThai} (${product.nameEn})` : 'Unknown';
-                detail += `${productName}: ${record.count} ${product?.unit || ''}\n`;
-                detail += `Quality: ${record.quality}\n`;
+                const batchKey = record.batch || 'Unassigned';
+                if (!batchSummary[batchKey]) {
+                    batchSummary[batchKey] = { count: 0, quality: new Set(), notes: [] };
+                }
+                batchSummary[batchKey].count += record.count;
+                batchSummary[batchKey].quality.add(record.quality);
                 if (record.notes) {
-                    detail += `Notes: ${record.notes}\n`;
+                    batchSummary[batchKey].notes.push(record.notes);
+                }
+            });
+
+            Object.entries(batchSummary).forEach(([batch, info]) => {
+                detail += `Batch ${batch}: ${info.count} ${product?.unit || ''}\n`;
+                detail += `Quality: ${Array.from(info.quality).join(', ')}\n`;
+                if (info.notes.length) {
+                    detail += `Notes: ${info.notes.join(' | ')}\n`;
                 }
                 detail += '\n';
             });
