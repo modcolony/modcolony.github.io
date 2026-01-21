@@ -794,8 +794,10 @@
 
         .round-selector-inline {
             display: flex;
+            flex-direction: row;
             gap: 8px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .round-status-badge {
@@ -828,48 +830,35 @@
             align-items: center;
             gap: 16px;
             flex-wrap: wrap;
+            padding: 16px;
+            background: #FFF3E0;
+            border: 2px solid #FF9800;
+            border-radius: 8px;
+            margin-top: 12px;
         }
 
         .signoff-status {
             display: flex;
             align-items: center;
             gap: 8px;
+            font-weight: 600;
         }
 
         .signoff-status label {
             margin: 0;
+            color: #E65100;
         }
 
-        .view-toggle-section {
-            margin-bottom: 24px;
-        }
-
-        .view-toggle-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .view-toggle-btn {
-            padding: 10px 20px;
-            background: white;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
+        #signoffStatusText {
             font-weight: 500;
-            transition: all 0.2s;
+            color: #E65100;
         }
 
-        .view-toggle-btn:hover {
-            border-color: #1976D2;
-            background: #E3F2FD;
-        }
-
-        .view-toggle-btn.active {
-            background: #1976D2;
-            color: white;
-            border-color: #1976D2;
+        .day-detail-view {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .product-dashboard {
@@ -922,18 +911,15 @@
             font-weight: 500;
         }
 
-        .entry-view-container {
+        .employee-accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
             background: white;
             padding: 24px;
             border-radius: 12px;
             margin-bottom: 80px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .employee-accordion {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
         }
 
         .accordion-item {
@@ -1634,18 +1620,6 @@
                             ℹ️ <strong>Note:</strong> Only Dept 01 Active employees and products are shown. Changes are auto-saved as draft.
                         </div>
 
-                        <!-- View Toggle -->
-                        <div class="view-toggle-section">
-                            <div class="view-toggle-buttons">
-                                <button id="accordionViewBtn" class="view-toggle-btn active" onclick="switchEntryView('accordion')">
-                                    📋 Employee Accordion
-                                </button>
-                                <button id="spreadsheetViewBtn" class="view-toggle-btn" onclick="switchEntryView('spreadsheet')">
-                                    📊 Spreadsheet View
-                                </button>
-                            </div>
-                        </div>
-
                         <!-- Per-Product Dashboard -->
                         <div class="product-dashboard">
                             <h3 style="margin-bottom: 16px;">Current Round Summary</h3>
@@ -1657,22 +1631,10 @@
                             </div>
                         </div>
 
-                        <!-- Accordion View (Default) -->
-                        <div id="accordionView" class="entry-view-container">
-                            <h3 style="margin-bottom: 16px;">Production Entry by Employee</h3>
-                            <div id="employeeAccordion" class="employee-accordion">
-                                <!-- Accordion items will be rendered here -->
-                            </div>
-                        </div>
-
-                        <!-- Spreadsheet View -->
-                        <div id="spreadsheetView" class="entry-view-container" style="display: none;">
-                            <h3 style="margin-bottom: 16px;">Production Entry - Spreadsheet View</h3>
-                            <div class="spreadsheet-container">
-                                <div id="spreadsheetGrid" class="spreadsheet-grid">
-                                    <!-- Spreadsheet will be rendered here -->
-                                </div>
-                            </div>
+                        <!-- Production Entry by Employee -->
+                        <h3 style="margin-bottom: 16px;">Production Entry by Employee</h3>
+                        <div id="employeeAccordion" class="employee-accordion">
+                            <!-- Accordion items will be rendered here -->
                         </div>
 
                         <!-- Sticky Save Button -->
@@ -1758,6 +1720,19 @@
                                     <tbody id="dayViewBody">
                                     </tbody>
                                 </table>
+                            </div>
+
+                            <!-- Spreadsheet Detail View -->
+                            <div id="dayDetailView" class="day-detail-view" style="display: none; margin-top: 24px;">
+                                <div style="margin-bottom: 16px;">
+                                    <button class="btn btn-secondary btn-small" onclick="closeDayDetailView()">← Back to Daily Summary</button>
+                                </div>
+                                <h3 style="margin-bottom: 16px;">Production Detail - <span id="detailViewDate"></span> - Round <span id="detailViewRound"></span></h3>
+                                <div class="spreadsheet-container">
+                                    <div id="reportSpreadsheetGrid" class="spreadsheet-grid">
+                                        <!-- Spreadsheet will be rendered here -->
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2824,7 +2799,6 @@
         let roundStates = {};    // New: track round states (Draft/Saved/Signed-off)
         let currentProductionDate = '';
         let currentRound = 1;
-        let currentView = 'accordion';  // 'accordion' or 'spreadsheet'
         let draftData = {};  // Draft entries not yet saved
         let isDirty = false;  // Track unsaved changes
         let pendingNavigation = null;  // For navigation guards
@@ -3212,28 +3186,9 @@
             }
         }
         
-        // Switch entry view
-        function switchEntryView(view) {
-            if (view === currentView) return;
-        
-            currentView = view;
-        
-            // Update toggle buttons
-            document.getElementById('accordionViewBtn').classList.toggle('active', view === 'accordion');
-            document.getElementById('spreadsheetViewBtn').classList.toggle('active', view === 'spreadsheet');
-        
-            // Show/hide views
-            document.getElementById('accordionView').style.display = view === 'accordion' ? 'block' : 'none';
-            document.getElementById('spreadsheetView').style.display = view === 'spreadsheet' ? 'block' : 'none';
-        
-            // Render the selected view
-            renderCurrentView();
-        }
-        
-        // Render current view
+        // Render current view (only accordion now)
         function renderCurrentView() {
-            if (currentView === 'accordion') {
-                renderAccordionView();
+            renderAccordionView();
             } else {
                 renderSpreadsheetView();
             }
@@ -3286,7 +3241,7 @@
                 item.innerHTML = `
                     <div class="accordion-header" onclick="toggleAccordion(${emp.id})">
                         <div class="accordion-header-left">
-                            <span class="accordion-employee-name">${emp.nameThai}</span>
+                            <span class="accordion-employee-name">${emp.nameThai}${emp.nameOther ? ' / ' + emp.nameOther : ''}</span>
                             <span class="accordion-employee-id">(ID: ${emp.id})</span>
                         </div>
                         <div class="accordion-header-right">
@@ -4223,6 +4178,11 @@
                 const totalPacks = Object.values(dateData[date].productCounts).reduce((sum, count) => sum + count, 0);
                 const productBreakdownWithTotal = `${productBreakdown}<br><strong>Total: ${totalPacks.toLocaleString()} packs</strong>`;
 
+                // Create buttons for each round
+                const roundButtons = Array.from(dateData[date].rounds).sort((a, b) => a - b).map(round => {
+                    return `<button class="btn btn-primary btn-small" onclick="showDayDetailSpreadsheet('${date}', ${round})" style="margin: 2px;">Round ${round}</button>`;
+                }).join('');
+
                 return `
                     <tr>
                         <td><strong>${date}</strong></td>
@@ -4230,7 +4190,7 @@
                         <td style="line-height: 1.6;">${productBreakdownWithTotal}</td>
                         <td>${dateData[date].rounds.size} rounds</td>
                         <td>${dateData[date].entries} entries</td>
-                        <td><button class="btn btn-primary btn-small" onclick="jumpToDate('${date}')">View →</button></td>
+                        <td style="line-height: 2;">${roundButtons}<br><button class="btn btn-secondary btn-small" onclick="jumpToDate('${date}')" style="margin-top: 4px;">Edit →</button></td>
                     </tr>
                 `;
             }).join('');
@@ -4243,7 +4203,82 @@
             loadProductionDay();
             switchProductionTab('entry');
         }
-        
+
+        // Show day detail with spreadsheet view
+        function showDayDetailSpreadsheet(date, round) {
+            // Hide the day view table
+            document.querySelector('#day-view .report-table').style.display = 'none';
+
+            // Show detail view
+            const detailView = document.getElementById('dayDetailView');
+            detailView.style.display = 'block';
+
+            // Update header
+            document.getElementById('detailViewDate').textContent = date;
+            document.getElementById('detailViewRound').textContent = round;
+
+            // Render spreadsheet for this date/round
+            renderReportSpreadsheet(date, round);
+        }
+
+        // Close day detail view
+        function closeDayDetailView() {
+            document.getElementById('dayDetailView').style.display = 'none';
+            document.querySelector('#day-view .report-table').style.display = 'block';
+        }
+
+        // Render spreadsheet in reports tab
+        function renderReportSpreadsheet(date, round) {
+            const container = document.getElementById('reportSpreadsheetGrid');
+            if (!container) return;
+
+            const eligibleEmployees = employees.filter(e => e.departmentId === 1 && e.status === 'Active');
+            const eligibleProducts = products.filter(p => p.departmentId === 1);
+
+            // Get saved entries for this date/round
+            const savedEntries = productionRecords.filter(
+                r => r.date === date && r.round === round
+            );
+
+            // Check if editable (read-only in reports view)
+            const isEditable = false;
+
+            let html = '<table><thead><tr>';
+            html += '<th class="employee-col">Employee</th>';
+            eligibleProducts.forEach(prod => {
+                html += `<th>${prod.nameThai}</th>`;
+            });
+            html += '<th>Quality</th>';
+            html += '</tr></thead><tbody>';
+
+            eligibleEmployees.forEach(emp => {
+                html += '<tr>';
+                html += `<td class="employee-name">${emp.nameThai}${emp.nameOther ? ' / ' + emp.nameOther : ''} (${emp.id})`;
+
+                // Quality icon/status
+                const qualityData = qualityStatus.find(q => q.date === date && q.round === round && q.employeeId === emp.id);
+                const qualityValue = qualityData ? qualityData.status : '';
+                const qualityIcon = qualityValue === 'OK' ? '✓' : qualityValue === 'Not OK' ? '✗' : '○';
+                const qualityColor = qualityValue === 'OK' ? '#4CAF50' : qualityValue === 'Not OK' ? '#F44336' : '#FF9800';
+                html += `<span class="spreadsheet-quality-icon" style="color: ${qualityColor}"
+                            title="${qualityValue}">${qualityIcon}</span>`;
+                html += '</td>';
+
+                eligibleProducts.forEach(prod => {
+                    const saved = savedEntries.find(e => e.employeeId === emp.id && e.productId === prod.id);
+                    const count = saved ? saved.count : '';
+                    html += `<td><input type="text" value="${count}" readonly style="background: #f5f5f5;"></td>`;
+                });
+
+                // Quality cell (read-only)
+                html += `<td><span class="quality-display">${qualityValue || '-'}</span></td>`;
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
         // ========== SEARCH ==========
         
         // Populate search dropdowns
