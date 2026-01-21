@@ -5668,7 +5668,10 @@
 
                 const product = getProductById(record.productId);
                 const productKey = product ? product.nameThai : 'Unknown';
-                yearData[year].products[productKey] = (yearData[year].products[productKey] || 0) + record.count;
+                if (!yearData[year].products[productKey]) {
+                    yearData[year].products[productKey] = { count: 0, unit: product?.unit || '' };
+                }
+                yearData[year].products[productKey].count += record.count;
                 yearData[year].dates.add(record.date);
             });
 
@@ -5683,8 +5686,8 @@
             tbody.innerHTML = years.map(year => {
                 const data = yearData[year];
                 const productBreakdown = Object.entries(data.products)
-                    .sort((a, b) => b[1] - a[1])
-                    .map(([name, count]) => `${name}: ${count}`)
+                    .sort((a, b) => b[1].count - a[1].count)
+                    .map(([name, info]) => `${name}: ${info.count} ${info.unit}`.trim())
                     .join('<br>');
 
                 return `
@@ -5721,7 +5724,10 @@
 
                     const product = getProductById(record.productId);
                     const productKey = product ? product.nameThai : 'Unknown';
-                    monthData[month].products[productKey] = (monthData[month].products[productKey] || 0) + record.count;
+                    if (!monthData[month].products[productKey]) {
+                        monthData[month].products[productKey] = { count: 0, unit: product?.unit || '' };
+                    }
+                    monthData[month].products[productKey].count += record.count;
                     monthData[month].dates.add(record.date);
                 });
 
@@ -5738,8 +5744,8 @@
                 const data = monthData[month];
                 const monthName = monthNames[parseInt(month) - 1];
                 const productBreakdown = Object.entries(data.products)
-                    .sort((a, b) => b[1] - a[1])
-                    .map(([name, count]) => `${name}: ${count}`)
+                    .sort((a, b) => b[1].count - a[1].count)
+                    .map(([name, info]) => `${name}: ${info.count} ${info.unit}`.trim())
                     .join('<br>');
 
                 return `
@@ -5775,6 +5781,7 @@
                             date: record.date,
                             productId: record.productId,
                             productName: product ? product.nameThai : 'Unknown',
+                            productUnit: product?.unit || '',
                             batches: {},
                             qualityStatuses: new Set()
                         };
@@ -5800,7 +5807,7 @@
 
             tbody.innerHTML = entries.map(data => {
                 const batchBreakdown = Object.entries(data.batches)
-                    .map(([batch, count]) => `<div><strong>${batch}</strong>: ${count}</div>`)
+                    .map(([batch, count]) => `<div><strong>${batch}</strong>: ${count} ${data.productUnit}`.trim() + '</div>')
                     .join('');
 
                 const qualityBadges = Array.from(data.qualityStatuses)
