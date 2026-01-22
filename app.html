@@ -959,6 +959,52 @@
             font-weight: 500;
         }
 
+        /* Dropdown Menu Styles */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            margin-top: 4px;
+        }
+
+        .dropdown-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.15s;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Required Field Highlighting */
+        .required-field {
+            border-color: #FFAB91 !important;
+            background-color: #FFF3E0 !important;
+        }
+
+        .required-field:focus {
+            border-color: #FF9800 !important;
+            background-color: white !important;
+        }
+
+        .invalid-row {
+            background-color: #FFEBEE;
+        }
+
         .employee-accordion {
             display: flex;
             flex-direction: column;
@@ -2221,10 +2267,137 @@
                 title: 'Product Outflow',
                 breadcrumb: 'Product Management / Product Outflow',
                 content: `
-                    <h2>Product Outflow Management</h2>
-                    <p style="margin-top: 16px; color: #666;">
-                        Track products leaving the facility for distribution, sales, or delivery.
-                    </p>
+                    <h2>Product Outflow</h2>
+
+                    <!-- Date and Status Controls -->
+                    <div class="production-header">
+                        <div class="header-controls">
+                            <div class="control-group">
+                                <label class="control-label">Date:</label>
+                                <input type="date"
+                                       id="outflowDate"
+                                       class="form-input"
+                                       style="width: 160px;"
+                                       onchange="handleOutflowDateChange()">
+                            </div>
+
+                            <div class="status-group">
+                                <div id="outflowDayStatusBadge" class="status-badge badge-open">Open</div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button id="closeOutflowDayBtn"
+                                    class="btn btn-danger"
+                                    onclick="closeOutflowDay()"
+                                    style="display: none;">
+                                🔒 Close Day
+                            </button>
+                            <button id="reopenOutflowDayBtn"
+                                    class="btn btn-warning"
+                                    onclick="reopenOutflowDay()"
+                                    style="display: none;">
+                                🔓 Reopen Day
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="info-note">
+                        ℹ️ <strong>Note:</strong> Record product outflow as they are sold or used. Save your work to finalize the entries. Admins can close the day to lock edits.
+                    </div>
+
+                    <!-- Outflow Entry Table -->
+                    <div class="entry-content-wrapper">
+                        <div style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                <h3 style="margin: 0;">Outflow Entry</h3>
+                                <button class="btn btn-primary" onclick="addOutflowRow()" id="addOutflowRowBtn">
+                                    ➕ Add Row
+                                </button>
+                            </div>
+
+                            <!-- Filters -->
+                            <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                                <div>
+                                    <input type="date"
+                                           id="outflowFilterDateFrom"
+                                           class="form-input"
+                                           placeholder="Date From"
+                                           onchange="applyOutflowFilters()"
+                                           style="width: 150px;">
+                                </div>
+                                <div>
+                                    <input type="date"
+                                           id="outflowFilterDateTo"
+                                           class="form-input"
+                                           placeholder="Date To"
+                                           onchange="applyOutflowFilters()"
+                                           style="width: 150px;">
+                                </div>
+                                <div>
+                                    <select id="outflowFilterCustomer"
+                                            class="form-select"
+                                            onchange="applyOutflowFilters()"
+                                            style="width: 180px;">
+                                        <option value="">All Customers</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <select id="outflowFilterProduct"
+                                            class="form-select"
+                                            onchange="applyOutflowFilters()"
+                                            style="width: 180px;">
+                                        <option value="">All Products</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <input type="text"
+                                           id="outflowFilterSeller"
+                                           class="form-input"
+                                           placeholder="Filter by Seller"
+                                           onchange="applyOutflowFilters()"
+                                           style="width: 150px;">
+                                </div>
+                                <button class="btn btn-secondary" onclick="clearOutflowFilters()" style="white-space: nowrap;">
+                                    Clear Filters
+                                </button>
+                            </div>
+
+                            <div class="report-table">
+                                <table id="outflowTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 10%;">Date<span style="color: #F44336;">*</span></th>
+                                            <th style="width: 15%;">Customer<span style="color: #F44336;">*</span></th>
+                                            <th style="width: 10%;">Customer Group</th>
+                                            <th style="width: 12%;">Seller<span style="color: #F44336;">*</span></th>
+                                            <th style="width: 15%;">Product<span style="color: #F44336;">*</span></th>
+                                            <th style="width: 8%;">Unit</th>
+                                            <th style="width: 10%;">Quantity<span style="color: #F44336;">*</span></th>
+                                            <th style="width: 15%;">Note</th>
+                                            <th style="width: 5%;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="outflowTableBody">
+                                        <!-- Outflow rows will be rendered here -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Save Button -->
+                            <div style="margin-top: 24px; display: flex; gap: 12px; align-items: center;">
+                                <button id="saveOutflowBtn" class="btn btn-success btn-large" onclick="saveOutflow()">
+                                    💾 Save Outflow
+                                </button>
+                                <div id="outflowDraftIndicator" class="draft-indicator" style="display: none;">
+                                    ⚠️ Unsaved changes
+                                </div>
+                                <div id="outflowLastSavedInfo" class="last-saved-info" style="display: none;">
+                                    Last saved: <span id="outflowLastSavedTime">Never</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 `
             },
             'inventory': {
@@ -2248,13 +2421,140 @@
                 `
             },
             'outflow': {
-                title: 'Inventory Outflow',
+                title: 'Product Outflow',
                 breadcrumb: 'Inventory Management / Outflow',
                 content: `
-                    <h2>Inventory Outflow</h2>
-                    <p style="margin-top: 16px; color: #666;">
-                        Track inventory items used in production or sold to customers.
-                    </p>
+                    <h2>Product Outflow</h2>
+
+                    <!-- Date and Status Controls -->
+                    <div class="production-header">
+                        <div class="header-controls">
+                            <div class="control-group">
+                                <label class="control-label">Date:</label>
+                                <input type="date"
+                                       id="outflowDate"
+                                       class="form-input"
+                                       style="width: 160px;"
+                                       onchange="handleOutflowDateChange()">
+                            </div>
+
+                            <div class="status-group">
+                                <div id="outflowDayStatusBadge" class="status-badge badge-open">Open</div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button id="closeOutflowDayBtn"
+                                    class="btn btn-danger"
+                                    onclick="closeOutflowDay()"
+                                    style="display: none;">
+                                🔒 Close Day
+                            </button>
+                            <button id="reopenOutflowDayBtn"
+                                    class="btn btn-warning"
+                                    onclick="reopenOutflowDay()"
+                                    style="display: none;">
+                                🔓 Reopen Day
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="info-note">
+                        ℹ️ <strong>Note:</strong> Record product outflow as they are sold or used. Save your work to finalize the entries. Admins can close the day to lock edits.
+                    </div>
+
+                    <!-- Outflow Entry Table -->
+                    <div class="entry-content-wrapper">
+                        <div style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                <h3 style="margin: 0;">Outflow Entry</h3>
+                                <button class="btn btn-primary" onclick="addOutflowRow()" id="addOutflowRowBtn">
+                                    ➕ Add Row
+                                </button>
+                            </div>
+
+                            <!-- Filters -->
+                            <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                                <div>
+                                    <input type="date"
+                                           id="outflowFilterDateFrom"
+                                           class="form-input"
+                                           placeholder="Date From"
+                                           onchange="applyOutflowFilters()"
+                                           style="width: 150px;">
+                                </div>
+                                <div>
+                                    <input type="date"
+                                           id="outflowFilterDateTo"
+                                           class="form-input"
+                                           placeholder="Date To"
+                                           onchange="applyOutflowFilters()"
+                                           style="width: 150px;">
+                                </div>
+                                <div>
+                                    <select id="outflowFilterCustomer"
+                                            class="form-select"
+                                            onchange="applyOutflowFilters()"
+                                            style="width: 180px;">
+                                        <option value="">All Customers</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <select id="outflowFilterProduct"
+                                            class="form-select"
+                                            onchange="applyOutflowFilters()"
+                                            style="width: 180px;">
+                                        <option value="">All Products</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <input type="text"
+                                           id="outflowFilterSeller"
+                                           class="form-input"
+                                           placeholder="Filter by Seller"
+                                           onchange="applyOutflowFilters()"
+                                           style="width: 150px;">
+                                </div>
+                                <button class="btn btn-secondary" onclick="clearOutflowFilters()" style="white-space: nowrap;">
+                                    Clear Filters
+                                </button>
+                            </div>
+
+                            <div class="report-table">
+                                <table id="outflowTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 10%;">Date<span style="color: #F44336;">*</span></th>
+                                            <th style="width: 15%;">Customer<span style="color: #F44336;">*</span></th>
+                                            <th style="width: 10%;">Customer Group</th>
+                                            <th style="width: 12%;">Seller<span style="color: #F44336;">*</span></th>
+                                            <th style="width: 15%;">Product<span style="color: #F44336;">*</span></th>
+                                            <th style="width: 8%;">Unit</th>
+                                            <th style="width: 10%;">Quantity<span style="color: #F44336;">*</span></th>
+                                            <th style="width: 15%;">Note</th>
+                                            <th style="width: 5%;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="outflowTableBody">
+                                        <!-- Outflow rows will be rendered here -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Save Button -->
+                            <div style="margin-top: 24px; display: flex; gap: 12px; align-items: center;">
+                                <button id="saveOutflowBtn" class="btn btn-success btn-large" onclick="saveOutflow()">
+                                    💾 Save Outflow
+                                </button>
+                                <div id="outflowDraftIndicator" class="draft-indicator" style="display: none;">
+                                    ⚠️ Unsaved changes
+                                </div>
+                                <div id="outflowLastSavedInfo" class="last-saved-info" style="display: none;">
+                                    Last saved: <span id="outflowLastSavedTime">Never</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 `
             },
             'net-change': {
@@ -2595,6 +2895,11 @@
             if (currentPage === 'other-production') {
                 updateOtherProductionStatusUI();
                 renderOtherProductionTable(otherProductionDraft[currentOtherProductionDate] || []);
+            }
+
+            if (currentPage === 'product-outflow') {
+                updateOutflowStatusUI();
+                renderOutflowTable(outflowDraft[currentOutflowDate] || []);
             }
         }
 
@@ -3380,6 +3685,13 @@
             if (pageId === 'other-production') {
                 setTimeout(() => {
                     initOtherProductionPage();
+                }, 10);
+            }
+
+            // If navigating to product outflow page, initialize it
+            if (pageId === 'product-outflow') {
+                setTimeout(() => {
+                    initOutflowPage();
                 }, 10);
             }
         };
@@ -5857,6 +6169,753 @@
             }
         }
 
+        // ========== PRODUCT OUTFLOW ==========
+
+        // Product Outflow Data
+        let outflowRecords = [];
+        let outflowDraft = {};
+        let outflowDayStatus = {};
+        let currentOutflowDate = '';
+        let outflowIsDirty = false;
+
+        // Load outflow records from localStorage
+        function loadOutflowRecords() {
+            const stored = localStorage.getItem('wontonOutflowRecords');
+            if (stored) {
+                outflowRecords = JSON.parse(stored);
+            }
+        }
+
+        // Save outflow records to localStorage
+        function saveOutflowRecords() {
+            localStorage.setItem('wontonOutflowRecords', JSON.stringify(outflowRecords));
+        }
+
+        // Load outflow draft from localStorage
+        function loadOutflowDraft() {
+            const stored = localStorage.getItem('wontonOutflowDraft');
+            if (stored) {
+                outflowDraft = JSON.parse(stored);
+            }
+        }
+
+        // Save outflow draft to localStorage
+        function saveOutflowDraft() {
+            localStorage.setItem('wontonOutflowDraft', JSON.stringify(outflowDraft));
+        }
+
+        // Load outflow day status from localStorage
+        function loadOutflowDayStatus() {
+            const stored = localStorage.getItem('wontonOutflowDayStatus');
+            if (stored) {
+                outflowDayStatus = JSON.parse(stored);
+            }
+        }
+
+        // Save outflow day status to localStorage
+        function saveOutflowDayStatus() {
+            localStorage.setItem('wontonOutflowDayStatus', JSON.stringify(outflowDayStatus));
+        }
+
+        // Get outflow draft entries for a date
+        function getOutflowDraftEntries(dateKey) {
+            if (!outflowDraft[dateKey]) {
+                outflowDraft[dateKey] = [];
+            }
+            return outflowDraft[dateKey];
+        }
+
+        // Initialize outflow page
+        function initOutflowPage() {
+            // Set today's date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('outflowDate').value = today;
+            currentOutflowDate = today;
+
+            // Load outflow data
+            loadOutflowDay();
+        }
+
+        // Load outflow day
+        function loadOutflowDay() {
+            const date = document.getElementById('outflowDate').value;
+            currentOutflowDate = date;
+
+            // Get draft entries for this date
+            const draftKey = date;
+            const draftEntries = getOutflowDraftEntries(draftKey);
+
+            // Render table
+            renderOutflowTable(draftEntries);
+
+            // Update status UI
+            updateOutflowStatusUI();
+
+            // Populate filter dropdowns
+            populateOutflowFilterDropdowns();
+        }
+
+        // Render outflow table
+        function renderOutflowTable(entries = []) {
+            const tbody = document.getElementById('outflowTableBody');
+            const dayStatusValue = outflowDayStatus[currentOutflowDate] || 'Open';
+            const isEditable = dayStatusValue === 'Open' || currentRole === 'admin';
+
+            if (!entries || entries.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 24px; color: #999;">No outflow entries yet. Click "Add Row" to record outflow.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = entries.map((entry) => {
+                const customer = customers.find(c => c.id === entry.customerId);
+                const product = products.find(p => p.id === entry.productId);
+                const customerGroup = customer ? customer.clientType : '';
+                const unit = product ? product.unit : '';
+
+                const isValid = validateOutflowEntry(entry);
+                const rowClass = !isValid && entry.transactionDate ? 'invalid-row' : '';
+
+                const savedTag = entry.isSaved ? '<span style="display: inline-block; margin-top: 4px; padding: 2px 6px; background: #E3F2FD; color: #1976D2; border-radius: 10px; font-size: 11px;">Saved</span>' : '';
+
+                const canDelete = isEditable && (currentRole === 'admin' || !entry.isSaved);
+
+                return `
+                    <tr class="${rowClass}">
+                        <td>
+                            <input type="date"
+                                   id="outflow-date-${entry.id}"
+                                   class="form-input ${!entry.transactionDate ? 'required-field' : ''}"
+                                   value="${entry.transactionDate || ''}"
+                                   onchange="handleOutflowChange(${entry.id})"
+                                   ${isEditable ? '' : 'disabled'}
+                                   style="width: 100%;">
+                        </td>
+                        <td>
+                            <div style="position: relative;">
+                                <input type="text"
+                                       id="outflow-customer-search-${entry.id}"
+                                       class="form-input ${!entry.customerId ? 'required-field' : ''}"
+                                       placeholder="Search customer..."
+                                       onkeyup="filterCustomerDropdown(${entry.id})"
+                                       onfocus="showCustomerDropdown(${entry.id})"
+                                       onblur="hideCustomerDropdown(${entry.id})"
+                                       ${isEditable ? '' : 'disabled'}
+                                       value="${customer ? customer.nameThai + ' / ' + customer.nameBurmese : ''}"
+                                       style="width: 100%;">
+                                <div id="customer-dropdown-${entry.id}" class="dropdown-menu" style="display: none;">
+                                    <!-- Customer options will be populated here -->
+                                </div>
+                                ${savedTag}
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text"
+                                   class="form-input"
+                                   value="${customerGroup}"
+                                   disabled
+                                   style="width: 100%; background: #f5f5f5; color: #666;">
+                        </td>
+                        <td>
+                            <input type="text"
+                                   id="outflow-seller-${entry.id}"
+                                   class="form-input ${!entry.sellerId ? 'required-field' : ''}"
+                                   value="${entry.sellerId || ''}"
+                                   placeholder="Seller name"
+                                   onchange="handleOutflowChange(${entry.id})"
+                                   ${isEditable ? '' : 'disabled'}
+                                   style="width: 100%;">
+                        </td>
+                        <td>
+                            <div style="position: relative;">
+                                <input type="text"
+                                       id="outflow-product-search-${entry.id}"
+                                       class="form-input ${!entry.productId ? 'required-field' : ''}"
+                                       placeholder="Search product..."
+                                       onkeyup="filterProductDropdown(${entry.id})"
+                                       onfocus="showProductDropdown(${entry.id})"
+                                       onblur="hideProductDropdown(${entry.id})"
+                                       ${isEditable ? '' : 'disabled'}
+                                       value="${product ? product.nameThai + ' / ' + product.nameEn : ''}"
+                                       style="width: 100%;">
+                                <div id="product-dropdown-${entry.id}" class="dropdown-menu" style="display: none;">
+                                    <!-- Product options will be populated here -->
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text"
+                                   class="form-input"
+                                   value="${unit}"
+                                   disabled
+                                   style="width: 100%; background: #f5f5f5; color: #666;">
+                        </td>
+                        <td>
+                            <input type="number"
+                                   id="outflow-quantity-${entry.id}"
+                                   class="form-input ${!entry.quantity || entry.quantity <= 0 ? 'required-field' : ''}"
+                                   value="${entry.quantity || ''}"
+                                   min="0"
+                                   step="0.001"
+                                   placeholder="0.000"
+                                   onchange="handleOutflowChange(${entry.id})"
+                                   ${isEditable ? '' : 'disabled'}
+                                   style="width: 100%;">
+                        </td>
+                        <td>
+                            <input type="text"
+                                   id="outflow-note-${entry.id}"
+                                   class="form-input"
+                                   value="${entry.note || ''}"
+                                   placeholder="Optional note"
+                                   onchange="handleOutflowChange(${entry.id})"
+                                   ${isEditable ? '' : 'disabled'}
+                                   style="width: 100%;">
+                        </td>
+                        <td style="text-align: center;">
+                            ${canDelete
+                                ? `<button class="btn-icon-danger"
+                                           onclick="removeOutflowRow(${entry.id})"
+                                           title="Delete row">
+                                       🗑️
+                                   </button>`
+                                : `<span title="${isEditable ? 'Saved entries can only be removed by admins.' : 'Day is closed.'}" style="color: #999;">🔒</span>`
+                            }
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Initialize customer and product dropdowns for each row
+            entries.forEach(entry => {
+                setTimeout(() => {
+                    initializeCustomerDropdown(entry.id);
+                    initializeProductDropdown(entry.id);
+                }, 0);
+            });
+        }
+
+        // Validate outflow entry
+        function validateOutflowEntry(entry) {
+            return entry.transactionDate &&
+                   entry.customerId &&
+                   entry.sellerId &&
+                   entry.productId &&
+                   entry.quantity &&
+                   entry.quantity > 0;
+        }
+
+        // Initialize customer dropdown
+        function initializeCustomerDropdown(entryId) {
+            const dropdown = document.getElementById(`customer-dropdown-${entryId}`);
+            if (!dropdown) return;
+
+            const activeCustomers = customers.filter(c => c.status === 'Active');
+
+            dropdown.innerHTML = activeCustomers.map(customer => {
+                return `<div class="dropdown-item" onmousedown="selectCustomer(${entryId}, ${customer.id})">
+                    <div style="font-weight: 600;">${customer.nameThai}</div>
+                    <div style="font-size: 12px; color: #666;">${customer.nameBurmese}</div>
+                    <div style="font-size: 11px; color: #999;">${customer.clientType}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // Initialize product dropdown
+        function initializeProductDropdown(entryId) {
+            const dropdown = document.getElementById(`product-dropdown-${entryId}`);
+            if (!dropdown) return;
+
+            const activeProducts = products.filter(p => p.status === 'Active');
+
+            dropdown.innerHTML = activeProducts.map(product => {
+                return `<div class="dropdown-item" onmousedown="selectProduct(${entryId}, ${product.id})">
+                    <div style="font-weight: 600;">${product.nameThai}</div>
+                    <div style="font-size: 12px; color: #666;">${product.nameEn}</div>
+                    <div style="font-size: 11px; color: #999;">${product.unit} - Dept ${String(product.departmentId).padStart(2, '0')}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // Show customer dropdown
+        function showCustomerDropdown(entryId) {
+            const dropdown = document.getElementById(`customer-dropdown-${entryId}`);
+            if (dropdown) {
+                dropdown.style.display = 'block';
+                filterCustomerDropdown(entryId);
+            }
+        }
+
+        // Hide customer dropdown
+        function hideCustomerDropdown(entryId) {
+            setTimeout(() => {
+                const dropdown = document.getElementById(`customer-dropdown-${entryId}`);
+                if (dropdown) {
+                    dropdown.style.display = 'none';
+                }
+            }, 200);
+        }
+
+        // Filter customer dropdown
+        function filterCustomerDropdown(entryId) {
+            const searchInput = document.getElementById(`outflow-customer-search-${entryId}`);
+            const dropdown = document.getElementById(`customer-dropdown-${entryId}`);
+
+            if (!searchInput || !dropdown) return;
+
+            const searchText = searchInput.value.toLowerCase();
+            const activeCustomers = customers.filter(c => c.status === 'Active');
+
+            const filteredCustomers = activeCustomers.filter(customer => {
+                return customer.nameThai.toLowerCase().includes(searchText) ||
+                       customer.nameBurmese.toLowerCase().includes(searchText) ||
+                       customer.clientType.toLowerCase().includes(searchText);
+            });
+
+            dropdown.innerHTML = filteredCustomers.map(customer => {
+                return `<div class="dropdown-item" onmousedown="selectCustomer(${entryId}, ${customer.id})">
+                    <div style="font-weight: 600;">${customer.nameThai}</div>
+                    <div style="font-size: 12px; color: #666;">${customer.nameBurmese}</div>
+                    <div style="font-size: 11px; color: #999;">${customer.clientType}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // Show product dropdown
+        function showProductDropdown(entryId) {
+            const dropdown = document.getElementById(`product-dropdown-${entryId}`);
+            if (dropdown) {
+                dropdown.style.display = 'block';
+                filterProductDropdown(entryId);
+            }
+        }
+
+        // Hide product dropdown
+        function hideProductDropdown(entryId) {
+            setTimeout(() => {
+                const dropdown = document.getElementById(`product-dropdown-${entryId}`);
+                if (dropdown) {
+                    dropdown.style.display = 'none';
+                }
+            }, 200);
+        }
+
+        // Filter product dropdown
+        function filterProductDropdown(entryId) {
+            const searchInput = document.getElementById(`outflow-product-search-${entryId}`);
+            const dropdown = document.getElementById(`product-dropdown-${entryId}`);
+
+            if (!searchInput || !dropdown) return;
+
+            const searchText = searchInput.value.toLowerCase();
+            const activeProducts = products.filter(p => p.status === 'Active');
+
+            const filteredProducts = activeProducts.filter(product => {
+                return product.nameThai.toLowerCase().includes(searchText) ||
+                       product.nameEn.toLowerCase().includes(searchText) ||
+                       product.unit.toLowerCase().includes(searchText);
+            });
+
+            dropdown.innerHTML = filteredProducts.map(product => {
+                return `<div class="dropdown-item" onmousedown="selectProduct(${entryId}, ${product.id})">
+                    <div style="font-weight: 600;">${product.nameThai}</div>
+                    <div style="font-size: 12px; color: #666;">${product.nameEn}</div>
+                    <div style="font-size: 11px; color: #999;">${product.unit} - Dept ${String(product.departmentId).padStart(2, '0')}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // Select customer
+        function selectCustomer(entryId, customerId) {
+            const draftKey = currentOutflowDate;
+            const draftEntries = getOutflowDraftEntries(draftKey);
+            const entry = draftEntries.find(e => e.id === entryId);
+
+            if (!entry) return;
+
+            entry.customerId = customerId;
+
+            // Update draft and re-render
+            outflowDraft[draftKey] = draftEntries;
+            saveOutflowDraft();
+
+            outflowIsDirty = true;
+            updateOutflowStatusUI();
+
+            renderOutflowTable(draftEntries);
+        }
+
+        // Select product
+        function selectProduct(entryId, productId) {
+            const draftKey = currentOutflowDate;
+            const draftEntries = getOutflowDraftEntries(draftKey);
+            const entry = draftEntries.find(e => e.id === entryId);
+
+            if (!entry) return;
+
+            entry.productId = productId;
+
+            // Update draft and re-render
+            outflowDraft[draftKey] = draftEntries;
+            saveOutflowDraft();
+
+            outflowIsDirty = true;
+            updateOutflowStatusUI();
+
+            renderOutflowTable(draftEntries);
+        }
+
+        // Handle outflow change
+        function handleOutflowChange(entryId) {
+            const dayStatusValue = outflowDayStatus[currentOutflowDate] || 'Open';
+            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
+                alert('This day is closed. Only admins can edit entries.');
+                return;
+            }
+
+            const draftKey = currentOutflowDate;
+            const draftEntries = getOutflowDraftEntries(draftKey);
+            const entry = draftEntries.find(e => e.id === entryId);
+
+            if (!entry) return;
+
+            // Update entry fields
+            const dateInput = document.getElementById(`outflow-date-${entryId}`);
+            const sellerInput = document.getElementById(`outflow-seller-${entryId}`);
+            const quantityInput = document.getElementById(`outflow-quantity-${entryId}`);
+            const noteInput = document.getElementById(`outflow-note-${entryId}`);
+
+            if (dateInput) entry.transactionDate = dateInput.value;
+            if (sellerInput) entry.sellerId = sellerInput.value;
+            if (quantityInput) entry.quantity = parseFloat(quantityInput.value) || 0;
+            if (noteInput) entry.note = noteInput.value;
+
+            // Save to localStorage
+            outflowDraft[draftKey] = draftEntries;
+            saveOutflowDraft();
+
+            // Mark as dirty
+            outflowIsDirty = true;
+            updateOutflowStatusUI();
+        }
+
+        // Add outflow row
+        function addOutflowRow() {
+            const dayStatusValue = outflowDayStatus[currentOutflowDate] || 'Open';
+            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
+                alert('This day is closed. Only admins can add rows.');
+                return;
+            }
+
+            const draftKey = currentOutflowDate;
+            const draftEntries = getOutflowDraftEntries(draftKey);
+
+            // Add new entry with default values
+            draftEntries.push({
+                id: Date.now() + Math.random(),
+                transactionDate: currentOutflowDate,
+                customerId: null,
+                sellerId: '',
+                productId: null,
+                quantity: 0,
+                note: '',
+                recordId: null,
+                isSaved: false
+            });
+
+            // Save to localStorage
+            outflowDraft[draftKey] = draftEntries;
+            saveOutflowDraft();
+
+            // Re-render table
+            renderOutflowTable(draftEntries);
+
+            // Mark as dirty
+            outflowIsDirty = true;
+            updateOutflowStatusUI();
+        }
+
+        // Remove outflow row
+        function removeOutflowRow(entryId) {
+            const dayStatusValue = outflowDayStatus[currentOutflowDate] || 'Open';
+            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
+                alert('This day is closed. Only admins can remove entries.');
+                return;
+            }
+
+            const draftKey = currentOutflowDate;
+            const draftEntries = getOutflowDraftEntries(draftKey);
+            const entry = draftEntries.find(e => e.id === entryId);
+
+            if (!entry) return;
+
+            if (entry.isSaved && currentRole !== 'admin') {
+                alert('Saved entries can only be removed by admins.');
+                return;
+            }
+
+            if (!confirm('Remove this outflow entry?')) {
+                return;
+            }
+
+            // Remove entry
+            const index = draftEntries.findIndex(e => e.id === entryId);
+            if (index !== -1) {
+                draftEntries.splice(index, 1);
+            }
+
+            // If entry was saved, also remove from outflowRecords
+            if (entry.recordId) {
+                const recordIndex = outflowRecords.findIndex(r => r.id === entry.recordId);
+                if (recordIndex !== -1) {
+                    outflowRecords.splice(recordIndex, 1);
+                    saveOutflowRecords();
+                }
+            }
+
+            // Save to localStorage
+            outflowDraft[draftKey] = draftEntries;
+            saveOutflowDraft();
+
+            // Re-render table
+            renderOutflowTable(draftEntries);
+
+            // Mark as dirty
+            outflowIsDirty = true;
+            updateOutflowStatusUI();
+        }
+
+        // Save outflow
+        function saveOutflow() {
+            const dayStatusValue = outflowDayStatus[currentOutflowDate] || 'Open';
+            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
+                alert('This day is closed. Only admins can save changes.');
+                return;
+            }
+
+            const draftKey = currentOutflowDate;
+            const draftEntries = getOutflowDraftEntries(draftKey);
+
+            // Validate entries
+            const invalidEntries = draftEntries.filter(entry => !validateOutflowEntry(entry));
+
+            if (draftEntries.length === 0) {
+                alert('Please add at least one outflow entry before saving.');
+                return;
+            }
+
+            if (invalidEntries.length > 0) {
+                alert('Please fill in all required fields (Date, Customer, Seller, Product, and Quantity > 0) before saving.');
+                return;
+            }
+
+            // Create/update outflow records from draft
+            const timestamp = Date.now();
+            const recordIndexMap = new Map();
+            outflowRecords.forEach((record, index) => {
+                recordIndexMap.set(record.id, index);
+            });
+
+            draftEntries.forEach(entry => {
+                if (entry.recordId && recordIndexMap.has(entry.recordId)) {
+                    // Update existing record
+                    const recordIndex = recordIndexMap.get(entry.recordId);
+                    outflowRecords[recordIndex] = {
+                        ...outflowRecords[recordIndex],
+                        transactionDate: entry.transactionDate,
+                        customerId: entry.customerId,
+                        sellerId: entry.sellerId,
+                        productId: entry.productId,
+                        quantity: entry.quantity,
+                        note: entry.note || '',
+                        updatedAt: timestamp
+                    };
+                    entry.isSaved = true;
+                } else {
+                    // Create new record
+                    const newId = timestamp + Math.random();
+                    outflowRecords.push({
+                        id: newId,
+                        transactionDate: entry.transactionDate,
+                        customerId: entry.customerId,
+                        sellerId: entry.sellerId,
+                        productId: entry.productId,
+                        quantity: entry.quantity,
+                        note: entry.note || '',
+                        createdAt: timestamp,
+                        updatedAt: timestamp
+                    });
+                    entry.recordId = newId;
+                    entry.isSaved = true;
+                }
+            });
+
+            // Save to localStorage
+            saveOutflowRecords();
+
+            // Save draft for this date (keep entries visible)
+            outflowDraft[draftKey] = draftEntries;
+            saveOutflowDraft();
+
+            // Update UI
+            outflowIsDirty = false;
+            updateOutflowStatusUI();
+
+            // Show success message
+            const lastSavedInfo = document.getElementById('outflowLastSavedInfo');
+            const lastSavedTime = document.getElementById('outflowLastSavedTime');
+            lastSavedTime.textContent = new Date().toLocaleTimeString();
+            lastSavedInfo.style.display = 'block';
+
+            alert('Outflow saved successfully!');
+
+            // Re-render table
+            renderOutflowTable(draftEntries);
+        }
+
+        // Update outflow status UI
+        function updateOutflowStatusUI() {
+            const dayStatusValue = outflowDayStatus[currentOutflowDate] || 'Open';
+            const statusBadge = document.getElementById('outflowDayStatusBadge');
+            const closeBtn = document.getElementById('closeOutflowDayBtn');
+            const reopenBtn = document.getElementById('reopenOutflowDayBtn');
+            const draftIndicator = document.getElementById('outflowDraftIndicator');
+            const saveBtn = document.getElementById('saveOutflowBtn');
+            const addRowBtn = document.getElementById('addOutflowRowBtn');
+
+            // Update status badge
+            if (statusBadge) {
+                if (dayStatusValue === 'Closed') {
+                    statusBadge.className = 'status-badge badge-closed';
+                    statusBadge.textContent = 'Closed';
+                } else {
+                    statusBadge.className = 'status-badge badge-open';
+                    statusBadge.textContent = 'Open';
+                }
+            }
+
+            // Show/hide buttons based on role and status
+            if (currentRole === 'admin') {
+                if (closeBtn) closeBtn.style.display = dayStatusValue === 'Open' ? 'block' : 'none';
+                if (reopenBtn) reopenBtn.style.display = dayStatusValue === 'Closed' ? 'block' : 'none';
+            } else {
+                if (closeBtn) closeBtn.style.display = 'none';
+                if (reopenBtn) reopenBtn.style.display = 'none';
+            }
+
+            // Show/hide draft indicator
+            if (draftIndicator) {
+                draftIndicator.style.display = outflowIsDirty ? 'block' : 'none';
+            }
+
+            // Enable/disable save button
+            const isEditable = dayStatusValue === 'Open' || currentRole === 'admin';
+            if (saveBtn) saveBtn.disabled = !isEditable;
+            if (addRowBtn) addRowBtn.disabled = !isEditable;
+        }
+
+        // Handle outflow date change
+        function handleOutflowDateChange() {
+            if (outflowIsDirty) {
+                const confirmChange = confirm('You have unsaved changes. Do you want to discard them and change the date?');
+                if (!confirmChange) {
+                    // Revert date back
+                    document.getElementById('outflowDate').value = currentOutflowDate;
+                    return;
+                }
+            }
+
+            outflowIsDirty = false;
+            loadOutflowDay();
+        }
+
+        // Close outflow day
+        function closeOutflowDay() {
+            if (currentRole !== 'admin') {
+                alert('Only admins can close the day.');
+                return;
+            }
+            if (!confirm('Close this outflow day? Entries will be locked for normal users.')) {
+                return;
+            }
+            outflowDayStatus[currentOutflowDate] = 'Closed';
+            saveOutflowDayStatus();
+            updateOutflowStatusUI();
+            renderOutflowTable(outflowDraft[currentOutflowDate] || []);
+        }
+
+        // Reopen outflow day
+        function reopenOutflowDay() {
+            if (currentRole !== 'admin') {
+                alert('Only admins can reopen the day.');
+                return;
+            }
+            outflowDayStatus[currentOutflowDate] = 'Open';
+            saveOutflowDayStatus();
+            updateOutflowStatusUI();
+            renderOutflowTable(outflowDraft[currentOutflowDate] || []);
+        }
+
+        // Populate outflow filter dropdowns
+        function populateOutflowFilterDropdowns() {
+            const customerFilter = document.getElementById('outflowFilterCustomer');
+            const productFilter = document.getElementById('outflowFilterProduct');
+
+            if (customerFilter) {
+                const activeCustomers = customers.filter(c => c.status === 'Active');
+                customerFilter.innerHTML = '<option value="">All Customers</option>' +
+                    activeCustomers.map(c => `<option value="${c.id}">${c.nameThai} / ${c.nameBurmese}</option>`).join('');
+            }
+
+            if (productFilter) {
+                const activeProducts = products.filter(p => p.status === 'Active');
+                productFilter.innerHTML = '<option value="">All Products</option>' +
+                    activeProducts.map(p => `<option value="${p.id}">${p.nameThai} / ${p.nameEn}</option>`).join('');
+            }
+        }
+
+        // Apply outflow filters
+        function applyOutflowFilters() {
+            const dateFrom = document.getElementById('outflowFilterDateFrom').value;
+            const dateTo = document.getElementById('outflowFilterDateTo').value;
+            const customerFilter = document.getElementById('outflowFilterCustomer').value;
+            const productFilter = document.getElementById('outflowFilterProduct').value;
+            const sellerFilter = document.getElementById('outflowFilterSeller').value.toLowerCase();
+
+            const draftKey = currentOutflowDate;
+            let entries = getOutflowDraftEntries(draftKey);
+
+            // Apply filters
+            if (dateFrom) {
+                entries = entries.filter(e => e.transactionDate >= dateFrom);
+            }
+            if (dateTo) {
+                entries = entries.filter(e => e.transactionDate <= dateTo);
+            }
+            if (customerFilter) {
+                entries = entries.filter(e => e.customerId === parseInt(customerFilter));
+            }
+            if (productFilter) {
+                entries = entries.filter(e => e.productId === parseInt(productFilter));
+            }
+            if (sellerFilter) {
+                entries = entries.filter(e => e.sellerId && e.sellerId.toLowerCase().includes(sellerFilter));
+            }
+
+            renderOutflowTable(entries);
+        }
+
+        // Clear outflow filters
+        function clearOutflowFilters() {
+            document.getElementById('outflowFilterDateFrom').value = '';
+            document.getElementById('outflowFilterDateTo').value = '';
+            document.getElementById('outflowFilterCustomer').value = '';
+            document.getElementById('outflowFilterProduct').value = '';
+            document.getElementById('outflowFilterSeller').value = '';
+
+            const draftKey = currentOutflowDate;
+            renderOutflowTable(getOutflowDraftEntries(draftKey));
+        }
+
         // ========== OTHER PRODUCTION REPORTS ==========
 
         // Show other report view
@@ -6187,6 +7246,9 @@
             loadDepartments();
             loadEmployees();
             loadCustomers();
+            loadOutflowRecords();
+            loadOutflowDraft();
+            loadOutflowDayStatus();
             init();
         });
     </script>
