@@ -2058,7 +2058,7 @@
                                                 <th style="width: 8%;">Unit</th>
                                                 <th style="width: 12%;">Batch</th>
                                                 <th style="width: 12%;">Amount</th>
-                                                <th style="width: 18%;">Quality Status</th>
+                                                <th style="width: 18%;">Quality Check</th>
                                                 <th style="width: 21%;">Notes</th>
                                                 <th style="width: 8%;">Action</th>
                                             </tr>
@@ -5204,20 +5204,20 @@
                         </td>
                         <td>
                             <div class="quality-toggle-group">
-                                <button class="quality-toggle-btn ${quality === 'OK' ? 'active ok' : ''}"
-                                        onclick="setOtherQualityStatus(${entry.id}, 'OK')"
-                                        ${isEditable ? '' : 'disabled'}>
-                                    ✓ OK
-                                </button>
-                                <button class="quality-toggle-btn ${quality === 'Not OK' ? 'active not-ok' : ''}"
-                                        onclick="setOtherQualityStatus(${entry.id}, 'Not OK')"
-                                        ${isEditable ? '' : 'disabled'}>
-                                    ✗ Not OK
-                                </button>
                                 <button class="quality-toggle-btn ${quality === 'Pending' ? 'active pending' : ''}"
                                         onclick="setOtherQualityStatus(${entry.id}, 'Pending')"
                                         ${isEditable ? '' : 'disabled'}>
                                     ⏱ Pending
+                                </button>
+                                <button class="quality-toggle-btn ${quality === 'OK' ? 'active ok' : ''}"
+                                        onclick="setOtherQualityStatus(${entry.id}, 'OK')"
+                                        ${isEditable ? '' : 'disabled'}>
+                                    ✓ Pass
+                                </button>
+                                <button class="quality-toggle-btn ${quality === 'Not OK' ? 'active not-ok' : ''}"
+                                        onclick="setOtherQualityStatus(${entry.id}, 'Not OK')"
+                                        ${isEditable ? '' : 'disabled'}>
+                                    ✗ Not Pass
                                 </button>
                             </div>
                         </td>
