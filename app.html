@@ -2296,6 +2296,7 @@
                         <button class="tab-btn active" onclick="switchSetupTab('product')">Product Management</button>
                         <button class="tab-btn" onclick="switchSetupTab('department')">Department Management</button>
                         <button class="tab-btn" onclick="switchSetupTab('employee')">Employee Management</button>
+                        <button class="tab-btn" onclick="switchSetupTab('customer')">Customer Management</button>
                     </div>
 
                     <!-- Product Management Tab -->
@@ -2486,6 +2487,71 @@
                                     </thead>
                                     <tbody id="employeeTableBody">
                                         <!-- Employees will be rendered here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Management Tab -->
+                    <div id="customer-tab" class="tab-content">
+                        <div class="product-section">
+                            <div class="section-header">
+                                <h2 class="section-title">Customer Management</h2>
+                                <button class="btn btn-primary" onclick="toggleCustomerForm()">
+                                    <span>+</span> Add New Customer
+                                </button>
+                            </div>
+
+                            <!-- Customer Form -->
+                            <div id="customerForm" class="product-form">
+                                <h3 style="margin-bottom: 20px; font-size: 18px;" id="customerFormTitle">Add New Customer</h3>
+                                <form onsubmit="saveCustomer(event)">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label class="form-label">Customer ID<span class="required">*</span></label>
+                                            <input type="number" id="customerId" class="form-input" disabled required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Customer Name (Thai)<span class="required">*</span></label>
+                                            <input type="text" id="customerNameThai" class="form-input" placeholder="ชื่อลูกค้า" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Customer Name (Burmese)<span class="required">*</span></label>
+                                            <input type="text" id="customerNameBurmese" class="form-input" placeholder="ဖောက်သည်အမည်" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Client Type<span class="required">*</span></label>
+                                            <select id="customerClientType" class="form-select" required>
+                                                <option value="">Select Client Type</option>
+                                                <option value="Retail">Retail</option>
+                                                <option value="Wholesale">Wholesale</option>
+                                                <option value="Distributor">Distributor</option>
+                                                <option value="Corporate">Corporate</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="button" class="btn btn-secondary" onclick="cancelCustomerForm()">Cancel</button>
+                                        <button type="submit" class="btn btn-success" id="customerSaveBtn">Save Customer</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Customer List -->
+                            <div id="customerListContainer">
+                                <table class="product-table" id="customerTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer ID</th>
+                                            <th>Customer Name (Thai)</th>
+                                            <th>Customer Name (Burmese)</th>
+                                            <th>Client Type</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="customerTableBody">
+                                        <!-- Customers will be rendered here -->
                                     </tbody>
                                 </table>
                             </div>
@@ -3125,6 +3191,152 @@
             `).join('');
         }
 
+        // Customer Management Functions
+        let customers = [];
+        let editingCustomerId = null;
+
+        // Load customers from localStorage
+        function loadCustomers() {
+            const stored = localStorage.getItem('wontonCustomers');
+            if (stored) {
+                customers = JSON.parse(stored);
+            }
+        }
+
+        // Save customers to localStorage
+        function saveCustomersToStorage() {
+            localStorage.setItem('wontonCustomers', JSON.stringify(customers));
+        }
+
+        // Get next customer ID
+        function getNextCustomerId() {
+            if (customers.length === 0) return 1;
+            return Math.max(...customers.map(c => c.id)) + 1;
+        }
+
+        // Format customer ID as 2-digit string
+        function formatCustomerId(id) {
+            return String(id).padStart(2, '0');
+        }
+
+        // Toggle customer form
+        function toggleCustomerForm() {
+            const form = document.getElementById('customerForm');
+            const isVisible = form.classList.contains('show');
+
+            if (isVisible) {
+                form.classList.remove('show');
+            } else {
+                resetCustomerForm();
+                form.classList.add('show');
+                editingCustomerId = null;
+                document.getElementById('customerFormTitle').textContent = 'Add New Customer';
+                document.getElementById('customerSaveBtn').textContent = 'Save Customer';
+                document.getElementById('customerId').value = formatCustomerId(getNextCustomerId());
+            }
+        }
+
+        // Reset customer form
+        function resetCustomerForm() {
+            document.getElementById('customerId').value = '';
+            document.getElementById('customerNameThai').value = '';
+            document.getElementById('customerNameBurmese').value = '';
+            document.getElementById('customerClientType').value = '';
+        }
+
+        // Cancel customer form
+        function cancelCustomerForm() {
+            document.getElementById('customerForm').classList.remove('show');
+            resetCustomerForm();
+            editingCustomerId = null;
+        }
+
+        // Save customer
+        function saveCustomer(event) {
+            event.preventDefault();
+
+            const customer = {
+                id: parseInt(document.getElementById('customerId').value),
+                nameThai: document.getElementById('customerNameThai').value,
+                nameBurmese: document.getElementById('customerNameBurmese').value,
+                clientType: document.getElementById('customerClientType').value
+            };
+
+            if (editingCustomerId !== null) {
+                // Update existing customer
+                const index = customers.findIndex(c => c.id === editingCustomerId);
+                if (index !== -1) {
+                    customers[index] = customer;
+                }
+            } else {
+                // Add new customer
+                customers.push(customer);
+            }
+
+            saveCustomersToStorage();
+            renderCustomerTable();
+            cancelCustomerForm();
+        }
+
+        // Edit customer
+        function editCustomer(customerId) {
+            const customer = customers.find(c => c.id === customerId);
+            if (!customer) return;
+
+            editingCustomerId = customerId;
+            document.getElementById('customerFormTitle').textContent = 'Edit Customer';
+            document.getElementById('customerSaveBtn').textContent = 'Update Customer';
+
+            document.getElementById('customerId').value = formatCustomerId(customer.id);
+            document.getElementById('customerNameThai').value = customer.nameThai;
+            document.getElementById('customerNameBurmese').value = customer.nameBurmese;
+            document.getElementById('customerClientType').value = customer.clientType;
+
+            document.getElementById('customerForm').classList.add('show');
+
+            // Scroll to form
+            document.getElementById('customerForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Render customer table
+        function renderCustomerTable() {
+            const tbody = document.getElementById('customerTableBody');
+
+            if (!tbody) return; // Guard clause if not on setup page
+
+            if (customers.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">👤</div>
+                                <div class="empty-state-text">No customers yet. Click "Add New Customer" to get started.</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = customers.map(customer => `
+                <tr>
+                    <td>${formatCustomerId(customer.id)}</td>
+                    <td>${customer.nameThai}</td>
+                    <td>${customer.nameBurmese}</td>
+                    <td>
+                        <span class="status-badge status-${customer.clientType.toLowerCase()}">
+                            ${customer.clientType}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-edit btn-small" onclick="editCustomer(${customer.id})">Edit</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
         // Modified navigateToPage function to render products when navigating to setup
         const originalNavigateToPage = navigateToPage;
         navigateToPage = function(pageId) {
@@ -3136,6 +3348,7 @@
                     renderProductTable();
                     renderDepartmentTable();
                     renderEmployeeTable();
+                    renderCustomerTable();
                 }, 10);
             }
 
@@ -5956,6 +6169,7 @@
             loadProducts();
             loadDepartments();
             loadEmployees();
+            loadCustomers();
             init();
         });
     </script>
