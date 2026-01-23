@@ -4272,6 +4272,18 @@
             const tbody = document.getElementById('dumplingEntryTableBody');
             if (!tbody) return;
 
+            // Preserve focus: capture which employee's input is currently focused
+            const activeElement = document.activeElement;
+            let focusedEmployeeId = null;
+            if (activeElement && activeElement.tagName === 'INPUT' && tbody.contains(activeElement)) {
+                // Find the employee ID from the row
+                const row = activeElement.closest('tr');
+                if (row) {
+                    const index = Array.from(tbody.children).indexOf(row);
+                    focusedEmployeeId = index;
+                }
+            }
+
             tbody.innerHTML = '';
 
             const currentRound = dumplingGetCurrentRound();
@@ -4375,6 +4387,21 @@
 
                 tbody.appendChild(tr);
             });
+
+            // Restore focus after re-render
+            if (focusedEmployeeId !== null && tbody.children[focusedEmployeeId]) {
+                const row = tbody.children[focusedEmployeeId];
+                const input = row.querySelector('input[type="number"]');
+                if (input && !input.disabled) {
+                    // Use setTimeout to ensure DOM is fully updated
+                    setTimeout(() => {
+                        input.focus();
+                        // Move cursor to end of input
+                        const len = input.value.length;
+                        input.setSelectionRange(len, len);
+                    }, 0);
+                }
+            }
         }
 
         function dumplingToggleEmployeeRows(productId) {
