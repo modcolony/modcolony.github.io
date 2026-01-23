@@ -3701,6 +3701,10 @@
             const storedRounds = localStorage.getItem('dumplingRounds');
             if (storedRounds) {
                 dumplingRounds = JSON.parse(storedRounds);
+                // Sync product structure for all loaded rounds
+                dumplingRounds.forEach(round => {
+                    initializeRoundProducts(round);
+                });
             } else {
                 // Initialize with Round 1
                 dumplingRounds = [{
@@ -3723,7 +3727,9 @@
         // Initialize products structure for a round
         function initializeRoundProducts(round) {
             for (let productId of dumplingProducts) {
-                round.perProduct[productId] = { perEmployee: {} };
+                if (!round.perProduct[productId]) {
+                    round.perProduct[productId] = { perEmployee: {} };
+                }
             }
         }
 
@@ -3804,9 +3810,12 @@
                 tabsContainer.appendChild(button);
             });
 
-            // Set first product as current if not already set
+            // Set first product as current (or validate existing selection)
             if (dumplingProducts.length > 0) {
-                dumplingCurrentProduct = dumplingProducts[0];
+                // If no product is selected or current selection is invalid, use first product
+                if (!dumplingCurrentProduct || !dumplingProducts.includes(dumplingCurrentProduct)) {
+                    dumplingCurrentProduct = dumplingProducts[0];
+                }
             }
         }
 
@@ -3875,6 +3884,12 @@
 
             const isLocked = currentRound.status === 'draft';
             const productData = currentRound.perProduct[dumplingCurrentProduct];
+
+            // Safety check: ensure productData exists
+            if (!productData) {
+                console.error('Product data not found for product:', dumplingCurrentProduct);
+                return;
+            }
 
             // Get previous round data for "Last Round" display
             const prevRound = dumplingRounds.find(r => r.roundNo === dumplingCurrentRound - 1 && r.status === 'draft');
@@ -3977,6 +3992,7 @@
             if (!currentRound || currentRound.status === 'draft') return;
 
             const productData = currentRound.perProduct[dumplingCurrentProduct];
+            if (!productData) return; // Safety check
 
             if (!productData.perEmployee[employeeId]) {
                 productData.perEmployee[employeeId] = {};
