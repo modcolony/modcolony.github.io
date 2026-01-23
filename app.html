@@ -1934,14 +1934,14 @@
                     <div class="dumpling-header">
                         <div class="dumpling-round-controls">
                             <div class="control-group">
+                                <label class="control-label">Entry Date</label>
+                                <input type="date" id="dumplingEntryDate" class="form-input" onchange="dumplingUpdateEntryDate(this.value)" style="min-width: 170px;">
+                            </div>
+                            <div class="control-group">
                                 <label class="control-label">Round</label>
                                 <select id="dumplingRoundSelector" class="form-select" onchange="dumplingSelectRound()" style="min-width: 120px;">
                                     <option value="1">Round 1</option>
                                 </select>
-                            </div>
-                            <div class="control-group">
-                                <label class="control-label">Entry Date</label>
-                                <input type="date" id="dumplingEntryDate" class="form-input" onchange="dumplingUpdateEntryDate(this.value)" style="min-width: 170px;">
                             </div>
                             <div class="control-group">
                                 <label class="control-label">Status</label>
@@ -4178,13 +4178,14 @@
 
             // Create new round
             const newRoundNo = dumplingRounds.length + 1;
+            const entryDate = dumplingRounds[0]?.entryDate || new Date().toISOString().slice(0, 10);
             const newRound = {
                 roundNo: newRoundNo,
                 status: 'editing',
                 createdAt: new Date().toISOString(),
                 savedAt: null,
                 initial: '',
-                entryDate: new Date().toISOString().slice(0, 10),
+                entryDate: entryDate,
                 perProduct: {}
             };
             initializeRoundProducts(newRound);
@@ -4252,6 +4253,7 @@
             const isLocked = currentRound.status === 'draft';
             const latestRound = dumplingRounds[dumplingRounds.length - 1];
             const canAddRound = latestRound.status === 'draft';
+            const hasEntryDate = !!currentRound.entryDate;
 
             // Update status badge
             const statusBadge = document.getElementById('dumplingRoundStatus');
@@ -4271,17 +4273,31 @@
                 entryDateInput.disabled = isLocked;
                 entryDateInput.value = currentRound.entryDate || '';
             }
+            const roundSelector = document.getElementById('dumplingRoundSelector');
+            if (roundSelector) {
+                roundSelector.disabled = !hasEntryDate;
+            }
             document.getElementById('dumplingSaveDraftBtn').style.display = isLocked ? 'none' : 'inline-flex';
             document.getElementById('dumplingUnlockBtn').style.display = isLocked ? 'inline-flex' : 'none';
-            document.getElementById('dumplingAddRoundBtn').disabled = !canAddRound;
+            document.getElementById('dumplingAddRoundBtn').disabled = !canAddRound || !hasEntryDate;
         }
 
         function dumplingUpdateEntryDate(value) {
             const currentRound = dumplingGetCurrentRound();
             if (!currentRound) return;
+            const baseEntryDate = dumplingRounds[0]?.entryDate || '';
+            if (dumplingRounds.length > 1 && value !== baseEntryDate) {
+                alert('❌ Date change not allowed.\nAll rounds for a day must share the same entry date. Start a new day with Round 1.');
+                const entryDateInput = document.getElementById('dumplingEntryDate');
+                if (entryDateInput) {
+                    entryDateInput.value = baseEntryDate;
+                }
+                return;
+            }
             currentRound.entryDate = value;
             saveDumplingData();
             dumplingRenderRoundHistory();
+            dumplingUpdateUI();
         }
 
         // Calculate totals for a round
