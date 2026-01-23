@@ -3747,6 +3747,14 @@
             }
         }
 
+        // HTML escape function to prevent XSS and HTML breaking
+        function dumplingEscapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         // Initialize dumpling production page
         function initDumplingPage() {
             // Load employees from Department 01
@@ -3916,9 +3924,13 @@
                 const tr = document.createElement('tr');
                 if (isTouched) tr.classList.add('touched');
 
+                // Escape HTML to prevent breaking
+                const empName = dumplingEscapeHtml(emp.nameThai || emp.nameOther || 'N/A');
+                const escapedNote = dumplingEscapeHtml(note);
+
                 tr.innerHTML = `
                     <td>${emp.id.toString().padStart(2, '0')}</td>
-                    <td>${emp.nameThai || emp.nameOther || 'N/A'}</td>
+                    <td>${empName}</td>
                     <td>
                         <input type="number"
                                value="${qtyProduced}"
@@ -3939,7 +3951,7 @@
                     </td>
                     <td>
                         <input type="text"
-                               value="${note}"
+                               value="${escapedNote}"
                                ${isLocked ? 'disabled' : ''}
                                onchange="dumplingUpdateEmployeeData(${emp.id}, 'note', this.value)"
                                placeholder="Optional note">
