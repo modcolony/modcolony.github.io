@@ -3932,6 +3932,69 @@
                 tr.appendChild(totalCell);
 
                 tbody.appendChild(tr);
+
+                // Add employee breakdown rows for this product
+                // Sort employees by ID
+                const sortedEmployees = [...dumplingEmployees].sort((a, b) => a.id - b.id);
+
+                sortedEmployees.forEach(emp => {
+                    // Check if this employee has any data for this product
+                    let hasData = false;
+                    let employeeTotal = 0;
+                    const employeeRoundData = [];
+
+                    dumplingRounds.forEach(round => {
+                        const productData = round.perProduct[productId];
+                        if (productData && productData.perEmployee && productData.perEmployee[emp.id]) {
+                            const empData = productData.perEmployee[emp.id];
+                            const qty = empData.qtyProduced;
+                            if (qty !== undefined && qty !== '') {
+                                const qtyNum = parseFloat(qty) || 0;
+                                employeeRoundData.push(qtyNum);
+                                employeeTotal += qtyNum;
+                                hasData = true;
+                            } else {
+                                employeeRoundData.push(0);
+                            }
+                        } else {
+                            employeeRoundData.push(0);
+                        }
+                    });
+
+                    // Only show employee row if they have data for this product
+                    if (hasData) {
+                        const empTr = document.createElement('tr');
+                        empTr.style.background = '#f9f9f9';
+
+                        // Employee name cell (indented)
+                        const empCell = document.createElement('td');
+                        const empId = emp.id.toString().padStart(2, '0');
+                        const empName = dumplingEscapeHtml(emp.nameThai || emp.nameOther || 'N/A');
+                        empCell.innerHTML = `&nbsp;&nbsp;&nbsp;&nbsp;${empId} - ${empName}`;
+                        empCell.style.fontSize = '0.9em';
+                        empCell.style.color = '#666';
+                        empTr.appendChild(empCell);
+
+                        // Add quantity for each round
+                        employeeRoundData.forEach(qty => {
+                            const empRoundCell = document.createElement('td');
+                            empRoundCell.textContent = qty > 0 ? qty.toFixed(1) : '-';
+                            empRoundCell.style.fontSize = '0.9em';
+                            empRoundCell.style.color = '#666';
+                            empTr.appendChild(empRoundCell);
+                        });
+
+                        // Add employee total cell
+                        const empTotalCell = document.createElement('td');
+                        empTotalCell.textContent = employeeTotal.toFixed(1);
+                        empTotalCell.style.fontSize = '0.9em';
+                        empTotalCell.style.color = '#666';
+                        empTotalCell.style.background = '#f0f0f0';
+                        empTr.appendChild(empTotalCell);
+
+                        tbody.appendChild(empTr);
+                    }
+                });
             });
         }
 
