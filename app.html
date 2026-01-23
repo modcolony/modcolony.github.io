@@ -1967,7 +1967,7 @@
 
                     <!-- Info Note -->
                     <div class="info-note">
-                        ℹ️ <strong>Note:</strong> Select a product below, then enter production data for Department 01 employees. Save as Draft to lock the round and enable adding a new round.
+                        ℹ️ <strong>Note:</strong> Select a round, expand a product, then enter production quantities for each Department 01 employee. Save as Draft when you want to start a new round.
                     </div>
 
                     <!-- Product-Round Consolidated Table -->
@@ -3976,24 +3976,6 @@
 
                 sortedEmployees.forEach(emp => {
                     let employeeTotal = 0;
-                    const employeeRoundData = [];
-
-                    dumplingRounds.forEach(round => {
-                        const productData = round.perProduct[productId];
-                        if (productData && productData.perEmployee && productData.perEmployee[emp.id]) {
-                            const empData = productData.perEmployee[emp.id];
-                            const qty = empData.qtyProduced;
-                            if (qty !== undefined && qty !== '') {
-                                const qtyNum = parseFloat(qty) || 0;
-                                employeeRoundData.push(qtyNum);
-                                employeeTotal += qtyNum;
-                            } else {
-                                employeeRoundData.push(0);
-                            }
-                        } else {
-                            employeeRoundData.push(0);
-                        }
-                    });
 
                     const empTr = document.createElement('tr');
                     empTr.classList.add('employee-row');
@@ -4012,11 +3994,31 @@
                     empTr.appendChild(empCell);
 
                     // Add quantity for each round
-                    employeeRoundData.forEach(qty => {
+                    dumplingRounds.forEach(round => {
+                        const productData = round.perProduct[productId];
+                        const empData = productData?.perEmployee?.[emp.id];
+                        const qtyValue = empData?.qtyProduced ?? '';
+                        const qtyNum = qtyValue === '' ? 0 : parseFloat(qtyValue) || 0;
+                        employeeTotal += qtyNum;
+
                         const empRoundCell = document.createElement('td');
-                        empRoundCell.textContent = qty > 0 ? qty.toFixed(1) : '-';
-                        empRoundCell.style.fontSize = '0.9em';
-                        empRoundCell.style.color = '#666';
+                        if (round.roundNo === dumplingCurrentRound) {
+                            empRoundCell.innerHTML = `
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.1"
+                                    value="${qtyValue !== '' ? qtyValue : ''}"
+                                    placeholder="-"
+                                    aria-label="Round ${round.roundNo} quantity for ${empName}"
+                                    onchange="dumplingUpdateEmployeeData(${productId}, ${emp.id}, 'qtyProduced', this.value, ${round.roundNo})"
+                                />
+                            `;
+                        } else {
+                            empRoundCell.textContent = qtyNum > 0 ? qtyNum.toFixed(1) : '-';
+                            empRoundCell.style.fontSize = '0.9em';
+                            empRoundCell.style.color = '#666';
+                        }
                         empTr.appendChild(empRoundCell);
                     });
 
@@ -4054,11 +4056,11 @@
         }
 
         // Update employee data
-        function dumplingUpdateEmployeeData(employeeId, field, value) {
-            const currentRound = dumplingGetCurrentRound();
-            if (!currentRound || currentRound.status === 'draft') return;
+        function dumplingUpdateEmployeeData(productId, employeeId, field, value, roundNo) {
+            const round = dumplingRounds.find(r => r.roundNo === roundNo);
+            if (!round) return;
 
-            const productData = currentRound.perProduct[dumplingCurrentProduct];
+            const productData = round.perProduct[productId];
             if (!productData) return; // Safety check
 
             if (!productData.perEmployee[employeeId]) {
@@ -4075,7 +4077,7 @@
             // Auto-save to localStorage
             saveDumplingData();
 
-            // Re-render to update touched indicator
+            // Re-render to update totals
             dumplingRenderProductTable();
             dumplingRenderRoundHistory();
         }
