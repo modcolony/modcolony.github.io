@@ -1940,6 +1940,13 @@
                                 </select>
                             </div>
                             <div class="control-group">
+                                <label class="control-label">Data View</label>
+                                <select id="dumplingDataScopeSelector" class="form-select" onchange="dumplingSelectDataScope()" style="min-width: 170px;">
+                                    <option value="all">All rounds</option>
+                                    <option value="current">Selected round only</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
                                 <label class="control-label">Status</label>
                                 <span id="dumplingRoundStatus" class="status-badge badge-open">Editing</span>
                             </div>
@@ -3712,6 +3719,7 @@
         let dumplingProducts = [];  // Department 01 products
         let dumplingProductsMap = {};  // Map of product ID to product object
         let dumplingExpandedProducts = {};  // Track expanded product employee lists
+        let dumplingDataScope = 'all';
 
         // Data structure for rounds:
         // {
@@ -3819,6 +3827,7 @@
 
             // Render UI
             dumplingRenderRoundSelector();
+            dumplingRenderDataScopeSelector();
             dumplingRenderProductTable();
             dumplingRenderRoundHistory();
             dumplingUpdateUI();
@@ -3867,12 +3876,24 @@
             selector.value = dumplingCurrentRound;
         }
 
+        function dumplingRenderDataScopeSelector() {
+            const selector = document.getElementById('dumplingDataScopeSelector');
+            if (!selector) return;
+            selector.value = dumplingDataScope;
+        }
+
         // Select a round
         function dumplingSelectRound() {
             const selector = document.getElementById('dumplingRoundSelector');
             dumplingCurrentRound = parseInt(selector.value);
             dumplingRenderProductTable();
             dumplingUpdateUI();
+        }
+
+        function dumplingSelectDataScope() {
+            const selector = document.getElementById('dumplingDataScopeSelector');
+            dumplingDataScope = selector ? selector.value : 'all';
+            dumplingRenderProductTable();
         }
 
         // Select a product tab (no longer used with consolidated view)
@@ -3904,8 +3925,12 @@
             productHeader.textContent = 'Product';
             headerRow.appendChild(productHeader);
 
+            const roundsToDisplay = dumplingDataScope === 'current'
+                ? dumplingRounds.filter(round => round.roundNo === dumplingCurrentRound)
+                : dumplingRounds;
+
             // Add a column for each round
-            dumplingRounds.forEach(round => {
+            roundsToDisplay.forEach(round => {
                 const roundHeader = document.createElement('th');
                 roundHeader.style.width = '150px';
                 roundHeader.textContent = `Round ${round.roundNo}`;
@@ -3941,7 +3966,7 @@
                 let productTotal = 0;
 
                 // Add data for each round
-                dumplingRounds.forEach(round => {
+                roundsToDisplay.forEach(round => {
                     const roundCell = document.createElement('td');
                     const productData = round.perProduct[productId];
 
@@ -3994,7 +4019,7 @@
                     empTr.appendChild(empCell);
 
                     // Add quantity for each round
-                    dumplingRounds.forEach(round => {
+                    roundsToDisplay.forEach(round => {
                         const productData = round.perProduct[productId];
                         const empData = productData?.perEmployee?.[emp.id];
                         const qtyValue = empData?.qtyProduced ?? '';
