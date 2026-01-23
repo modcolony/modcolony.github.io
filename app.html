@@ -1940,11 +1940,8 @@
                                 </select>
                             </div>
                             <div class="control-group">
-                                <label class="control-label">Data View</label>
-                                <select id="dumplingDataScopeSelector" class="form-select" onchange="dumplingSelectDataScope()" style="min-width: 170px;">
-                                    <option value="all">All rounds</option>
-                                    <option value="current">Selected round only</option>
-                                </select>
+                                <label class="control-label">Entry Date</label>
+                                <input type="date" id="dumplingEntryDate" class="form-input" onchange="dumplingUpdateEntryDate(this.value)" style="min-width: 170px;">
                             </div>
                             <div class="control-group">
                                 <label class="control-label">Status</label>
@@ -3719,7 +3716,6 @@
         let dumplingProducts = [];  // Department 01 products
         let dumplingProductsMap = {};  // Map of product ID to product object
         let dumplingExpandedProducts = {};  // Track expanded product employee lists
-        let dumplingDataScope = 'all';
 
         // Data structure for rounds:
         // {
@@ -3728,6 +3724,7 @@
         //   createdAt: timestamp,
         //   savedAt: null or timestamp,
         //   initial: "",
+        //   entryDate: "",
         //   perProduct: {
         //     1: { perEmployee: { 1: { qtyProduced: 0, qtyReject: 0, note: "" } } },
         //     2: { perEmployee: { 1: { qtyProduced: 0, qtyReject: 0, note: "" } } },
@@ -3742,6 +3739,9 @@
                 dumplingRounds = JSON.parse(storedRounds);
                 // Sync product structure for all loaded rounds
                 dumplingRounds.forEach(round => {
+                    if (!round.entryDate) {
+                        round.entryDate = round.createdAt ? round.createdAt.slice(0, 10) : '';
+                    }
                     initializeRoundProducts(round);
                 });
             } else {
@@ -3752,6 +3752,7 @@
                     createdAt: new Date().toISOString(),
                     savedAt: null,
                     initial: "",
+                    entryDate: new Date().toISOString().slice(0, 10),
                     perProduct: {}
                 }];
                 initializeRoundProducts(dumplingRounds[0]);
@@ -3827,7 +3828,6 @@
 
             // Render UI
             dumplingRenderRoundSelector();
-            dumplingRenderDataScopeSelector();
             dumplingRenderProductTable();
             dumplingRenderRoundHistory();
             dumplingUpdateUI();
@@ -3876,24 +3876,12 @@
             selector.value = dumplingCurrentRound;
         }
 
-        function dumplingRenderDataScopeSelector() {
-            const selector = document.getElementById('dumplingDataScopeSelector');
-            if (!selector) return;
-            selector.value = dumplingDataScope;
-        }
-
         // Select a round
         function dumplingSelectRound() {
             const selector = document.getElementById('dumplingRoundSelector');
             dumplingCurrentRound = parseInt(selector.value);
             dumplingRenderProductTable();
             dumplingUpdateUI();
-        }
-
-        function dumplingSelectDataScope() {
-            const selector = document.getElementById('dumplingDataScopeSelector');
-            dumplingDataScope = selector ? selector.value : 'all';
-            dumplingRenderProductTable();
         }
 
         // Select a product tab (no longer used with consolidated view)
@@ -3925,9 +3913,7 @@
             productHeader.textContent = 'Product';
             headerRow.appendChild(productHeader);
 
-            const roundsToDisplay = dumplingDataScope === 'current'
-                ? dumplingRounds.filter(round => round.roundNo === dumplingCurrentRound)
-                : dumplingRounds;
+            const roundsToDisplay = dumplingRounds;
 
             // Add a column for each round
             roundsToDisplay.forEach(round => {
@@ -4198,6 +4184,7 @@
                 createdAt: new Date().toISOString(),
                 savedAt: null,
                 initial: '',
+                entryDate: new Date().toISOString().slice(0, 10),
                 perProduct: {}
             };
             initializeRoundProducts(newRound);
@@ -4279,9 +4266,22 @@
             // Enable/disable controls
             document.getElementById('dumplingInitial').disabled = isLocked;
             document.getElementById('dumplingInitial').value = currentRound.initial || '';
+            const entryDateInput = document.getElementById('dumplingEntryDate');
+            if (entryDateInput) {
+                entryDateInput.disabled = isLocked;
+                entryDateInput.value = currentRound.entryDate || '';
+            }
             document.getElementById('dumplingSaveDraftBtn').style.display = isLocked ? 'none' : 'inline-flex';
             document.getElementById('dumplingUnlockBtn').style.display = isLocked ? 'inline-flex' : 'none';
             document.getElementById('dumplingAddRoundBtn').disabled = !canAddRound;
+        }
+
+        function dumplingUpdateEntryDate(value) {
+            const currentRound = dumplingGetCurrentRound();
+            if (!currentRound) return;
+            currentRound.entryDate = value;
+            saveDumplingData();
+            dumplingRenderRoundHistory();
         }
 
         // Calculate totals for a round
