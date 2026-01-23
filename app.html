@@ -1544,6 +1544,27 @@
             overflow-x: auto;
         }
 
+        .dumpling-product-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .dumpling-product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .dumpling-product-grid {
+            overflow-x: auto;
+        }
+
         .dumpling-table {
             width: 100%;
             border-collapse: collapse;
@@ -1919,46 +1940,25 @@
                         ℹ️ <strong>Note:</strong> Select a product below, then enter production data for Department 01 employees. Save as Draft to lock the round and enable adding a new round.
                     </div>
 
-                    <!-- Product Tabs -->
-                    <div class="dumpling-product-tabs">
-                        <button class="dumpling-product-tab active" onclick="dumplingSelectProduct(1)">Product 1</button>
-                        <button class="dumpling-product-tab" onclick="dumplingSelectProduct(2)">Product 2</button>
-                        <button class="dumpling-product-tab" onclick="dumplingSelectProduct(3)">Product 3</button>
-                        <button class="dumpling-product-tab" onclick="dumplingSelectProduct(4)">Product 4</button>
-                        <button class="dumpling-product-tab" onclick="dumplingSelectProduct(5)">Product 5</button>
-                    </div>
-
-                    <!-- Employee Entry Area -->
-                    <div class="dumpling-employee-section">
-                        <div class="dumpling-employee-header">
+                    <!-- Product-Round Consolidated Table -->
+                    <div class="dumpling-product-section">
+                        <div class="dumpling-product-header">
                             <h3 style="margin: 0;">
-                                Editing: Round <span id="dumplingCurrentRound">1</span> - <span id="dumplingCurrentProduct">Product 1</span>
+                                Products with Accumulated Rounds
                             </h3>
-                            <div class="dumpling-search-sort">
-                                <input type="text" id="dumplingSearch" class="form-input" placeholder="Search by name or ID..." onkeyup="dumplingFilterEmployees()" style="width: 250px;">
-                                <select id="dumplingSort" class="form-select" onchange="dumplingFilterEmployees()" style="width: 150px;">
-                                    <option value="name">Sort by Name</option>
-                                    <option value="id" selected>Sort by ID</option>
-                                </select>
-                            </div>
                         </div>
 
-                        <!-- Employee Grid -->
-                        <div class="dumpling-employee-grid">
+                        <!-- Product-Round Grid -->
+                        <div class="dumpling-product-grid">
                             <table class="dumpling-table">
-                                <thead>
+                                <thead id="dumplingProductTableHead">
                                     <tr>
-                                        <th style="width: 80px;">Emp ID</th>
-                                        <th style="width: 180px;">Employee Name</th>
-                                        <th style="width: 120px;">Qty Produced *</th>
-                                        <th style="width: 120px;">Qty Reject</th>
-                                        <th style="width: 200px;">Note</th>
-                                        <th style="width: 60px;">✓</th>
-                                        <th style="width: 100px;">Last Round</th>
+                                        <th style="width: 200px;">Product</th>
+                                        <!-- Round columns will be dynamically added here -->
                                     </tr>
                                 </thead>
-                                <tbody id="dumplingEmployeeTableBody">
-                                    <!-- Employee rows rendered here -->
+                                <tbody id="dumplingProductTableBody">
+                                    <!-- Product rows rendered here -->
                                 </tbody>
                             </table>
                         </div>
@@ -3787,9 +3787,8 @@
             loadDumplingData();
 
             // Render UI
-            dumplingRenderProductTabs();
             dumplingRenderRoundSelector();
-            dumplingRenderEmployeeTable();
+            dumplingRenderProductTable();
             dumplingRenderRoundHistory();
             dumplingUpdateUI();
         }
@@ -3841,32 +3840,14 @@
         function dumplingSelectRound() {
             const selector = document.getElementById('dumplingRoundSelector');
             dumplingCurrentRound = parseInt(selector.value);
-            dumplingRenderEmployeeTable();
+            dumplingRenderProductTable();
             dumplingUpdateUI();
         }
 
-        // Select a product tab
+        // Select a product tab (no longer used with consolidated view)
         function dumplingSelectProduct(productId) {
-            dumplingCurrentProduct = productId;
-
-            // Update tab active state
-            const tabs = document.querySelectorAll('.dumpling-product-tab');
-            tabs.forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            // Find and activate the clicked tab
-            tabs.forEach(tab => {
-                if (tab.textContent === dumplingGetProductName(productId)) {
-                    tab.classList.add('active');
-                }
-            });
-
-            // Update current product display
-            document.getElementById('dumplingCurrentProduct').textContent = dumplingGetProductName(productId);
-
-            // Re-render employee table for this product
-            dumplingRenderEmployeeTable();
+            // This function is kept for compatibility but does nothing
+            // since we now show all products in one consolidated table
         }
 
         // Get current round object
@@ -3874,116 +3855,84 @@
             return dumplingRounds.find(r => r.roundNo === dumplingCurrentRound);
         }
 
-        // Render employee table
-        function dumplingRenderEmployeeTable() {
-            const tbody = document.getElementById('dumplingEmployeeTableBody');
+        // Render product-round consolidated table
+        function dumplingRenderProductTable() {
+            const thead = document.getElementById('dumplingProductTableHead');
+            const tbody = document.getElementById('dumplingProductTableBody');
+
+            if (!thead || !tbody) return;
+
+            // Clear existing content
+            thead.innerHTML = '';
             tbody.innerHTML = '';
 
-            const currentRound = dumplingGetCurrentRound();
-            if (!currentRound) return;
+            // Build header row with round columns
+            const headerRow = document.createElement('tr');
+            const productHeader = document.createElement('th');
+            productHeader.style.width = '200px';
+            productHeader.textContent = 'Product';
+            headerRow.appendChild(productHeader);
 
-            const isLocked = currentRound.status === 'draft';
-            const productData = currentRound.perProduct[dumplingCurrentProduct];
-
-            // Safety check: ensure productData exists
-            if (!productData) {
-                console.error('Product data not found for product:', dumplingCurrentProduct);
-                return;
-            }
-
-            // Get previous round data for "Last Round" display
-            const prevRound = dumplingRounds.find(r => r.roundNo === dumplingCurrentRound - 1 && r.status === 'draft');
-
-            // Apply search and sort
-            let filteredEmployees = [...dumplingEmployees];
-            const searchTerm = document.getElementById('dumplingSearch')?.value.toLowerCase() || '';
-            const sortBy = document.getElementById('dumplingSort')?.value || 'id';  // Default to ID sort
-
-            if (searchTerm) {
-                filteredEmployees = filteredEmployees.filter(emp =>
-                    emp.id.toString().includes(searchTerm) ||
-                    emp.nameThai?.toLowerCase().includes(searchTerm) ||
-                    emp.nameOther?.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            if (sortBy === 'name') {
-                filteredEmployees.sort((a, b) => {
-                    const nameA = a.nameThai || a.nameOther || '';
-                    const nameB = b.nameThai || b.nameOther || '';
-                    return nameA.localeCompare(nameB);
-                });
-            } else if (sortBy === 'id') {
-                filteredEmployees.sort((a, b) => a.id - b.id);
-            }
-
-            filteredEmployees.forEach(emp => {
-                const empData = productData.perEmployee[emp.id] || {};
-                const qtyProduced = empData.qtyProduced !== undefined ? empData.qtyProduced : '';
-                const qtyReject = empData.qtyReject !== undefined ? empData.qtyReject : 0;
-                const note = empData.note || '';
-
-                // Check if row is "touched" (has data entered)
-                const isTouched = qtyProduced !== '' || qtyReject > 0 || note !== '';
-
-                // Get last round value
-                let lastRoundValue = '';
-                if (prevRound) {
-                    const prevProductData = prevRound.perProduct[dumplingCurrentProduct];
-                    const prevEmpData = prevProductData?.perEmployee[emp.id];
-                    if (prevEmpData && prevEmpData.qtyProduced !== undefined) {
-                        lastRoundValue = prevEmpData.qtyProduced;
-                    }
+            // Add a column for each round
+            dumplingRounds.forEach(round => {
+                const roundHeader = document.createElement('th');
+                roundHeader.style.width = '150px';
+                roundHeader.textContent = `Round ${round.roundNo}`;
+                if (round.status === 'draft') {
+                    roundHeader.textContent += ' (Draft)';
                 }
+                headerRow.appendChild(roundHeader);
+            });
 
+            // Add total column
+            const totalHeader = document.createElement('th');
+            totalHeader.style.width = '150px';
+            totalHeader.textContent = 'Total';
+            headerRow.appendChild(totalHeader);
+
+            thead.appendChild(headerRow);
+
+            // Build product rows
+            dumplingProducts.forEach(productId => {
                 const tr = document.createElement('tr');
-                if (isTouched) tr.classList.add('touched');
 
-                // Escape HTML to prevent breaking
-                const empName = dumplingEscapeHtml(emp.nameThai || emp.nameOther || 'N/A');
-                const escapedNote = dumplingEscapeHtml(note);
+                // Product name cell
+                const productCell = document.createElement('td');
+                productCell.innerHTML = `<strong>${dumplingGetProductName(productId)}</strong>`;
+                tr.appendChild(productCell);
 
-                tr.innerHTML = `
-                    <td>${emp.id.toString().padStart(2, '0')}</td>
-                    <td>${empName}</td>
-                    <td>
-                        <input type="number"
-                               value="${qtyProduced}"
-                               min="0"
-                               step="0.1"
-                               ${isLocked ? 'disabled' : ''}
-                               onchange="dumplingUpdateEmployeeData(${emp.id}, 'qtyProduced', this.value)"
-                               placeholder="0">
-                    </td>
-                    <td>
-                        <input type="number"
-                               value="${qtyReject || ''}"
-                               min="0"
-                               step="0.1"
-                               ${isLocked ? 'disabled' : ''}
-                               onchange="dumplingUpdateEmployeeData(${emp.id}, 'qtyReject', this.value)"
-                               placeholder="0">
-                    </td>
-                    <td>
-                        <input type="text"
-                               value="${escapedNote}"
-                               ${isLocked ? 'disabled' : ''}
-                               onchange="dumplingUpdateEmployeeData(${emp.id}, 'note', this.value)"
-                               placeholder="Optional note">
-                    </td>
-                    <td class="touched-indicator">
-                        ${isTouched ? '<span style="color: #4CAF50;">✓</span>' : ''}
-                    </td>
-                    <td class="last-round-value">
-                        ${lastRoundValue !== '' ? `<span style="color: #999; font-size: 12px;">${lastRoundValue}</span>` : '-'}
-                    </td>
-                `;
+                let productTotal = 0;
+
+                // Add data for each round
+                dumplingRounds.forEach(round => {
+                    const roundCell = document.createElement('td');
+                    const productData = round.perProduct[productId];
+
+                    if (productData && productData.perEmployee) {
+                        // Calculate total produced for this product in this round (excluding rejects)
+                        let roundTotal = 0;
+                        Object.values(productData.perEmployee).forEach(empData => {
+                            if (empData.qtyProduced !== undefined && empData.qtyProduced !== '') {
+                                roundTotal += parseFloat(empData.qtyProduced) || 0;
+                            }
+                        });
+                        roundCell.textContent = roundTotal.toFixed(1);
+                        productTotal += roundTotal;
+                    } else {
+                        roundCell.textContent = '0.0';
+                    }
+
+                    tr.appendChild(roundCell);
+                });
+
+                // Add total cell
+                const totalCell = document.createElement('td');
+                totalCell.innerHTML = `<strong>${productTotal.toFixed(1)}</strong>`;
+                totalCell.style.background = '#f5f5f5';
+                tr.appendChild(totalCell);
 
                 tbody.appendChild(tr);
             });
-
-            // Update current round display
-            document.getElementById('dumplingCurrentRound').textContent = dumplingCurrentRound;
         }
 
         // Update employee data
@@ -4009,13 +3958,13 @@
             saveDumplingData();
 
             // Re-render to update touched indicator
-            dumplingRenderEmployeeTable();
+            dumplingRenderProductTable();
             dumplingRenderRoundHistory();
         }
 
         // Filter employees (called by search/sort)
         function dumplingFilterEmployees() {
-            dumplingRenderEmployeeTable();
+            dumplingRenderProductTable();
         }
 
         // Save current round as Draft
@@ -4080,7 +4029,7 @@
 
             // Update UI
             dumplingRenderRoundSelector();
-            dumplingRenderEmployeeTable();
+            dumplingRenderProductTable();
             dumplingRenderRoundHistory();
             dumplingUpdateUI();
 
@@ -4115,7 +4064,7 @@
 
             // Update UI
             dumplingRenderRoundSelector();
-            dumplingRenderEmployeeTable();
+            dumplingRenderProductTable();
             dumplingRenderRoundHistory();
             dumplingUpdateUI();
         }
@@ -4159,7 +4108,7 @@
 
             // Update UI
             dumplingRenderRoundSelector();
-            dumplingRenderEmployeeTable();
+            dumplingRenderProductTable();
             dumplingUpdateUI();
         }
 
