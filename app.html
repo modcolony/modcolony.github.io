@@ -1468,6 +1468,194 @@
             display: block;
         }
 
+        /* Dumpling Production Styles */
+        .dumpling-header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .dumpling-round-controls {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .dumpling-product-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .dumpling-product-tab {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 100px;
+        }
+
+        .dumpling-product-tab:hover {
+            border-color: #1976D2;
+            background: #f5f9ff;
+        }
+
+        .dumpling-product-tab.active {
+            background: #1976D2;
+            color: white;
+            border-color: #1976D2;
+        }
+
+        .dumpling-employee-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .dumpling-employee-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .dumpling-search-sort {
+            display: flex;
+            gap: 12px;
+        }
+
+        .dumpling-employee-grid {
+            overflow-x: auto;
+        }
+
+        .dumpling-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dumpling-table thead {
+            background: #f5f5f5;
+        }
+
+        .dumpling-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .dumpling-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .dumpling-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .dumpling-table tbody tr.touched {
+            background: #f0f7ff;
+        }
+
+        .dumpling-table input[type="number"],
+        .dumpling-table input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .dumpling-table input[type="number"]:focus,
+        .dumpling-table input[type="text"]:focus {
+            outline: none;
+            border-color: #1976D2;
+        }
+
+        .dumpling-table input[type="number"]:disabled,
+        .dumpling-table input[type="text"]:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .dumpling-table .touched-indicator {
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .dumpling-table .last-round-value {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .dumpling-history-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .error-message {
+            background: #FFEBEE;
+            border-left: 4px solid #F44336;
+            padding: 12px;
+            border-radius: 4px;
+            color: #C62828;
+            font-size: 13px;
+        }
+
+        .badge-draft {
+            background: #FFF3E0;
+            color: #EF6C00;
+        }
+
+        /* Responsive adjustments for dumpling module */
+        @media (max-width: 1024px) {
+            .dumpling-product-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+            }
+
+            .dumpling-product-tab {
+                flex-shrink: 0;
+            }
+
+            .dumpling-employee-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .dumpling-search-sort {
+                width: 100%;
+            }
+
+            .dumpling-search-sort input,
+            .dumpling-search-sort select {
+                flex: 1;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -1688,347 +1876,137 @@
                 `
             },
             'dumpling-production': {
-                title: 'Dumpling Production Record',
+                title: 'Dumpling Production',
                 breadcrumb: 'Product Management / Product Inflow / Dumpling Production',
                 content: `
-                    <!-- Tab Navigation -->
-                    <div class="tab-container">
-                        <button class="tab-btn active" onclick="switchProductionTab('entry')">Entry</button>
-                        <button class="tab-btn" onclick="switchProductionTab('reports')">Reports</button>
-                        <button class="tab-btn" onclick="switchProductionTab('search')">Search</button>
-                    </div>
-
-                    <!-- Entry Tab -->
-                    <div id="entry-tab" class="tab-content active">
-                        <!-- Sticky Header -->
-                        <div class="production-sticky-header" id="productionStickyHeader">
-                            <div class="production-header-row">
-                                <div class="header-controls-left">
-                                    <div class="control-group">
-                                        <label class="control-label">Date</label>
-                                        <input type="date" id="productionDate" class="date-input" onchange="handleDateChange()">
-                                    </div>
-                                    <div class="control-group">
-                                        <label class="control-label">Round</label>
-                                        <div class="round-selector-inline" id="roundSelectorInline">
-                                            <!-- Rounds will be rendered here -->
-                                        </div>
-                                    </div>
-                                    <div class="control-group">
-                                        <button id="addRoundBtn" class="btn btn-secondary btn-small" onclick="handleAddRound()">
-                                            + Add Round
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="header-controls-right">
-                                    <div class="control-group">
-                                        <label class="control-label">Round Status</label>
-                                        <span id="roundStatusBadge" class="round-status-badge draft">
-                                            <span>●</span> <span id="roundStatusText">Draft</span>
-                                        </span>
-                                    </div>
-                                    <div class="control-group">
-                                        <label class="control-label">Day Status</label>
-                                        <span id="dayStatusBadge" class="day-status-badge open">
-                                            <span>●</span> Open
-                                        </span>
-                                    </div>
-                                    <div class="control-group">
-                                        <label class="control-label">Sign-off</label>
-                                        <span id="signoffStatusBadge" class="signoff-status-badge not-signed">
-                                            <span id="signoffStatusText">Not signed</span>
-                                        </span>
-                                    </div>
-                                    <div class="control-group" id="closeDayBtnGroup">
-                                        <button id="closeDayBtn" class="btn btn-close-day btn-small" onclick="closeDayModal()">
-                                            🔒 Close Day
-                                        </button>
-                                        <button id="reopenDayBtn" class="btn btn-reopen-day btn-small" onclick="reopenDay()" style="display: none;">
-                                            🔓 Reopen (Admin)
-                                        </button>
-                                    </div>
-                                </div>
+                    <!-- Round Controls Header -->
+                    <div class="dumpling-header">
+                        <div class="dumpling-round-controls">
+                            <div class="control-group">
+                                <label class="control-label">Round</label>
+                                <select id="dumplingRoundSelector" class="form-select" onchange="dumplingSelectRound()" style="min-width: 120px;">
+                                    <option value="1">Round 1</option>
+                                </select>
                             </div>
-                        </div>
-
-                        <!-- Info Note -->
-                        <div class="info-note">
-                            ℹ️ <strong>Note:</strong> Only Dept 01 Active employees and products are shown. Changes are auto-saved as draft.
-                        </div>
-
-                        <!-- Two-column layout: Entry area + Summary -->
-                        <div class="entry-content-wrapper">
-                            <!-- Left Column: Production Entry by Employee -->
-                            <div class="entry-column-left">
-                                <h3 style="margin-bottom: 16px;">Production Entry by Employee</h3>
-                                <div id="employeeAccordion" class="employee-accordion">
-                                    <!-- Accordion items will be rendered here -->
-                                </div>
+                            <div class="control-group">
+                                <label class="control-label">Status</label>
+                                <span id="dumplingRoundStatus" class="status-badge badge-open">Editing</span>
                             </div>
-
-                            <!-- Right Column: Current Round Summary -->
-                            <div class="entry-column-right">
-                                <div class="product-dashboard">
-                                    <h3>Current Round Summary</h3>
-                                    <div class="product-dashboard-cards" id="productDashboard">
-                                        <!-- Per-product cards will be rendered here -->
-                                    </div>
-                                    <div id="draftIndicator" class="draft-indicator" style="display: none;">
-                                        ⚠️ Unsaved changes
-                                    </div>
-                                </div>
+                            <div class="control-group">
+                                <label class="control-label">Initial *</label>
+                                <input type="text" id="dumplingInitial" class="form-input" placeholder="Your initial" maxlength="4" style="width: 120px; text-transform: uppercase;" disabled>
                             </div>
-                        </div>
-
-                        <!-- Sticky Save Button -->
-                        <div class="sticky-save-container">
-                            <button id="saveRoundBtn" class="btn btn-success btn-large" onclick="openInitialsModal()">
-                                💾 Save Round
-                            </button>
-                            <div id="lastSavedInfo" class="last-saved-info" style="display: none;">
-                                Last saved: <span id="lastSavedTime">Never</span>
+                            <div class="control-group">
+                                <button id="dumplingAddRoundBtn" class="btn btn-primary btn-small" onclick="dumplingAddRound()" disabled>
+                                    ➕ Add Round
+                                </button>
+                            </div>
+                            <div class="control-group">
+                                <button id="dumplingSaveDraftBtn" class="btn btn-success" onclick="dumplingSaveDraft()">
+                                    💾 Save Draft
+                                </button>
+                            </div>
+                            <div class="control-group">
+                                <button id="dumplingUnlockBtn" class="btn btn-edit btn-small" onclick="dumplingUnlockRound()" style="display: none;">
+                                    🔓 Unlock
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Reports Tab -->
-                    <div id="reports-tab" class="tab-content">
-                        <!-- Dashboard Navigation -->
-                        <div class="dashboard-nav" id="dashboardNav">
-                            <div class="nav-chip active" onclick="showReportView('year')">📅 Year View</div>
-                            <div class="nav-chip" onclick="showReportView('month')">📆 Month View</div>
-                            <div class="nav-chip" onclick="showReportView('day')">📋 Day View</div>
-                        </div>
+                    <!-- Info Note -->
+                    <div class="info-note">
+                        ℹ️ <strong>Note:</strong> Select a product below, then enter production data for Department 01 employees. Save as Draft to lock the round and enable adding a new round.
+                    </div>
 
-                        <!-- Year View -->
-                        <div id="year-view" class="report-view" style="display: block;">
-                            <h3 style="margin-bottom: 16px;">Yearly Summary</h3>
-                            <div class="report-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Year</th>
-                                            <th>Product Breakdown</th>
-                                            <th>Days Recorded</th>
-                                            <th>Employees</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="yearViewBody">
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <!-- Product Tabs -->
+                    <div class="dumpling-product-tabs">
+                        <button class="dumpling-product-tab active" onclick="dumplingSelectProduct(1)">Product 1</button>
+                        <button class="dumpling-product-tab" onclick="dumplingSelectProduct(2)">Product 2</button>
+                        <button class="dumpling-product-tab" onclick="dumplingSelectProduct(3)">Product 3</button>
+                        <button class="dumpling-product-tab" onclick="dumplingSelectProduct(4)">Product 4</button>
+                        <button class="dumpling-product-tab" onclick="dumplingSelectProduct(5)">Product 5</button>
+                    </div>
 
-                        <!-- Month View -->
-                        <div id="month-view" class="report-view" style="display: none;">
-                            <div style="margin-bottom: 16px;">
-                                <button class="btn btn-secondary btn-small" onclick="showReportView('year')">← Back to Year View</button>
-                            </div>
-                            <h3 style="margin-bottom: 16px;">Monthly Summary - <span id="selectedYear"></span></h3>
-                            <div class="report-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Month</th>
-                                            <th>Product Breakdown</th>
-                                            <th>Days Recorded</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="monthViewBody">
-                                    </tbody>
-                                </table>
+                    <!-- Employee Entry Area -->
+                    <div class="dumpling-employee-section">
+                        <div class="dumpling-employee-header">
+                            <h3 style="margin: 0;">
+                                Editing: Round <span id="dumplingCurrentRound">1</span> - <span id="dumplingCurrentProduct">Product 1</span>
+                            </h3>
+                            <div class="dumpling-search-sort">
+                                <input type="text" id="dumplingSearch" class="form-input" placeholder="Search by name or ID..." onkeyup="dumplingFilterEmployees()" style="width: 250px;">
+                                <select id="dumplingSort" class="form-select" onchange="dumplingFilterEmployees()" style="width: 150px;">
+                                    <option value="name">Sort by Name</option>
+                                    <option value="id">Sort by ID</option>
+                                </select>
                             </div>
                         </div>
 
-                        <!-- Day View -->
-                        <div id="day-view" class="report-view" style="display: none;">
-                            <div style="margin-bottom: 16px;">
-                                <button class="btn btn-secondary btn-small" onclick="showReportView('month')">← Back to Month View</button>
-                            </div>
-                            <h3 style="margin-bottom: 16px;">Daily Summary - <span id="selectedMonth"></span></h3>
-                            <div class="report-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Status</th>
-                                            <th>Product Breakdown</th>
-                                            <th>Rounds</th>
-                                            <th>Entries</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="dayViewBody">
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!-- Spreadsheet Detail View -->
-                            <div id="dayDetailView" class="day-detail-view" style="display: none; margin-top: 24px;">
-                                <div style="margin-bottom: 16px;">
-                                    <button class="btn btn-secondary btn-small" onclick="closeDayDetailView()">← Back to Daily Summary</button>
-                                </div>
-                                <h3 style="margin-bottom: 16px;">Production Detail - <span id="detailViewDate"></span> - Round <span id="detailViewRound"></span></h3>
-                                <div class="spreadsheet-container">
-                                    <div id="reportSpreadsheetGrid" class="spreadsheet-grid">
-                                        <!-- Spreadsheet will be rendered here -->
-                                    </div>
-                                </div>
-                            </div>
+                        <!-- Employee Grid -->
+                        <div class="dumpling-employee-grid">
+                            <table class="dumpling-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">Emp ID</th>
+                                        <th style="width: 180px;">Employee Name</th>
+                                        <th style="width: 120px;">Qty Produced *</th>
+                                        <th style="width: 120px;">Qty Reject</th>
+                                        <th style="width: 200px;">Note</th>
+                                        <th style="width: 60px;">✓</th>
+                                        <th style="width: 100px;">Last Round</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dumplingEmployeeTableBody">
+                                    <!-- Employee rows rendered here -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <!-- Search Tab -->
-                    <div id="search-tab" class="tab-content">
-                        <div class="search-section">
-                            <h3 style="margin-bottom: 16px;">Search Production Records</h3>
-                            <div class="search-grid">
-                                <div class="form-group">
-                                    <label class="form-label">Date From</label>
-                                    <input type="date" id="searchDateFrom" class="form-input">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Date To</label>
-                                    <input type="date" id="searchDateTo" class="form-input">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Employee</label>
-                                    <select id="searchEmployee" class="form-select">
-                                        <option value="">All Employees</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Product</label>
-                                    <select id="searchProduct" class="form-select">
-                                        <option value="">All Products</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Day Status</label>
-                                    <select id="searchDayStatus" class="form-select">
-                                        <option value="">All</option>
-                                        <option value="Open">Open</option>
-                                        <option value="Closed">Closed</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Quality Status</label>
-                                    <select id="searchQualityStatus" class="form-select">
-                                        <option value="">All</option>
-                                        <option value="OK">OK</option>
-                                        <option value="Not OK">Not OK</option>
-                                        <option value="Pending">Pending</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: 12px;">
-                                <button class="btn btn-primary" onclick="performSearch()">🔍 Search</button>
-                                <button class="btn btn-secondary" onclick="clearSearch()">Clear</button>
-                            </div>
-                        </div>
-
-                        <!-- Search Results -->
-                        <div id="searchResults" style="display: none;">
-                            <h3 style="margin-bottom: 16px;">Search Results</h3>
-                            <div class="report-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Round</th>
-                                            <th>Employee</th>
-                                            <th>Product</th>
-                                            <th>Count</th>
-                                            <th>Day Status</th>
-                                            <th>Quality</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="searchResultsBody">
-                                    </tbody>
-                                </table>
-                            </div>
+                    <!-- Round History Summary -->
+                    <div class="dumpling-history-section">
+                        <h3 style="margin-bottom: 16px;">Round History Summary</h3>
+                        <div class="report-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Round #</th>
+                                        <th>Timestamp</th>
+                                        <th>Initial</th>
+                                        <th>Prod 1 Total</th>
+                                        <th>Prod 2 Total</th>
+                                        <th>Prod 3 Total</th>
+                                        <th>Prod 4 Total</th>
+                                        <th>Prod 5 Total</th>
+                                        <th>Grand Total</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dumplingHistoryBody">
+                                    <tr>
+                                        <td colspan="10" style="text-align: center; color: #999;">No rounds saved yet</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <!-- Modals -->
-                    <div id="closeDayModal" class="modal">
+                    <!-- Unlock Modal -->
+                    <div id="dumplingUnlockModal" class="modal">
                         <div class="modal-content">
-                            <div class="modal-title">Close Production Day</div>
+                            <div class="modal-title">Unlock Round</div>
                             <div class="modal-body">
-                                Are you sure you want to close this production day? Once closed, normal users will not be able to edit entries. Only admins can reopen or edit closed days.
-                            </div>
-                            <div class="modal-actions">
-                                <button class="btn btn-secondary" onclick="hideModal('closeDayModal')">Cancel</button>
-                                <button class="btn btn-close-day" onclick="closeDay()">Close Day</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="initialsModal" class="modal">
-                        <div class="modal-content">
-                            <div class="modal-title">Inspector Sign-off Required</div>
-                            <div class="modal-body">
-                                <p><strong>Date:</strong> <span id="initialsModalDate"></span> | <strong>Round:</strong> <span id="initialsModalRound"></span></p>
-                                <p style="margin-top: 12px;">Please enter your initials to sign-off and save this round.</p>
+                                <p>Enter your initial to unlock Round <span id="unlockRoundNo"></span> for editing.</p>
                                 <div class="form-group" style="margin-top: 16px;">
-                                    <label class="form-label">Inspector Initials *</label>
-                                    <input type="text" id="inspectorInitials" class="form-input" placeholder="Enter your initials (e.g., AB)" maxlength="10" style="text-transform: uppercase;">
+                                    <label class="form-label">Initial *</label>
+                                    <input type="text" id="unlockInitialInput" class="form-input" placeholder="Enter initial" maxlength="4" style="text-transform: uppercase;">
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-label">Notes (Optional)</label>
-                                    <textarea id="initialsNotes" class="form-input" rows="3" placeholder="Add any inspection notes"></textarea>
-                                </div>
-                                <div id="initialsError" class="error-message" style="display: none; margin-top: 12px;"></div>
+                                <div id="unlockError" class="error-message" style="display: none; margin-top: 12px; color: #F44336;"></div>
                             </div>
                             <div class="modal-actions">
-                                <button class="btn btn-secondary" onclick="hideModal('initialsModal')">Cancel</button>
-                                <button class="btn btn-success" onclick="confirmInitialsAndSave()">Sign-off & Save</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="signoffModal" class="modal">
-                        <div class="modal-content">
-                            <div class="modal-title">Inspection Sign-off</div>
-                            <div class="modal-body">
-                                <p><strong>Date:</strong> <span id="signoffModalDate"></span> | <strong>Round:</strong> <span id="signoffModalRound"></span></p>
-                                <p style="margin-top: 12px;">The round has been saved. Would you like to sign off now? This will lock the round for normal operators.</p>
-                                <div class="form-group" style="margin-top: 16px;">
-                                    <label class="form-label">Inspector Name</label>
-                                    <input type="text" id="inspectorName" class="form-input" placeholder="Enter your name">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Sign-off Method</label>
-                                    <select id="signoffMethod" class="form-select">
-                                        <option value="typed_name">Typed Name</option>
-                                        <option value="checkbox_confirm">Checkbox Confirmation</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Notes (Optional)</label>
-                                    <textarea id="signoffNotes" class="form-input" rows="3" placeholder="Add any inspection notes"></textarea>
-                                </div>
-                                <div id="signoffError" class="error-message" style="display: none; margin-top: 12px;"></div>
-                            </div>
-                            <div class="modal-actions">
-                                <button class="btn btn-secondary" onclick="hideModal('signoffModal')">Not now</button>
-                                <button class="btn btn-warning" onclick="confirmSignoff()">Sign Off</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="navigationGuardModal" class="modal">
-                        <div class="modal-content">
-                            <div class="modal-title">Unsaved Changes</div>
-                            <div class="modal-body">
-                                You have unsaved changes in the current round. What would you like to do?
-                            </div>
-                            <div class="modal-actions">
-                                <button class="btn btn-secondary" onclick="handleNavigationGuard('cancel')">Cancel</button>
-                                <button class="btn btn-danger" onclick="handleNavigationGuard('discard')">Discard</button>
-                                <button class="btn btn-success" onclick="handleNavigationGuard('save')">Save Round</button>
+                                <button class="btn btn-secondary" onclick="hideModal('dumplingUnlockModal')">Cancel</button>
+                                <button class="btn btn-success" onclick="dumplingConfirmUnlock()">Unlock</button>
                             </div>
                         </div>
                     </div>
@@ -3675,7 +3653,7 @@
             // If navigating to dumpling production page, initialize it
             if (pageId === 'dumpling-production') {
                 setTimeout(() => {
-                    initProductionPage();
+                    initDumplingPage();
                 }, 10);
             }
 
@@ -3695,1787 +3673,520 @@
         };
 
         // ========== DUMPLING PRODUCTION FEATURE ==========
-        
-        // Production state
-        let productionRecords = [];
-        let dayStatus = {};
-        let auditLog = [];
-        let qualityStatus = [];  // Now stores per round per employee
-        let roundSignoffs = [];  // New: sign-off data per round
-        let roundStates = {};    // New: track round states (Draft/Saved/Signed-off)
-        let currentProductionDate = '';
-        let currentRound = 1;
-        let draftData = {};  // Draft entries not yet saved
-        let isDirty = false;  // Track unsaved changes
-        let pendingNavigation = null;  // For navigation guards
-        let reportContext = { selectedYear: null, selectedMonth: null };
-        
-        // Load production data from localStorage
-        function loadProductionData() {
-            const storedRecords = localStorage.getItem('wontonProductionRecords');
-            if (storedRecords) {
-                productionRecords = JSON.parse(storedRecords);
-            }
-        
-            const storedDayStatus = localStorage.getItem('wontonDayStatus');
-            if (storedDayStatus) {
-                dayStatus = JSON.parse(storedDayStatus);
-            }
-        
-            const storedAudit = localStorage.getItem('wontonProductionAudit');
-            if (storedAudit) {
-                auditLog = JSON.parse(storedAudit);
-            }
-        
-            const storedQuality = localStorage.getItem('wontonQualityStatus');
-            if (storedQuality) {
-                qualityStatus = JSON.parse(storedQuality);
-            }
-        
-            const storedSignoffs = localStorage.getItem('wontonRoundSignoffs');
-            if (storedSignoffs) {
-                roundSignoffs = JSON.parse(storedSignoffs);
-            }
-        
-            const storedRoundStates = localStorage.getItem('wontonRoundStates');
-            if (storedRoundStates) {
-                roundStates = JSON.parse(storedRoundStates);
-            }
-        
-            // Load draft from localStorage
-            const storedDraft = localStorage.getItem('wontonDraftData');
-            if (storedDraft) {
-                draftData = JSON.parse(storedDraft);
-            }
-        }
-        
-        // Save production data to localStorage
-        function saveProductionRecords() {
-            localStorage.setItem('wontonProductionRecords', JSON.stringify(productionRecords));
-        }
-        
-        function saveDayStatus() {
-            localStorage.setItem('wontonDayStatus', JSON.stringify(dayStatus));
-        }
-        
-        function saveAuditLog() {
-            localStorage.setItem('wontonProductionAudit', JSON.stringify(auditLog));
-        }
-        
-        function saveQualityStatus() {
-            localStorage.setItem('wontonQualityStatus', JSON.stringify(qualityStatus));
-        }
-        
-        function saveRoundSignoffs() {
-            localStorage.setItem('wontonRoundSignoffs', JSON.stringify(roundSignoffs));
-        }
-        
-        function saveRoundStates() {
-            localStorage.setItem('wontonRoundStates', JSON.stringify(roundStates));
-        }
-        
-        function saveDraftData() {
-            localStorage.setItem('wontonDraftData', JSON.stringify(draftData));
-        }
-        
-        // Initialize production page
-        function initProductionPage() {
-            loadProductionData();
-        
-            // Set date to today
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('productionDate').value = today;
-            currentProductionDate = today;
-        
-            // Load the production day
-            loadProductionDay();
-        
-            // Initialize search dropdowns
-            populateSearchDropdowns();
-        
-            // Load year view for reports
-            loadYearView();
-        
-            // Set up input change listeners for draft mode
-            setupDraftListeners();
-        }
-        
-        // Get eligible employees (Dept 01 + Active)
-        function getEligibleEmployees() {
-            return employees.filter(e => e.departmentId === 1 && e.status === 'Active');
-        }
-        
-        // Get eligible products (Dept 01 + Active)
-        function getEligibleProducts() {
-            return products.filter(p => p.departmentId === 1 && p.status === 'Active');
-        }
-        
-        // Get employee by ID (including historical)
-        function getEmployeeById(id) {
-            return employees.find(e => e.id === id);
-        }
-        
-        // Get product by ID (including historical)
-        function getProductById(id) {
-            return products.find(p => p.id === id);
-        }
-        
-        // Get rounds for a specific date
-        function getDateRounds(date) {
-            const savedRounds = productionRecords.filter(r => r.date === date);
-            const uniqueRounds = [...new Set(savedRounds.map(r => r.round))];
-        
-            // Also check if there's a draft round
-            const draftKey = `${date}_${currentRound}`;
-            if (draftData[draftKey] && !uniqueRounds.includes(currentRound)) {
-                // Draft exists for a round not yet saved
-                uniqueRounds.push(currentRound);
-            }
-        
-            return uniqueRounds.sort((a, b) => a - b);
-        }
-        
-        // Get round state
-        function getRoundState(date, round) {
-            const key = `${date}_${round}`;
-        
-            // Check if signed off
-            const signoff = roundSignoffs.find(s => s.date === date && s.round === round);
-            if (signoff) return 'signed-off';
-        
-            // Check if saved
-            const savedRecords = productionRecords.filter(r => r.date === date && r.round === round);
-            if (savedRecords.length > 0) return 'saved';
-        
-            // Check if has draft data
-            if (draftData[key]) return 'draft';
-        
-            return 'draft'; // Default for new rounds
-        }
-        
-        // Load production day
-        function loadProductionDay() {
-            const date = document.getElementById('productionDate').value;
-            currentProductionDate = date;
 
-            // Get rounds for this date
-            const rounds = getDateRounds(date);
-            if (rounds.length === 0) {
-                currentRound = 1;
-            } else if (!rounds.includes(currentRound)) {
-                // Check if currentRound is a new round (next in sequence)
-                const maxRound = Math.max(...rounds);
-                const isNewRound = currentRound === maxRound + 1;
+        // Dumpling Production State
+        let dumplingRounds = [];  // Array of rounds with all data
+        let dumplingCurrentRound = 1;
+        let dumplingCurrentProduct = 1;
+        let dumplingEmployees = [];  // Department 01 employees
+        let dumplingProducts = [1, 2, 3, 4, 5];  // 5 products
 
-                // Only reset to latest round if we're not explicitly adding a new round
-                if (!isNewRound) {
-                    currentRound = rounds[rounds.length - 1]; // Latest round
-                }
-                // Otherwise, keep currentRound as is (for new rounds)
+        // Data structure for rounds:
+        // {
+        //   roundNo: 1,
+        //   status: "editing" | "draft",
+        //   createdAt: timestamp,
+        //   savedAt: null or timestamp,
+        //   initial: "",
+        //   perProduct: {
+        //     1: { perEmployee: { 1: { qtyProduced: 0, qtyReject: 0, note: "" } } },
+        //     2: { perEmployee: { 1: { qtyProduced: 0, qtyReject: 0, note: "" } } },
+        //     ...
+        //   }
+        // }
+
+        // Load dumpling data from localStorage
+        function loadDumplingData() {
+            const storedRounds = localStorage.getItem('dumplingRounds');
+            if (storedRounds) {
+                dumplingRounds = JSON.parse(storedRounds);
+            } else {
+                // Initialize with Round 1
+                dumplingRounds = [{
+                    roundNo: 1,
+                    status: "editing",
+                    createdAt: new Date().toISOString(),
+                    savedAt: null,
+                    initial: "",
+                    perProduct: {}
+                }];
+                initializeRoundProducts(dumplingRounds[0]);
             }
+        }
 
-            // Load draft for current round
-            loadDraftForCurrentRound();
+        // Save dumpling data to localStorage
+        function saveDumplingData() {
+            localStorage.setItem('dumplingRounds', JSON.stringify(dumplingRounds));
+        }
+
+        // Initialize products structure for a round
+        function initializeRoundProducts(round) {
+            for (let productId of dumplingProducts) {
+                round.perProduct[productId] = { perEmployee: {} };
+            }
+        }
+
+        // Initialize dumpling production page
+        function initDumplingPage() {
+            // Load employees from Department 01
+            loadEmployees();
+            dumplingEmployees = employees.filter(emp =>
+                emp.departmentId === 1 && emp.status === 'Active'
+            );
+
+            // Load data
+            loadDumplingData();
 
             // Render UI
-            renderRounds(rounds);
-            updateDayStatusUI();
-            updateRoundStatusUI();
-            updateSignoffUI();
-            renderProductDashboard();
-            renderCurrentView();
+            dumplingRenderRoundSelector();
+            dumplingRenderEmployeeTable();
+            dumplingRenderRoundHistory();
+            dumplingUpdateUI();
         }
-        
-        // Load draft data for current round
-        function loadDraftForCurrentRound() {
-            const key = `${currentProductionDate}_${currentRound}`;
-            const draft = draftData[key];
-        
-            if (draft) {
-                // Draft exists, mark as dirty
-                isDirty = true;
-            } else {
-                // No draft, not dirty
-                isDirty = false;
-            }
-        }
-        
-        // Handle date change with navigation guard
-        function handleDateChange() {
-            if (isDirty) {
-                pendingNavigation = { type: 'date', action: () => {
-                    isDirty = false;
-                    clearDraftForCurrentRound();
-                    loadProductionDay();
-                }};
-                showModal('navigationGuardModal');
-            } else {
-                loadProductionDay();
-            }
-        }
-        
-        // Handle add round
-        function handleAddRound() {
-            if (isDirty) {
-                pendingNavigation = { type: 'round', action: () => {
-                    isDirty = false;
-                    clearDraftForCurrentRound();
-                    addNewRound();
-                }};
-                showModal('navigationGuardModal');
-            } else {
-                addNewRound();
-            }
-        }
-        
-        // Add new round
-        function addNewRound() {
-            const rounds = getDateRounds(currentProductionDate);
-            const nextRound = rounds.length > 0 ? Math.max(...rounds) + 1 : 1;
-            currentRound = nextRound;
-            isDirty = false; // New round starts clean
-            loadProductionDay();
-        }
-        
-        // Select a round with navigation guard
-        function selectRound(round) {
-            if (round === currentRound) return; // Same round, do nothing
-        
-            if (isDirty) {
-                pendingNavigation = { type: 'round', targetRound: round, action: () => {
-                    isDirty = false;
-                    clearDraftForCurrentRound();
-                    currentRound = round;
-                    loadProductionDay();
-                }};
-                showModal('navigationGuardModal');
-            } else {
-                currentRound = round;
-                loadProductionDay();
-            }
-        }
-        
-        // Handle navigation guard modal actions
-        function handleNavigationGuard(action) {
-            hideModal('navigationGuardModal');
-        
-            if (action === 'cancel') {
-                pendingNavigation = null;
-                return;
-            }
-        
-            if (action === 'discard') {
-                clearDraftForCurrentRound();
-                isDirty = false;
-                if (pendingNavigation && pendingNavigation.action) {
-                    pendingNavigation.action();
+
+        // Render round selector dropdown
+        function dumplingRenderRoundSelector() {
+            const selector = document.getElementById('dumplingRoundSelector');
+            selector.innerHTML = '';
+
+            dumplingRounds.forEach(round => {
+                const option = document.createElement('option');
+                option.value = round.roundNo;
+                option.textContent = `Round ${round.roundNo}`;
+                if (round.status === 'draft') {
+                    option.textContent += ' (Draft)';
                 }
-                pendingNavigation = null;
-            } else if (action === 'save') {
-                openInitialsModal(() => {
-                    isDirty = false;
-                    if (pendingNavigation && pendingNavigation.action) {
-                        pendingNavigation.action();
-                    }
-                    pendingNavigation = null;
-                });
-            }
-        }
-        
-        // Clear draft for current round
-        function clearDraftForCurrentRound() {
-            const key = `${currentProductionDate}_${currentRound}`;
-            delete draftData[key];
-            saveDraftData();
-        }
-        
-        // Render rounds selector
-        function renderRounds(rounds) {
-            const container = document.getElementById('roundSelectorInline');
-            if (!container) return;
-        
-            container.innerHTML = '';
-        
-            // Render existing rounds
-            rounds.forEach(round => {
-                const btn = document.createElement('button');
-                btn.className = 'round-btn' + (round === currentRound ? ' active' : '');
-        
-                // Add state indicator
-                const state = getRoundState(currentProductionDate, round);
-                let stateIcon = '';
-                if (state === 'signed-off') stateIcon = '✓';
-                else if (state === 'saved') stateIcon = '💾';
-                else if (state === 'draft') stateIcon = '📝';
-        
-                btn.textContent = `${stateIcon} Round ${round}`;
-                btn.onclick = () => selectRound(round);
-                container.appendChild(btn);
+                selector.appendChild(option);
             });
-        
-            // Update add round button visibility
-            const addRoundBtn = document.getElementById('addRoundBtn');
-            const dayStatusValue = dayStatus[currentProductionDate] || 'Open';
-            if (addRoundBtn) {
-                addRoundBtn.style.display = (dayStatusValue === 'Open' || currentRole === 'admin') ? 'block' : 'none';
-            }
+
+            selector.value = dumplingCurrentRound;
         }
-        
-        // Update day status UI
-        function updateDayStatusUI() {
-            const status = dayStatus[currentProductionDate] || 'Open';
-            const badge = document.getElementById('dayStatusBadge');
-            const closeDayBtn = document.getElementById('closeDayBtn');
-            const reopenDayBtn = document.getElementById('reopenDayBtn');
-            const closeDayBtnGroup = document.getElementById('closeDayBtnGroup');
 
-            if (badge) {
-                badge.className = `day-status-badge ${status.toLowerCase()}`;
-                badge.innerHTML = status === 'Open'
-                    ? '<span>●</span> Open'
-                    : '<span>●</span> Closed';
-            }
+        // Select a round
+        function dumplingSelectRound() {
+            const selector = document.getElementById('dumplingRoundSelector');
+            dumplingCurrentRound = parseInt(selector.value);
+            dumplingRenderEmployeeTable();
+            dumplingUpdateUI();
+        }
 
-            // Only show Close Day controls for admin
-            if (closeDayBtnGroup) {
-                closeDayBtnGroup.style.display = currentRole === 'admin' ? 'flex' : 'none';
-            }
+        // Select a product tab
+        function dumplingSelectProduct(productId) {
+            dumplingCurrentProduct = productId;
 
-            if (closeDayBtn && reopenDayBtn) {
-                if (status === 'Open') {
-                    closeDayBtn.style.display = 'inline-block';
-                    reopenDayBtn.style.display = 'none';
+            // Update tab active state
+            const tabs = document.querySelectorAll('.dumpling-product-tab');
+            tabs.forEach((tab, index) => {
+                if (index + 1 === productId) {
+                    tab.classList.add('active');
                 } else {
-                    closeDayBtn.style.display = 'none';
-                    reopenDayBtn.style.display = 'inline-block';
+                    tab.classList.remove('active');
                 }
-            }
-        }
-        
-        // Update round status UI
-        function updateRoundStatusUI() {
-            const state = getRoundState(currentProductionDate, currentRound);
-            const badge = document.getElementById('roundStatusBadge');
-            const text = document.getElementById('roundStatusText');
-        
-            if (badge && text) {
-                badge.className = `round-status-badge ${state}`;
-        
-                if (state === 'signed-off') {
-                    badge.innerHTML = '<span>●</span> <span id="roundStatusText">Signed Off</span>';
-                } else if (state === 'saved') {
-                    badge.innerHTML = '<span>●</span> <span id="roundStatusText">Saved</span>';
-                } else {
-                    badge.innerHTML = '<span>●</span> <span id="roundStatusText">Draft</span>';
-                }
-            }
-        }
-        
-        // Update sign-off UI (using new compact badge)
-        function updateSignoffUI() {
-            const signoff = roundSignoffs.find(s =>
-                s.date === currentProductionDate && s.round === currentRound
-            );
-
-            const statusText = document.getElementById('signoffStatusText');
-            const statusBadge = document.getElementById('signoffStatusBadge');
-
-            if (statusText && statusBadge) {
-                if (signoff) {
-                    const inspector = getEmployeeById(signoff.inspectedBy) || { nameThai: 'Unknown' };
-                    statusText.textContent = `✓ ${inspector.nameThai}`;
-                    statusBadge.className = 'signoff-status-badge signed';
-                    statusBadge.title = `Signed at ${new Date(signoff.signedOffAt).toLocaleString('th-TH')}`;
-                } else {
-                    statusText.textContent = 'Not signed';
-                    statusBadge.className = 'signoff-status-badge not-signed';
-                    statusBadge.title = '';
-                }
-            }
-        }
-        
-        // Render current view (only accordion now)
-        function renderCurrentView() {
-            renderAccordionView();
-        }
-        
-        // Render accordion view
-        function renderAccordionView() {
-            const container = document.getElementById('employeeAccordion');
-            if (!container) return;
-        
-            container.innerHTML = '';
-        
-            const eligibleEmployees = getEligibleEmployees();
-            const eligibleProducts = getEligibleProducts();
-            const draftKey = `${currentProductionDate}_${currentRound}`;
-            const currentDraft = draftData[draftKey] || {};
-        
-            // Get saved entries
-            const savedEntries = productionRecords.filter(
-                r => r.date === currentProductionDate && r.round === currentRound
-            );
-        
-            // Check if editable
-            const roundState = getRoundState(currentProductionDate, currentRound);
-            const dayStatusValue = dayStatus[currentProductionDate] || 'Open';
-            const isEditable = (roundState !== 'signed-off' || currentRole === 'admin') &&
-                               (dayStatusValue === 'Open' || currentRole === 'admin');
-        
-            eligibleEmployees.forEach(emp => {
-                // Calculate employee subtotal (draft + saved)
-                let subtotal = 0;
-                eligibleProducts.forEach(prod => {
-                    const entryKey = `${emp.id}_${prod.id}`;
-                    if (currentDraft[entryKey]?.count !== undefined) {
-                        subtotal += parseInt(currentDraft[entryKey].count) || 0;
-                    } else {
-                        const saved = savedEntries.find(e => e.employeeId === emp.id && e.productId === prod.id);
-                        if (saved) subtotal += saved.count;
-                    }
-                });
-        
-                // Check if employee has any entries
-                const hasEntries = subtotal > 0 || currentDraft[`quality_${emp.id}`];
-                const statusClass = hasEntries ? 'has-entries' : 'no-entries';
-                const statusText = hasEntries ? 'Has entries' : 'No entries';
-        
-                // Create accordion item
-                const item = document.createElement('div');
-                item.className = 'accordion-item';
-                item.innerHTML = `
-                    <div class="accordion-header" onclick="toggleAccordion(${emp.id})">
-                        <div class="accordion-header-left">
-                            <span class="accordion-employee-name">${emp.nameThai}${emp.nameOther ? ' / ' + emp.nameOther : ''}</span>
-                            <span class="accordion-employee-id">(ID: ${emp.id})</span>
-                        </div>
-                        <div class="accordion-header-right">
-                            <div class="accordion-subtotal">
-                                Subtotal: <span class="accordion-subtotal-value">${subtotal}</span> packs
-                            </div>
-                            <span class="accordion-status ${statusClass}">${statusText}</span>
-                            <span class="accordion-expand-icon" id="expand_${emp.id}">▶</span>
-                        </div>
-                    </div>
-                    <div class="accordion-content" id="content_${emp.id}">
-                        <div class="product-mini-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Count</th>
-                                        <th>Notes</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${eligibleProducts.map(prod => {
-                                        const entryKey = `${emp.id}_${prod.id}`;
-                                        let count = '';
-                                        let notes = '';
-        
-                                        if (currentDraft[entryKey]) {
-                                            count = currentDraft[entryKey].count || '';
-                                            notes = currentDraft[entryKey].notes || '';
-                                        } else {
-                                            const saved = savedEntries.find(e => e.employeeId === emp.id && e.productId === prod.id);
-                                            if (saved) {
-                                                count = saved.count;
-                                                notes = saved.notes || '';
-                                            }
-                                        }
-        
-                                        return `
-                                            <tr>
-                                                <td>${prod.nameThai}${prod.nameEn ? ' / ' + prod.nameEn : ''}</td>
-                                                <td>
-                                                    <input type="number"
-                                                        class="entry-input"
-                                                        id="acc_count_${emp.id}_${prod.id}"
-                                                        value="${count}"
-                                                        min="0"
-                                                        ${!isEditable ? 'disabled' : ''}
-                                                        onchange="updateDraft(${emp.id}, ${prod.id})"
-                                                        placeholder="0">
-                                                </td>
-                                                <td>
-                                                    <input type="text"
-                                                        class="entry-input"
-                                                        id="acc_notes_${emp.id}_${prod.id}"
-                                                        value="${notes}"
-                                                        ${!isEditable ? 'disabled' : ''}
-                                                        onchange="updateDraft(${emp.id}, ${prod.id})"
-                                                        placeholder="Optional">
-                                                </td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="quality-check-section">
-                            <h4>Quality Check for this Employee (Current Round)</h4>
-                            <div class="quality-select-row">
-                                <label>Status:</label>
-                                <div class="quality-toggles">
-                                    <button type="button" class="quality-toggle-btn ok ${getQualityStatus(emp.id) === 'OK' ? 'active' : ''}"
-                                        id="quality_ok_${emp.id}"
-                                        onclick="setQualityStatus(${emp.id}, 'OK')"
-                                        ${!isEditable ? 'disabled' : ''}>
-                                        ✓ OK
-                                    </button>
-                                    <button type="button" class="quality-toggle-btn not-ok ${getQualityStatus(emp.id) === 'Not OK' ? 'active' : ''}"
-                                        id="quality_notok_${emp.id}"
-                                        onclick="setQualityStatus(${emp.id}, 'Not OK')"
-                                        ${!isEditable ? 'disabled' : ''}>
-                                        ✗ Not OK
-                                    </button>
-                                </div>
-                                <label style="margin-left: 16px;">Notes:</label>
-                                <input type="text" class="entry-input" id="quality_notes_${emp.id}"
-                                    value="${getQualityNotes(emp.id)}"
-                                    onchange="updateQualityDraft(${emp.id})"
-                                    ${!isEditable ? 'disabled' : ''}
-                                    placeholder="Optional notes"
-                                    style="flex: 1;">
-                            </div>
-                        </div>
-                    </div>
-                `;
-        
-                container.appendChild(item);
             });
-        }
-        
-        // Toggle accordion
-        function toggleAccordion(employeeId) {
-            const content = document.getElementById(`content_${employeeId}`);
-            const icon = document.getElementById(`expand_${employeeId}`);
-            const header = content.previousElementSibling;
-        
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.remove('expanded');
-                header.classList.remove('expanded');
-            } else {
-                content.classList.add('expanded');
-                icon.classList.add('expanded');
-                header.classList.add('expanded');
-            }
-        }
-        
-        // Get quality status for employee
-        function getQualityStatus(employeeId) {
-            const draftKey = `${currentProductionDate}_${currentRound}`;
-            const currentDraft = draftData[draftKey] || {};
 
-            let status = 'Pending';
-            if (currentDraft[`quality_${employeeId}`]) {
-                status = currentDraft[`quality_${employeeId}`].status;
-            } else {
-                const saved = qualityStatus.find(q =>
-                    q.date === currentProductionDate &&
-                    q.round === currentRound &&
-                    q.employeeId === employeeId
+            // Update current product display
+            document.getElementById('dumplingCurrentProduct').textContent = `Product ${productId}`;
+
+            // Re-render employee table for this product
+            dumplingRenderEmployeeTable();
+        }
+
+        // Get current round object
+        function dumplingGetCurrentRound() {
+            return dumplingRounds.find(r => r.roundNo === dumplingCurrentRound);
+        }
+
+        // Render employee table
+        function dumplingRenderEmployeeTable() {
+            const tbody = document.getElementById('dumplingEmployeeTableBody');
+            tbody.innerHTML = '';
+
+            const currentRound = dumplingGetCurrentRound();
+            if (!currentRound) return;
+
+            const isLocked = currentRound.status === 'draft';
+            const productData = currentRound.perProduct[dumplingCurrentProduct];
+
+            // Get previous round data for "Last Round" display
+            const prevRound = dumplingRounds.find(r => r.roundNo === dumplingCurrentRound - 1 && r.status === 'draft');
+
+            // Apply search and sort
+            let filteredEmployees = [...dumplingEmployees];
+            const searchTerm = document.getElementById('dumplingSearch')?.value.toLowerCase() || '';
+            const sortBy = document.getElementById('dumplingSort')?.value || 'name';
+
+            if (searchTerm) {
+                filteredEmployees = filteredEmployees.filter(emp =>
+                    emp.id.toString().includes(searchTerm) ||
+                    emp.nameThai?.toLowerCase().includes(searchTerm) ||
+                    emp.nameOther?.toLowerCase().includes(searchTerm)
                 );
-                if (saved) status = saved.status;
             }
 
-            return status;
-        }
-
-        // Set quality status for employee (for toggle buttons)
-        function setQualityStatus(employeeId, newStatus) {
-            const okBtn = document.getElementById(`quality_ok_${employeeId}`);
-            const notOkBtn = document.getElementById(`quality_notok_${employeeId}`);
-
-            // Toggle the clicked button
-            if (newStatus === 'OK') {
-                if (okBtn.classList.contains('active')) {
-                    // Clicking active OK button sets to Pending
-                    okBtn.classList.remove('active');
-                    newStatus = 'Pending';
-                } else {
-                    // Set to OK
-                    okBtn.classList.add('active');
-                    notOkBtn.classList.remove('active');
-                }
-            } else if (newStatus === 'Not OK') {
-                if (notOkBtn.classList.contains('active')) {
-                    // Clicking active Not OK button sets to Pending
-                    notOkBtn.classList.remove('active');
-                    newStatus = 'Pending';
-                } else {
-                    // Set to Not OK
-                    notOkBtn.classList.add('active');
-                    okBtn.classList.remove('active');
-                }
+            if (sortBy === 'name') {
+                filteredEmployees.sort((a, b) => {
+                    const nameA = a.nameThai || a.nameOther || '';
+                    const nameB = b.nameThai || b.nameOther || '';
+                    return nameA.localeCompare(nameB);
+                });
+            } else if (sortBy === 'id') {
+                filteredEmployees.sort((a, b) => a.id - b.id);
             }
 
-            // Update the draft data
-            const notesInput = document.getElementById(`quality_notes_${employeeId}`);
-            const draftKey = `${currentProductionDate}_${currentRound}`;
-            if (!draftData[draftKey]) draftData[draftKey] = {};
+            filteredEmployees.forEach(emp => {
+                const empData = productData.perEmployee[emp.id] || {};
+                const qtyProduced = empData.qtyProduced !== undefined ? empData.qtyProduced : '';
+                const qtyReject = empData.qtyReject !== undefined ? empData.qtyReject : 0;
+                const note = empData.note || '';
 
-            draftData[draftKey][`quality_${employeeId}`] = {
-                status: newStatus,
-                notes: notesInput ? notesInput.value : ''
-            };
+                // Check if row is "touched" (has data entered)
+                const isTouched = qtyProduced !== '' || qtyReject > 0 || note !== '';
 
-            isDirty = true;
-            saveDraftData();
-            updateDraftIndicator();
-        }
-        
-        // Get quality notes for employee
-        function getQualityNotes(employeeId) {
-            const draftKey = `${currentProductionDate}_${currentRound}`;
-            const currentDraft = draftData[draftKey] || {};
-        
-            if (currentDraft[`quality_${employeeId}`]) {
-                return currentDraft[`quality_${employeeId}`].notes || '';
-            }
-        
-            const saved = qualityStatus.find(q =>
-                q.date === currentProductionDate &&
-                q.round === currentRound &&
-                q.employeeId === employeeId
-            );
-        
-            return saved ? (saved.notes || '') : '';
-        }
-        
-        // Update draft when user changes input
-        function updateDraft(employeeId, productId) {
-            const countInput = document.getElementById(`acc_count_${employeeId}_${productId}`) ||
-                               document.getElementById(`spr_count_${employeeId}_${productId}`);
-            const notesInput = document.getElementById(`acc_notes_${employeeId}_${productId}`) ||
-                               document.getElementById(`spr_notes_${employeeId}_${productId}`);
-        
-            const draftKey = `${currentProductionDate}_${currentRound}`;
-            if (!draftData[draftKey]) draftData[draftKey] = {};
-        
-            const entryKey = `${employeeId}_${productId}`;
-            draftData[draftKey][entryKey] = {
-                count: countInput ? countInput.value : '',
-                notes: notesInput ? notesInput.value : ''
-            };
-        
-            isDirty = true;
-            saveDraftData();
-            updateDraftIndicator();
-            renderProductDashboard(); // Update dashboard to reflect draft changes
-        
-            // Update accordion subtotal if in accordion view
-            if (currentView === 'accordion') {
-                updateAccordionSubtotal(employeeId);
-            }
-        }
-        
-        // Update accordion subtotal
-        function updateAccordionSubtotal(employeeId) {
-            const eligibleProducts = getEligibleProducts();
-            const draftKey = `${currentProductionDate}_${currentRound}`;
-            const currentDraft = draftData[draftKey] || {};
-            const savedEntries = productionRecords.filter(
-                r => r.date === currentProductionDate && r.round === currentRound && r.employeeId === employeeId
-            );
-        
-            let subtotal = 0;
-            eligibleProducts.forEach(prod => {
-                const entryKey = `${employeeId}_${prod.id}`;
-                if (currentDraft[entryKey]?.count !== undefined) {
-                    subtotal += parseInt(currentDraft[entryKey].count) || 0;
-                } else {
-                    const saved = savedEntries.find(e => e.productId === prod.id);
-                    if (saved) subtotal += saved.count;
-                }
-            });
-        
-            // Find and update the subtotal display
-            const subtotalElem = document.querySelector(`#content_${employeeId}`).previousElementSibling.querySelector('.accordion-subtotal-value');
-            if (subtotalElem) {
-                subtotalElem.textContent = subtotal;
-            }
-        }
-        
-        // Update quality draft
-        function updateQualityDraft(employeeId) {
-            // Get current status from buttons
-            const okBtn = document.getElementById(`quality_ok_${employeeId}`);
-            const notOkBtn = document.getElementById(`quality_notok_${employeeId}`);
-            const notesInput = document.getElementById(`quality_notes_${employeeId}`);
-
-            let status = 'Pending';
-            if (okBtn && okBtn.classList.contains('active')) {
-                status = 'OK';
-            } else if (notOkBtn && notOkBtn.classList.contains('active')) {
-                status = 'Not OK';
-            }
-
-            const draftKey = `${currentProductionDate}_${currentRound}`;
-            if (!draftData[draftKey]) draftData[draftKey] = {};
-
-            draftData[draftKey][`quality_${employeeId}`] = {
-                status: status,
-                notes: notesInput ? notesInput.value : ''
-            };
-
-            isDirty = true;
-            saveDraftData();
-            updateDraftIndicator();
-        }
-        
-        // Update draft indicator
-        function updateDraftIndicator() {
-            const indicator = document.getElementById('draftIndicator');
-            if (indicator) {
-                indicator.style.display = isDirty ? 'block' : 'none';
-            }
-        }
-        
-        // Render spreadsheet view
-        function renderSpreadsheetView() {
-            const container = document.getElementById('spreadsheetGrid');
-            if (!container) return;
-        
-            const eligibleEmployees = getEligibleEmployees();
-            const eligibleProducts = getEligibleProducts();
-            const draftKey = `${currentProductionDate}_${currentRound}`;
-            const currentDraft = draftData[draftKey] || {};
-        
-            // Get saved entries
-            const savedEntries = productionRecords.filter(
-                r => r.date === currentProductionDate && r.round === currentRound
-            );
-        
-            // Check if editable
-            const roundState = getRoundState(currentProductionDate, currentRound);
-            const dayStatusValue = dayStatus[currentProductionDate] || 'Open';
-            const isEditable = (roundState !== 'signed-off' || currentRole === 'admin') &&
-                               (dayStatusValue === 'Open' || currentRole === 'admin');
-        
-            let html = '<table><thead><tr>';
-            html += '<th class="employee-col">Employee</th>';
-            eligibleProducts.forEach(prod => {
-                html += `<th>${prod.nameThai}${prod.nameEn ? ' / ' + prod.nameEn : ''}</th>`;
-            });
-            html += '<th>Quality</th>';
-            html += '</tr></thead><tbody>';
-        
-            eligibleEmployees.forEach(emp => {
-                html += '<tr>';
-                html += `<td class="employee-name">${emp.nameThai} (${emp.id})`;
-        
-                // Quality icon/status
-                const qualityStatus = getQualityStatusForEmployee(emp.id);
-                const qualityIcon = qualityStatus === 'OK' ? '✓' : qualityStatus === 'Not OK' ? '✗' : '○';
-                const qualityColor = qualityStatus === 'OK' ? '#4CAF50' : qualityStatus === 'Not OK' ? '#F44336' : '#FF9800';
-                html += `<span class="spreadsheet-quality-icon" style="color: ${qualityColor}"
-                            title="${qualityStatus}" onclick="openQualityModal(${emp.id})">${qualityIcon}</span>`;
-                html += '</td>';
-        
-                eligibleProducts.forEach(prod => {
-                    const entryKey = `${emp.id}_${prod.id}`;
-                    let count = '';
-        
-                    if (currentDraft[entryKey]) {
-                        count = currentDraft[entryKey].count || '';
-                    } else {
-                        const saved = savedEntries.find(e => e.employeeId === emp.id && e.productId === prod.id);
-                        if (saved) count = saved.count;
+                // Get last round value
+                let lastRoundValue = '';
+                if (prevRound) {
+                    const prevProductData = prevRound.perProduct[dumplingCurrentProduct];
+                    const prevEmpData = prevProductData?.perEmployee[emp.id];
+                    if (prevEmpData && prevEmpData.qtyProduced !== undefined) {
+                        lastRoundValue = prevEmpData.qtyProduced;
                     }
-        
-                    html += `<td>
+                }
+
+                const tr = document.createElement('tr');
+                if (isTouched) tr.classList.add('touched');
+
+                tr.innerHTML = `
+                    <td>${emp.id.toString().padStart(2, '0')}</td>
+                    <td>${emp.nameThai || emp.nameOther || 'N/A'}</td>
+                    <td>
                         <input type="number"
-                            id="spr_count_${emp.id}_${prod.id}"
-                            value="${count}"
-                            min="0"
-                            ${!isEditable ? 'disabled' : ''}
-                            onchange="updateDraft(${emp.id}, ${prod.id})"
-                            placeholder="0">
-                    </td>`;
-                });
-        
-                // Quality status cell
-                html += `<td style="text-align: center;">
-                    <select class="entry-select" id="spr_quality_${emp.id}"
-                        onchange="updateQualityDraftSpreadsheet(${emp.id})"
-                        ${!isEditable ? 'disabled' : ''}
-                        style="width: 100px;">
-                        ${getQualityOptionsSpreadsheet(emp.id)}
-                    </select>
-                </td>`;
-        
-                html += '</tr>';
-            });
-        
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        }
-        
-        // Get quality status for employee
-        function getQualityStatusForEmployee(employeeId) {
-            const draftKey = `${currentProductionDate}_${currentRound}`;
-            const currentDraft = draftData[draftKey] || {};
-        
-            if (currentDraft[`quality_${employeeId}`]) {
-                return currentDraft[`quality_${employeeId}`].status;
-            }
-        
-            const saved = qualityStatus.find(q =>
-                q.date === currentProductionDate &&
-                q.round === currentRound &&
-                q.employeeId === employeeId
-            );
-        
-            return saved ? saved.status : 'Pending';
-        }
-        
-        // Get quality options for spreadsheet
-        function getQualityOptionsSpreadsheet(employeeId) {
-            const status = getQualityStatusForEmployee(employeeId);
-            return `
-                <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
-                <option value="OK" ${status === 'OK' ? 'selected' : ''}>OK</option>
-                <option value="Not OK" ${status === 'Not OK' ? 'selected' : ''}>Not OK</option>
-            `;
-        }
-        
-        // Update quality draft from spreadsheet
-        function updateQualityDraftSpreadsheet(employeeId) {
-            const statusSelect = document.getElementById(`spr_quality_${employeeId}`);
-        
-            const draftKey = `${currentProductionDate}_${currentRound}`;
-            if (!draftData[draftKey]) draftData[draftKey] = {};
-        
-            // Get existing notes if any
-            const existingNotes = draftData[draftKey][`quality_${employeeId}`]?.notes || '';
-        
-            draftData[draftKey][`quality_${employeeId}`] = {
-                status: statusSelect ? statusSelect.value : 'Pending',
-                notes: existingNotes
-            };
-        
-            isDirty = true;
-            saveDraftData();
-            updateDraftIndicator();
-        }
-        
-        // Render per-product dashboard
-        function renderProductDashboard() {
-            const container = document.getElementById('productDashboard');
-            if (!container) return;
-        
-            const eligibleProducts = getEligibleProducts();
-            const draftKey = `${currentProductionDate}_${currentRound}`;
-            const currentDraft = draftData[draftKey] || {};
-        
-            // Get saved entries for current round
-            const savedEntries = productionRecords.filter(
-                r => r.date === currentProductionDate && r.round === currentRound
-            );
-        
-            container.innerHTML = '';
-        
-            eligibleProducts.forEach(prod => {
-                // Calculate total for this product (draft + saved)
-                let total = 0;
-                const eligibleEmployees = getEligibleEmployees();
-        
-                eligibleEmployees.forEach(emp => {
-                    const entryKey = `${emp.id}_${prod.id}`;
-                    if (currentDraft[entryKey]?.count !== undefined) {
-                        total += parseInt(currentDraft[entryKey].count) || 0;
-                    } else {
-                        const saved = savedEntries.find(e => e.employeeId === emp.id && e.productId === prod.id);
-                        if (saved) total += saved.count;
-                    }
-                });
-        
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.innerHTML = `
-                    <div class="product-card-name">${prod.nameThai}${prod.nameEn ? ' / ' + prod.nameEn : ''}</div>
-                    <div class="product-card-value">${total}</div>
-                    <div class="product-card-label">packs (this round)</div>
+                               value="${qtyProduced}"
+                               min="0"
+                               step="0.1"
+                               ${isLocked ? 'disabled' : ''}
+                               onchange="dumplingUpdateEmployeeData(${emp.id}, 'qtyProduced', this.value)"
+                               placeholder="0">
+                    </td>
+                    <td>
+                        <input type="number"
+                               value="${qtyReject || ''}"
+                               min="0"
+                               step="0.1"
+                               ${isLocked ? 'disabled' : ''}
+                               onchange="dumplingUpdateEmployeeData(${emp.id}, 'qtyReject', this.value)"
+                               placeholder="0">
+                    </td>
+                    <td>
+                        <input type="text"
+                               value="${note}"
+                               ${isLocked ? 'disabled' : ''}
+                               onchange="dumplingUpdateEmployeeData(${emp.id}, 'note', this.value)"
+                               placeholder="Optional note">
+                    </td>
+                    <td class="touched-indicator">
+                        ${isTouched ? '<span style="color: #4CAF50;">✓</span>' : ''}
+                    </td>
+                    <td class="last-round-value">
+                        ${lastRoundValue !== '' ? `<span style="color: #999; font-size: 12px;">${lastRoundValue}</span>` : '-'}
+                    </td>
                 `;
-                container.appendChild(card);
+
+                tbody.appendChild(tr);
             });
-        
-            updateDraftIndicator();
+
+            // Update current round display
+            document.getElementById('dumplingCurrentRound').textContent = dumplingCurrentRound;
         }
-        
-        // Save current round
-        function saveCurrentRound(callback) {
-            const roundState = getRoundState(currentProductionDate, currentRound);
-            const dayStatusValue = dayStatus[currentProductionDate] || 'Open';
 
-            // Check if round is signed off
-            if (roundState === 'signed-off' && currentRole !== 'admin') {
-                alert('This round is signed off. Only admins can edit signed-off rounds.');
+        // Update employee data
+        function dumplingUpdateEmployeeData(employeeId, field, value) {
+            const currentRound = dumplingGetCurrentRound();
+            if (!currentRound || currentRound.status === 'draft') return;
+
+            const productData = currentRound.perProduct[dumplingCurrentProduct];
+
+            if (!productData.perEmployee[employeeId]) {
+                productData.perEmployee[employeeId] = {};
+            }
+
+            if (field === 'qtyProduced' || field === 'qtyReject') {
+                const numValue = value === '' ? '' : parseFloat(value);
+                productData.perEmployee[employeeId][field] = numValue;
+            } else {
+                productData.perEmployee[employeeId][field] = value;
+            }
+
+            // Auto-save to localStorage
+            saveDumplingData();
+
+            // Re-render to update touched indicator
+            dumplingRenderEmployeeTable();
+            dumplingRenderRoundHistory();
+        }
+
+        // Filter employees (called by search/sort)
+        function dumplingFilterEmployees() {
+            dumplingRenderEmployeeTable();
+        }
+
+        // Save current round as Draft
+        function dumplingSaveDraft() {
+            const currentRound = dumplingGetCurrentRound();
+            if (!currentRound || currentRound.status === 'draft') return;
+
+            // Get initial input
+            const initial = document.getElementById('dumplingInitial').value.trim().toUpperCase();
+
+            // Validation
+            if (!initial) {
+                alert('❌ Initial is required to save as Draft.\nPlease enter your initial (2-4 characters recommended).');
+                document.getElementById('dumplingInitial').focus();
                 return;
             }
 
-            // Check if day is closed
-            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
-                alert('This day is closed. Only admins can edit closed days.');
-                return;
+            // Validate that at least some data is entered across all products
+            let hasData = false;
+            for (let productId of dumplingProducts) {
+                const productData = currentRound.perProduct[productId];
+                const employeeData = Object.values(productData.perEmployee);
+                if (employeeData.some(emp => emp.qtyProduced !== undefined && emp.qtyProduced !== '')) {
+                    hasData = true;
+                    break;
+                }
             }
 
-            const draftKey = `${currentProductionDate}_${currentRound}`;
-            const currentDraft = draftData[draftKey] || {};
+            if (!hasData) {
+                const confirmSave = confirm('⚠️ No production data entered for any product.\nDo you still want to save as Draft?');
+                if (!confirmSave) return;
+            }
 
-            // Save production entries
-            const eligibleEmployees = getEligibleEmployees();
-            const eligibleProducts = getEligibleProducts();
-
-            eligibleEmployees.forEach(emp => {
-                eligibleProducts.forEach(prod => {
-                    const entryKey = `${emp.id}_${prod.id}`;
-                    if (currentDraft[entryKey]) {
-                        const count = parseInt(currentDraft[entryKey].count) || 0;
-                        const notes = currentDraft[entryKey].notes || '';
-
-                        if (count > 0 || notes) {
-                            saveEntry(emp.id, prod.id, count, notes);
+            // Validate required fields for any touched employee
+            let hasError = false;
+            for (let productId of dumplingProducts) {
+                const productData = currentRound.perProduct[productId];
+                for (let empId in productData.perEmployee) {
+                    const empData = productData.perEmployee[empId];
+                    if (empData.qtyProduced === '' || empData.qtyProduced === undefined) {
+                        // If reject or note is filled but qtyProduced is not, that's an error
+                        if (empData.qtyReject || empData.note) {
+                            hasError = true;
+                            break;
                         }
                     }
-                });
-
-                // Save quality status for this employee
-                if (currentDraft[`quality_${emp.id}`]) {
-                    saveQualityForEmployee(emp.id, currentDraft[`quality_${emp.id}`]);
                 }
-            });
-
-            // Save to localStorage
-            saveProductionRecords();
-            saveQualityStatus();
-
-            // Clear draft
-            delete draftData[draftKey];
-            saveDraftData();
-            isDirty = false;
-
-            // Update last saved time
-            const lastSavedInfo = document.getElementById('lastSavedInfo');
-            const lastSavedTime = document.getElementById('lastSavedTime');
-            if (lastSavedInfo && lastSavedTime) {
-                lastSavedTime.textContent = new Date().toLocaleTimeString('th-TH');
-                lastSavedInfo.style.display = 'block';
+                if (hasError) break;
             }
 
-            if (callback) callback();
+            if (hasError) {
+                alert('❌ Validation Error:\nIf you enter Qty Reject or Note for an employee, you must also enter Qty Produced.');
+                return;
+            }
+
+            // Save as draft
+            currentRound.status = 'draft';
+            currentRound.savedAt = new Date().toISOString();
+            currentRound.initial = initial;
+
+            saveDumplingData();
+
+            // Update UI
+            dumplingRenderRoundSelector();
+            dumplingRenderEmployeeTable();
+            dumplingRenderRoundHistory();
+            dumplingUpdateUI();
+
+            alert(`✅ Round ${dumplingCurrentRound} saved as Draft successfully!\nYou can now add a new round.`);
         }
-        
-        // Save individual entry
-        function saveEntry(employeeId, productId, count, notes) {
-            const key = {
-                date: currentProductionDate,
-                round: currentRound,
-                employeeId: employeeId,
-                productId: productId
+
+        // Add a new round
+        function dumplingAddRound() {
+            // Check if latest round is draft
+            const latestRound = dumplingRounds[dumplingRounds.length - 1];
+            if (latestRound.status !== 'draft') {
+                alert('❌ Cannot add new round.\nPlease save the current round as Draft first.');
+                return;
+            }
+
+            // Create new round
+            const newRoundNo = dumplingRounds.length + 1;
+            const newRound = {
+                roundNo: newRoundNo,
+                status: 'editing',
+                createdAt: new Date().toISOString(),
+                savedAt: null,
+                initial: '',
+                perProduct: {}
             };
-        
-            // Find existing entry
-            const existingIndex = productionRecords.findIndex(r =>
-                r.date === key.date &&
-                r.round === key.round &&
-                r.employeeId === key.employeeId &&
-                r.productId === key.productId
-            );
-        
-            const now = Date.now();
-        
-            if (existingIndex !== -1) {
-                // Update existing entry
-                const oldEntry = { ...productionRecords[existingIndex] };
-                productionRecords[existingIndex].count = count;
-                productionRecords[existingIndex].notes = notes;
-                productionRecords[existingIndex].updatedAt = now;
-        
-                // Add audit log
-                addAuditLog(key, oldEntry.count, count, 'Updated');
+            initializeRoundProducts(newRound);
+
+            dumplingRounds.push(newRound);
+            dumplingCurrentRound = newRoundNo;
+
+            saveDumplingData();
+
+            // Update UI
+            dumplingRenderRoundSelector();
+            dumplingRenderEmployeeTable();
+            dumplingRenderRoundHistory();
+            dumplingUpdateUI();
+        }
+
+        // Unlock a draft round for editing
+        function dumplingUnlockRound() {
+            const currentRound = dumplingGetCurrentRound();
+            if (!currentRound || currentRound.status !== 'draft') return;
+
+            // Show modal
+            document.getElementById('unlockRoundNo').textContent = currentRound.roundNo;
+            document.getElementById('unlockInitialInput').value = '';
+            document.getElementById('unlockError').style.display = 'none';
+            showModal('dumplingUnlockModal');
+        }
+
+        // Confirm unlock
+        function dumplingConfirmUnlock() {
+            const currentRound = dumplingGetCurrentRound();
+            const enteredInitial = document.getElementById('unlockInitialInput').value.trim().toUpperCase();
+
+            if (!enteredInitial) {
+                document.getElementById('unlockError').textContent = 'Initial is required.';
+                document.getElementById('unlockError').style.display = 'block';
+                return;
+            }
+
+            // Optional: match the original initial (commented out for simplicity)
+            // if (enteredInitial !== currentRound.initial) {
+            //     document.getElementById('unlockError').textContent = 'Initial does not match the one used to save this round.';
+            //     document.getElementById('unlockError').style.display = 'block';
+            //     return;
+            // }
+
+            // Unlock the round
+            currentRound.status = 'editing';
+            currentRound.savedAt = null;
+
+            saveDumplingData();
+            hideModal('dumplingUnlockModal');
+
+            // Update UI
+            dumplingRenderRoundSelector();
+            dumplingRenderEmployeeTable();
+            dumplingUpdateUI();
+        }
+
+        // Update UI based on current round status
+        function dumplingUpdateUI() {
+            const currentRound = dumplingGetCurrentRound();
+            if (!currentRound) return;
+
+            const isLocked = currentRound.status === 'draft';
+            const latestRound = dumplingRounds[dumplingRounds.length - 1];
+            const canAddRound = latestRound.status === 'draft';
+
+            // Update status badge
+            const statusBadge = document.getElementById('dumplingRoundStatus');
+            if (isLocked) {
+                statusBadge.textContent = 'Draft';
+                statusBadge.className = 'status-badge badge-draft';
             } else {
-                // Create new entry
-                const entry = {
-                    id: Date.now() + Math.random(),
-                    ...key,
-                    count: count,
-                    notes: notes,
-                    createdAt: now,
-                    updatedAt: now
-                };
-                productionRecords.push(entry);
-        
-                // Add audit log
-                addAuditLog(key, null, count, 'Created');
-            }
-        }
-        
-        // Save quality status for employee
-        function saveQualityForEmployee(employeeId, qualityData) {
-            // Find existing quality status
-            const existingIndex = qualityStatus.findIndex(q =>
-                q.date === currentProductionDate &&
-                q.round === currentRound &&
-                q.employeeId === employeeId
-            );
-        
-            const qualityEntry = {
-                date: currentProductionDate,
-                round: currentRound,
-                employeeId: employeeId,
-                status: qualityData.status,
-                notes: qualityData.notes || '',
-                updatedAt: Date.now()
-            };
-        
-            if (existingIndex !== -1) {
-                qualityStatus[existingIndex] = qualityEntry;
-            } else {
-                qualityStatus.push(qualityEntry);
-            }
-        }
-        
-        // Add audit log entry
-        function addAuditLog(key, oldValue, newValue, action) {
-            const status = dayStatus[key.date] || 'Open';
-        
-            auditLog.push({
-                id: Date.now() + Math.random(),
-                date: key.date,
-                round: key.round,
-                employeeId: key.employeeId,
-                productId: key.productId,
-                oldValue: oldValue,
-                newValue: newValue,
-                action: action,
-                dayStatus: status,
-                editedBy: currentRole,
-                timestamp: Date.now()
-            });
-        
-            saveAuditLog();
-        }
-        
-        // Variable to store callback after save
-        let saveCallback = null;
-
-        // Open initials modal before save
-        function openInitialsModal(callback) {
-            const roundState = getRoundState(currentProductionDate, currentRound);
-            const dayStatusValue = dayStatus[currentProductionDate] || 'Open';
-
-            // Check if round is signed off
-            if (roundState === 'signed-off' && currentRole !== 'admin') {
-                alert('This round is signed off. Only admins can edit signed-off rounds.');
-                return;
+                statusBadge.textContent = 'Editing';
+                statusBadge.className = 'status-badge badge-open';
             }
 
-            // Check if day is closed
-            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
-                alert('This day is closed. Only admins can edit closed days.');
-                return;
-            }
-
-            // Store callback for later
-            saveCallback = callback;
-
-            // Populate date and round info
-            document.getElementById('initialsModalDate').textContent = currentProductionDate;
-            document.getElementById('initialsModalRound').textContent = currentRound;
-
-            // Clear previous inputs
-            document.getElementById('inspectorInitials').value = '';
-            document.getElementById('initialsNotes').value = '';
-            document.getElementById('initialsError').style.display = 'none';
-
-            showModal('initialsModal');
+            // Enable/disable controls
+            document.getElementById('dumplingInitial').disabled = isLocked;
+            document.getElementById('dumplingInitial').value = currentRound.initial || '';
+            document.getElementById('dumplingSaveDraftBtn').style.display = isLocked ? 'none' : 'inline-flex';
+            document.getElementById('dumplingUnlockBtn').style.display = isLocked ? 'inline-flex' : 'none';
+            document.getElementById('dumplingAddRoundBtn').disabled = !canAddRound;
         }
 
-        // Confirm initials and save round with sign-off
-        function confirmInitialsAndSave() {
-            const initials = document.getElementById('inspectorInitials').value.trim().toUpperCase();
-            const notes = document.getElementById('initialsNotes').value.trim();
-            const errorDiv = document.getElementById('initialsError');
-
-            if (!initials) {
-                errorDiv.textContent = 'Please enter your initials to sign-off.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            if (initials.length < 2) {
-                errorDiv.textContent = 'Initials must be at least 2 characters.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            // Hide modal
-            hideModal('initialsModal');
-
-            // Create sign-off record with initials
-            const signoff = {
-                date: currentProductionDate,
-                round: currentRound,
-                inspectorInitials: initials,
-                signedOffAt: Date.now(),
-                notes: notes
+        // Calculate totals for a round
+        function dumplingCalculateRoundTotals(round) {
+            const totals = {
+                perProduct: {},
+                grandTotal: 0
             };
 
-            roundSignoffs.push(signoff);
-            saveRoundSignoffs();
+            for (let productId of dumplingProducts) {
+                let productTotal = 0;
+                const productData = round.perProduct[productId];
 
-            // Save the round
-            saveCurrentRound(() => {
-                alert('Round saved and signed-off successfully!');
-
-                // Execute callback if provided (for navigation guard)
-                if (saveCallback) {
-                    saveCallback();
-                    saveCallback = null;
-                } else {
-                    // Normal flow - reload the page
-                    loadProductionDay();
+                for (let empId in productData.perEmployee) {
+                    const empData = productData.perEmployee[empId];
+                    if (empData.qtyProduced !== undefined && empData.qtyProduced !== '') {
+                        productTotal += parseFloat(empData.qtyProduced) || 0;
+                    }
                 }
+
+                totals.perProduct[productId] = productTotal;
+                totals.grandTotal += productTotal;
+            }
+
+            return totals;
+        }
+
+        // Render round history table
+        function dumplingRenderRoundHistory() {
+            const tbody = document.getElementById('dumplingHistoryBody');
+            tbody.innerHTML = '';
+
+            const draftRounds = dumplingRounds.filter(r => r.status === 'draft');
+
+            if (draftRounds.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #999;">No rounds saved yet</td></tr>';
+                return;
+            }
+
+            draftRounds.forEach(round => {
+                const totals = dumplingCalculateRoundTotals(round);
+                const timestamp = new Date(round.savedAt).toLocaleString();
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${round.roundNo}</td>
+                    <td style="font-size: 12px;">${timestamp}</td>
+                    <td><strong>${round.initial}</strong></td>
+                    <td>${totals.perProduct[1].toFixed(1)}</td>
+                    <td>${totals.perProduct[2].toFixed(1)}</td>
+                    <td>${totals.perProduct[3].toFixed(1)}</td>
+                    <td>${totals.perProduct[4].toFixed(1)}</td>
+                    <td>${totals.perProduct[5].toFixed(1)}</td>
+                    <td><strong>${totals.grandTotal.toFixed(1)}</strong></td>
+                    <td>
+                        <button class="btn btn-secondary btn-small" onclick="dumplingViewRound(${round.roundNo})">
+                            👁️ View
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
         }
 
-        // Open sign-off modal after save (called automatically)
-        function openSignoffModalAfterSave() {
-            // Populate date and round info
-            document.getElementById('signoffModalDate').textContent = currentProductionDate;
-            document.getElementById('signoffModalRound').textContent = currentRound;
-
-            // Clear previous inputs
-            document.getElementById('inspectorName').value = '';
-            document.getElementById('signoffNotes').value = '';
-            document.getElementById('signoffMethod').value = 'typed_name';
-            document.getElementById('signoffError').style.display = 'none';
-
-            showModal('signoffModal');
+        // View a specific round
+        function dumplingViewRound(roundNo) {
+            dumplingCurrentRound = roundNo;
+            document.getElementById('dumplingRoundSelector').value = roundNo;
+            dumplingSelectRound();
         }
 
-        // Open sign-off modal (for manual trigger - kept for compatibility)
-        function openSignoffModal() {
-            const roundState = getRoundState(currentProductionDate, currentRound);
-
-            if (roundState === 'draft') {
-                alert('Please save the round before signing off.');
-                return;
-            }
-
-            if (isDirty) {
-                alert('Please save the round before signing off.');
-                return;
-            }
-
-            openSignoffModalAfterSave();
-        }
-        
-        // Confirm sign-off
-        function confirmSignoff() {
-            const inspectorName = document.getElementById('inspectorName').value.trim();
-            const signoffMethod = document.getElementById('signoffMethod').value;
-            const signoffNotes = document.getElementById('signoffNotes').value.trim();
-            const errorDiv = document.getElementById('signoffError');
-        
-            if (!inspectorName) {
-                errorDiv.textContent = 'Please enter inspector name.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-        
-            // Find employee by name (simple match)
-            const inspector = employees.find(e => e.nameThai.includes(inspectorName));
-            const inspectorId = inspector ? inspector.id : null;
-        
-            if (!inspectorId) {
-                errorDiv.textContent = 'Inspector not found in employee list. Please use exact name.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-        
-            // Create sign-off record
-            const signoff = {
-                date: currentProductionDate,
-                round: currentRound,
-                inspectedBy: inspectorId,
-                signedOffAt: Date.now(),
-                signatureMethod: signoffMethod,
-                signatureValue: inspectorName,
-                notes: signoffNotes
-            };
-        
-            roundSignoffs.push(signoff);
-            saveRoundSignoffs();
-        
-            hideModal('signoffModal');
-            alert('Round signed off successfully!');
-            loadProductionDay();
-        }
-        
-        // Close day
-        function closeDay() {
-            dayStatus[currentProductionDate] = 'Closed';
-            saveDayStatus();
-        
-            // Add audit log
-            auditLog.push({
-                id: Date.now() + Math.random(),
-                date: currentProductionDate,
-                action: 'Day Closed',
-                editedBy: currentRole,
-                timestamp: Date.now()
-            });
-            saveAuditLog();
-        
-            hideModal('closeDayModal');
-            updateDayStatusUI();
-            renderCurrentView();
-        
-            alert(`Production day ${currentProductionDate} has been closed.`);
-        }
-        
-        // Reopen day
-        function reopenDay() {
-            if (currentRole !== 'admin') {
-                alert('Only admins can reopen closed days.');
-                return;
-            }
-        
-            dayStatus[currentProductionDate] = 'Open';
-            saveDayStatus();
-        
-            // Add audit log
-            auditLog.push({
-                id: Date.now() + Math.random(),
-                date: currentProductionDate,
-                action: 'Day Reopened',
-                editedBy: currentRole,
-                timestamp: Date.now()
-            });
-            saveAuditLog();
-        
-            updateDayStatusUI();
-            renderCurrentView();
-        
-            alert(`Production day ${currentProductionDate} has been reopened.`);
-        }
-        
-        // Setup draft listeners
-        function setupDraftListeners() {
-            // This function can be used to set up global input listeners if needed
-            // For now, we're using onchange handlers directly in the HTML
-        }
-        
-        // Close day modal
-        function closeDayModal() {
-            showModal('closeDayModal');
-        }
-        
-        // Show modal
+        // Modal helper functions for dumpling production
         function showModal(modalId) {
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.add('show');
+                modal.style.display = 'flex';
             }
         }
-        
-        // Hide modal
+
         function hideModal(modalId) {
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.remove('show');
-            }
-        }
-        
-        // Switch production tab
-        function switchProductionTab(tabName) {
-            // Update tab buttons
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            tabBtns.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-
-            // Load data for specific tabs
-            if (tabName === 'reports') {
-                loadYearView();
-            } else if (tabName === 'search') {
-                populateSearchDropdowns();
+                modal.style.display = 'none';
             }
         }
 
-        // Switch setup tab
-        function switchSetupTab(tabName) {
-            // Update tab buttons
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            tabBtns.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-        }
-
-        // ========== REPORTS ==========
-        
-        // Show report view
-        function showReportView(view) {
-            // Update nav
-            document.querySelectorAll('.nav-chip').forEach(chip => chip.classList.remove('active'));
-            event.target.classList.add('active');
-        
-            // Hide all views
-            document.querySelectorAll('.report-view').forEach(v => v.style.display = 'none');
-        
-            // Show selected view
-            document.getElementById(`${view}-view`).style.display = 'block';
-        
-            // Load data
-            if (view === 'year') {
-                loadYearView();
-            } else if (view === 'month') {
-                loadMonthView(reportContext.selectedYear);
-            } else if (view === 'day') {
-                loadDayView(reportContext.selectedYear, reportContext.selectedMonth);
-            }
-        }
-        
-        // Load year view
-        function loadYearView() {
-            const tbody = document.getElementById('yearViewBody');
-            if (!tbody) return;
-
-            // Group records by year
-            const yearData = {};
-            productionRecords.forEach(r => {
-                const year = r.date.substring(0, 4);
-                if (!yearData[year]) {
-                    yearData[year] = {
-                        productCounts: {},
-                        dates: new Set(),
-                        employees: new Set()
-                    };
-                }
-                // Group by product
-                if (!yearData[year].productCounts[r.productId]) {
-                    yearData[year].productCounts[r.productId] = 0;
-                }
-                yearData[year].productCounts[r.productId] += r.count;
-                yearData[year].dates.add(r.date);
-                yearData[year].employees.add(r.employeeId);
-            });
-
-            // Render table
-            const years = Object.keys(yearData).sort((a, b) => b - a);
-
-            if (years.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No production records yet.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = years.map(year => {
-                // Format product breakdown
-                const productBreakdown = Object.entries(yearData[year].productCounts)
-                    .map(([productId, count]) => {
-                        const product = getProductById(parseInt(productId));
-                        const productName = product ? product.nameThai : `Product ${productId}`;
-                        return `${productName}: ${count.toLocaleString()}`;
-                    })
-                    .join('<br>');
-
-                // Calculate total
-                const totalPacks = Object.values(yearData[year].productCounts).reduce((sum, count) => sum + count, 0);
-                const productBreakdownWithTotal = `${productBreakdown}<br><strong>Total: ${totalPacks.toLocaleString()} packs</strong>`;
-
-                return `
-                <tr class="clickable-row" onclick="drillDownToMonth('${year}')">
-                    <td><strong>${year}</strong></td>
-                    <td style="line-height: 1.6;">${productBreakdownWithTotal}</td>
-                    <td>${yearData[year].dates.size} days</td>
-                    <td>${yearData[year].employees.size} employees</td>
-                    <td><button class="btn btn-primary btn-small" onclick="event.stopPropagation(); drillDownToMonth('${year}')">View Details →</button></td>
-                </tr>
-            `;
-            }).join('');
-        }
-        
-        // Drill down to month view
-        function drillDownToMonth(year) {
-            reportContext.selectedYear = year;
-            document.getElementById('selectedYear').textContent = year;
-            showReportView('month');
-            loadMonthView(year);
-        }
-        
-        // Load month view
-        function loadMonthView(year) {
-            const tbody = document.getElementById('monthViewBody');
-            if (!tbody) return;
-
-            // Group records by month
-            const monthData = {};
-            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-            productionRecords
-                .filter(r => r.date.startsWith(year))
-                .forEach(r => {
-                    const month = r.date.substring(5, 7);
-                    if (!monthData[month]) {
-                        monthData[month] = {
-                            productCounts: {},
-                            dates: new Set()
-                        };
-                    }
-                    // Group by product
-                    if (!monthData[month].productCounts[r.productId]) {
-                        monthData[month].productCounts[r.productId] = 0;
-                    }
-                    monthData[month].productCounts[r.productId] += r.count;
-                    monthData[month].dates.add(r.date);
-                });
-
-            // Render table
-            const months = Object.keys(monthData).sort();
-
-            if (months.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">No production records for this year.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = months.map(month => {
-                const monthNum = parseInt(month);
-
-                // Format product breakdown
-                const productBreakdown = Object.entries(monthData[month].productCounts)
-                    .map(([productId, count]) => {
-                        const product = getProductById(parseInt(productId));
-                        const productName = product ? product.nameThai : `Product ${productId}`;
-                        return `${productName}: ${count.toLocaleString()}`;
-                    })
-                    .join('<br>');
-
-                // Calculate total
-                const totalPacks = Object.values(monthData[month].productCounts).reduce((sum, count) => sum + count, 0);
-                const productBreakdownWithTotal = `${productBreakdown}<br><strong>Total: ${totalPacks.toLocaleString()} packs</strong>`;
-
-                return `
-                    <tr class="clickable-row" onclick="drillDownToDay('${year}', '${month}')">
-                        <td><strong>${monthNames[monthNum - 1]} ${year}</strong></td>
-                        <td style="line-height: 1.6;">${productBreakdownWithTotal}</td>
-                        <td>${monthData[month].dates.size} days</td>
-                        <td><button class="btn btn-primary btn-small" onclick="event.stopPropagation(); drillDownToDay('${year}', '${month}')">View Details →</button></td>
-                    </tr>
-                `;
-            }).join('');
-        }
-        
-        // Drill down to day view
-        function drillDownToDay(year, month) {
-            reportContext.selectedYear = year;
-            reportContext.selectedMonth = month;
-            document.getElementById('selectedMonth').textContent = `${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][parseInt(month) - 1]} ${year}`;
-            showReportView('day');
-            loadDayView(year, month);
-        }
-        
-        // Load day view
-        function loadDayView(year, month) {
-            const tbody = document.getElementById('dayViewBody');
-            if (!tbody) return;
-
-            // Group records by date
-            const dateData = {};
-
-            productionRecords
-                .filter(r => r.date.startsWith(`${year}-${month}`))
-                .forEach(r => {
-                    if (!dateData[r.date]) {
-                        dateData[r.date] = {
-                            productCounts: {},
-                            rounds: new Set(),
-                            entries: 0
-                        };
-                    }
-                    // Group by product
-                    if (!dateData[r.date].productCounts[r.productId]) {
-                        dateData[r.date].productCounts[r.productId] = 0;
-                    }
-                    dateData[r.date].productCounts[r.productId] += r.count;
-                    dateData[r.date].rounds.add(r.round);
-                    dateData[r.date].entries++;
-                });
-
-            // Render table
-            const dates = Object.keys(dateData).sort((a, b) => b.localeCompare(a));
-
-            if (dates.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">No production records for this month.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = dates.map(date => {
-                const status = dayStatus[date] || 'Open';
-                const statusBadge = status === 'Open'
-                    ? '<span style="color: #4CAF50;">● Open</span>'
-                    : '<span style="color: #666;">● Closed</span>';
-
-                // Format product breakdown
-                const productBreakdown = Object.entries(dateData[date].productCounts)
-                    .map(([productId, count]) => {
-                        const product = getProductById(parseInt(productId));
-                        const productName = product ? product.nameThai : `Product ${productId}`;
-                        return `${productName}: ${count.toLocaleString()}`;
-                    })
-                    .join('<br>');
-
-                // Calculate total
-                const totalPacks = Object.values(dateData[date].productCounts).reduce((sum, count) => sum + count, 0);
-                const productBreakdownWithTotal = `${productBreakdown}<br><strong>Total: ${totalPacks.toLocaleString()} packs</strong>`;
-
-                // Create buttons for each round
-                const roundButtons = Array.from(dateData[date].rounds).sort((a, b) => a - b).map(round => {
-                    return `<button class="btn btn-primary btn-small" onclick="showDayDetailSpreadsheet('${date}', ${round})" style="margin: 2px;">Round ${round}</button>`;
-                }).join('');
-
-                return `
-                    <tr>
-                        <td><strong>${date}</strong></td>
-                        <td>${statusBadge}</td>
-                        <td style="line-height: 1.6;">${productBreakdownWithTotal}</td>
-                        <td>${dateData[date].rounds.size} rounds</td>
-                        <td>${dateData[date].entries} entries</td>
-                        <td style="line-height: 2;">${roundButtons}<br><button class="btn btn-secondary btn-small" onclick="jumpToDate('${date}')" style="margin-top: 4px;">Edit →</button></td>
-                    </tr>
-                `;
-            }).join('');
-        }
-        
-        // Jump to specific date
-        function jumpToDate(date) {
-            document.getElementById('productionDate').value = date;
-            currentProductionDate = date;
-            loadProductionDay();
-            switchProductionTab('entry');
-        }
-
-        // Show day detail with spreadsheet view
-        function showDayDetailSpreadsheet(date, round) {
-            // Hide the day view table
-            document.querySelector('#day-view .report-table').style.display = 'none';
-
-            // Show detail view
-            const detailView = document.getElementById('dayDetailView');
-            detailView.style.display = 'block';
-
-            // Update header
-            document.getElementById('detailViewDate').textContent = date;
-            document.getElementById('detailViewRound').textContent = round;
-
-            // Render spreadsheet for this date/round
-            renderReportSpreadsheet(date, round);
-        }
-
-        // Close day detail view
-        function closeDayDetailView() {
-            document.getElementById('dayDetailView').style.display = 'none';
-            document.querySelector('#day-view .report-table').style.display = 'block';
-        }
-
-        // Render spreadsheet in reports tab
-        function renderReportSpreadsheet(date, round) {
-            const container = document.getElementById('reportSpreadsheetGrid');
-            if (!container) return;
-
-            const eligibleEmployees = employees.filter(e => e.departmentId === 1 && e.status === 'Active');
-            const eligibleProducts = products.filter(p => p.departmentId === 1);
-
-            // Get saved entries for this date/round
-            const savedEntries = productionRecords.filter(
-                r => r.date === date && r.round === round
-            );
-
-            // Check if editable (read-only in reports view)
-            const isEditable = false;
-
-            let html = '<table><thead><tr>';
-            html += '<th class="employee-col">Employee</th>';
-            eligibleProducts.forEach(prod => {
-                html += `<th>${prod.nameThai}${prod.nameEn ? ' / ' + prod.nameEn : ''}</th>`;
-            });
-            html += '<th>Quality</th>';
-            html += '</tr></thead><tbody>';
-
-            eligibleEmployees.forEach(emp => {
-                html += '<tr>';
-                html += `<td class="employee-name">${emp.nameThai}${emp.nameOther ? ' / ' + emp.nameOther : ''} (${emp.id})`;
-
-                // Quality icon/status
-                const qualityData = qualityStatus.find(q => q.date === date && q.round === round && q.employeeId === emp.id);
-                const qualityValue = qualityData ? qualityData.status : '';
-                const qualityIcon = qualityValue === 'OK' ? '✓' : qualityValue === 'Not OK' ? '✗' : '○';
-                const qualityColor = qualityValue === 'OK' ? '#4CAF50' : qualityValue === 'Not OK' ? '#F44336' : '#FF9800';
-                html += `<span class="spreadsheet-quality-icon" style="color: ${qualityColor}"
-                            title="${qualityValue}">${qualityIcon}</span>`;
-                html += '</td>';
-
-                eligibleProducts.forEach(prod => {
-                    const saved = savedEntries.find(e => e.employeeId === emp.id && e.productId === prod.id);
-                    const count = saved ? saved.count : '';
-                    html += `<td><input type="text" value="${count}" readonly style="background: #f5f5f5;"></td>`;
-                });
-
-                // Quality cell (read-only)
-                html += `<td><span class="quality-display">${qualityValue || '-'}</span></td>`;
-                html += '</tr>';
-            });
-
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        }
-
-        // ========== SEARCH ==========
-        
-        // Populate search dropdowns
-        function populateSearchDropdowns() {
-            const employeeSelect = document.getElementById('searchEmployee');
-            const productSelect = document.getElementById('searchProduct');
-        
-            if (!employeeSelect || !productSelect) return;
-        
-            // Clear existing options (keep "All" option)
-            employeeSelect.innerHTML = '<option value="">All Employees</option>';
-            productSelect.innerHTML = '<option value="">All Products</option>';
-        
-            // Add employees
-            const eligibleEmployees = employees.filter(e => e.departmentId === 1);
-            eligibleEmployees.forEach(emp => {
-                const option = document.createElement('option');
-                option.value = emp.id;
-                option.textContent = `${emp.nameThai} (${emp.id})`;
-                employeeSelect.appendChild(option);
-            });
-        
-            // Add products
-            const eligibleProducts = products.filter(p => p.departmentId === 1);
-            eligibleProducts.forEach(prod => {
-                const option = document.createElement('option');
-                option.value = prod.id;
-                option.textContent = `${prod.nameThai} (${prod.id})`;
-                productSelect.appendChild(option);
-            });
-        }
-        
-        // Perform search
-        function performSearch() {
-            const dateFrom = document.getElementById('searchDateFrom').value;
-            const dateTo = document.getElementById('searchDateTo').value;
-            const employeeId = document.getElementById('searchEmployee').value;
-            const productId = document.getElementById('searchProduct').value;
-            const dayStatusFilter = document.getElementById('searchDayStatus').value;
-            const qualityFilter = document.getElementById('searchQualityStatus').value;
-        
-            // Filter records
-            let filtered = productionRecords;
-        
-            if (dateFrom) {
-                filtered = filtered.filter(r => r.date >= dateFrom);
-            }
-        
-            if (dateTo) {
-                filtered = filtered.filter(r => r.date <= dateTo);
-            }
-        
-            if (employeeId) {
-                filtered = filtered.filter(r => r.employeeId == employeeId);
-            }
-        
-            if (productId) {
-                filtered = filtered.filter(r => r.productId == productId);
-            }
-        
-            if (dayStatusFilter) {
-                filtered = filtered.filter(r => {
-                    const status = dayStatus[r.date] || 'Open';
-                    return status === dayStatusFilter;
-                });
-            }
-        
-            if (qualityFilter) {
-                filtered = filtered.filter(r => {
-                    const quality = qualityStatus.find(q =>
-                        q.date === r.date &&
-                        q.round === r.round &&
-                        q.employeeId === r.employeeId
-                    );
-                    return quality && quality.status === qualityFilter;
-                });
-            }
-        
-            // Render results
-            renderSearchResults(filtered);
-        }
-        
-        // Render search results
-        function renderSearchResults(records) {
-            const resultsDiv = document.getElementById('searchResults');
-            const tbody = document.getElementById('searchResultsBody');
-        
-            if (!resultsDiv || !tbody) return;
-        
-            if (records.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">No results found.</td></tr>';
-                resultsDiv.style.display = 'block';
-                return;
-            }
-        
-            tbody.innerHTML = records.map(r => {
-                const emp = getEmployeeById(r.employeeId);
-                const prod = getProductById(r.productId);
-                const status = dayStatus[r.date] || 'Open';
-                const quality = qualityStatus.find(q =>
-                    q.date === r.date &&
-                    q.round === r.round &&
-                    q.employeeId === r.employeeId
-                );
-                const qualityText = quality ? quality.status : '-';
-        
-                return `
-                    <tr>
-                        <td>${r.date}</td>
-                        <td>Round ${r.round}</td>
-                        <td>${emp ? emp.nameThai : 'Unknown'}</td>
-                        <td>${prod ? prod.nameThai : 'Unknown'}</td>
-                        <td><strong>${r.count}</strong> packs</td>
-                        <td>${status === 'Open' ? '<span style="color: #4CAF50;">Open</span>' : '<span style="color: #666;">Closed</span>'}</td>
-                        <td>${qualityText}</td>
-                    </tr>
-                `;
-            }).join('');
-        
-            resultsDiv.style.display = 'block';
-        }
-        
-        // Clear search
-        function clearSearch() {
-            document.getElementById('searchDateFrom').value = '';
-            document.getElementById('searchDateTo').value = '';
-            document.getElementById('searchEmployee').value = '';
-            document.getElementById('searchProduct').value = '';
-            document.getElementById('searchDayStatus').value = '';
-            document.getElementById('searchQualityStatus').value = '';
-            document.getElementById('searchResults').style.display = 'none';
-        }
-        
         // ========== END DUMPLING PRODUCTION FEATURE ==========
 
         // ========== OTHER PRODUCTION FEATURE ==========
