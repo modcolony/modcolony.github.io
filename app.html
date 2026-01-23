@@ -4215,6 +4215,81 @@
             return totals;
         }
 
+        // Extract product type from product name (removes size indicators)
+        function dumplingGetProductType(productId) {
+            const product = dumplingProductsMap[productId];
+            if (!product) return `Product ${productId}`;
+
+            // Get the full product name
+            const nameThai = product.nameThai || '';
+            const nameEn = product.nameEn || '';
+
+            // Remove common size indicators from both Thai and English names
+            const sizePatternsThai = /\s*(เล็ก|กลาง|ใหญ่|พิเศษ)\s*/g;
+            const sizePatternsEn = /\s*(small|medium|large|big|extra|xl|l|m|s)\s*/gi;
+            const sizeNumbers = /\s*\d+\s*(g|kg|cm|mm|piece|pcs)\s*/gi;
+
+            const typeNameThai = nameThai.replace(sizePatternsThai, ' ').replace(sizeNumbers, ' ').trim();
+            const typeNameEn = nameEn.replace(sizePatternsEn, ' ').replace(sizeNumbers, ' ').trim();
+
+            if (typeNameThai && typeNameEn) {
+                return `${typeNameThai} / ${typeNameEn}`;
+            } else if (typeNameThai) {
+                return typeNameThai;
+            } else if (typeNameEn) {
+                return typeNameEn;
+            } else {
+                return 'Unknown Type';
+            }
+        }
+
+        // Calculate grand totals per product type across all draft rounds
+        function dumplingCalculateProductTypeGrandTotals() {
+            const draftRounds = dumplingRounds.filter(r => r.status === 'draft');
+
+            // Group products by type
+            const productsByType = {};
+            dumplingProducts.forEach(productId => {
+                const type = dumplingGetProductType(productId);
+                if (!productsByType[type]) {
+                    productsByType[type] = [];
+                }
+                productsByType[type].push(productId);
+            });
+
+            // Calculate totals per type
+            const typeTotals = {};
+            let overallGrandTotal = 0;
+
+            for (const type in productsByType) {
+                let typeTotal = 0;
+                const productIds = productsByType[type];
+
+                // Sum up all products of this type across all rounds
+                draftRounds.forEach(round => {
+                    productIds.forEach(productId => {
+                        const productData = round.perProduct[productId];
+                        if (productData) {
+                            for (let empId in productData.perEmployee) {
+                                const empData = productData.perEmployee[empId];
+                                if (empData.qtyProduced !== undefined && empData.qtyProduced !== '') {
+                                    typeTotal += parseFloat(empData.qtyProduced) || 0;
+                                }
+                            }
+                        }
+                    });
+                });
+
+                typeTotals[type] = typeTotal;
+                overallGrandTotal += typeTotal;
+            }
+
+            return {
+                byType: typeTotals,
+                grandTotal: overallGrandTotal
+            };
+        }
+
         // Render round history table
         function dumplingRenderRoundHistory() {
             // Update table headers
@@ -4264,6 +4339,92 @@
                 `;
                 tbody.appendChild(tr);
             });
+
+            // Add grand total rows per product type
+            const productTypeGrandTotals = dumplingCalculateProductTypeGrandTotals();
+
+            // Group products by type for display
+            const productsByType = {};
+            dumplingProducts.forEach(productId => {
+                const type = dumplingGetProductType(productId);
+                if (!productsByType[type]) {
+                    productsByType[type] = [];
+                }
+                productsByType[type].push(productId);
+            });
+
+            // Add separator row
+            const separatorTr = document.createElement('tr');
+            separatorTr.style.borderTop = '3px solid #333';
+            separatorTr.innerHTML = `<td colspan="${dumplingProducts.length + 5}" style="height: 8px; background: #f5f5f5;"></td>`;
+            tbody.appendChild(separatorTr);
+
+            // Add a row for each product type showing grand totals
+            for (const type in productsByType) {
+                const productIds = productsByType[type];
+                const typeTotal = productTypeGrandTotals.byType[type] || 0;
+
+                // Create cells for each product column
+                const productCells = dumplingProducts.map(productId => {
+                    // Only show value if this product belongs to this type
+                    if (productIds.includes(productId)) {
+                        // Calculate total for this specific product across all rounds
+                        let productTotal = 0;
+                        draftRounds.forEach(round => {
+                            const productData = round.perProduct[productId];
+                            if (productData) {
+                                for (let empId in productData.perEmployee) {
+                                    const empData = productData.perEmployee[empId];
+                                    if (empData.qtyProduced !== undefined && empData.qtyProduced !== '') {
+                                        productTotal += parseFloat(empData.qtyProduced) || 0;
+                                    }
+                                }
+                            }
+                        });
+                        return `<td style="background: #f9f9f9;"><strong>${productTotal.toFixed(1)}</strong></td>`;
+                    } else {
+                        return `<td style="background: #f9f9f9;">-</td>`;
+                    }
+                }).join('');
+
+                const typeTotalTr = document.createElement('tr');
+                typeTotalTr.style.background = '#f0f8ff';
+                typeTotalTr.innerHTML = `
+                    <td colspan="3" style="text-align: right; padding-right: 16px;"><strong>Grand Total - ${type}:</strong></td>
+                    ${productCells}
+                    <td style="background: #e6f3ff;"><strong>${typeTotal.toFixed(1)}</strong></td>
+                    <td></td>
+                `;
+                tbody.appendChild(typeTotalTr);
+            }
+
+            // Add overall grand total row
+            const productGrandTotals = dumplingProducts.map(productId => {
+                let productTotal = 0;
+                draftRounds.forEach(round => {
+                    const productData = round.perProduct[productId];
+                    if (productData) {
+                        for (let empId in productData.perEmployee) {
+                            const empData = productData.perEmployee[empId];
+                            if (empData.qtyProduced !== undefined && empData.qtyProduced !== '') {
+                                productTotal += parseFloat(empData.qtyProduced) || 0;
+                            }
+                        }
+                    }
+                });
+                return `<td style="background: #e8e8e8;"><strong>${productTotal.toFixed(1)}</strong></td>`;
+            }).join('');
+
+            const overallTr = document.createElement('tr');
+            overallTr.style.background = '#e0e0e0';
+            overallTr.style.fontWeight = 'bold';
+            overallTr.innerHTML = `
+                <td colspan="3" style="text-align: right; padding-right: 16px;"><strong>Overall Grand Total:</strong></td>
+                ${productGrandTotals}
+                <td style="background: #d0d0d0; font-size: 16px;"><strong>${productTypeGrandTotals.grandTotal.toFixed(1)}</strong></td>
+                <td></td>
+            `;
+            tbody.appendChild(overallTr);
         }
 
         // View a specific round
