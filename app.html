@@ -1938,7 +1938,7 @@
                                 <input type="text" id="dumplingSearch" class="form-input" placeholder="Search by name or ID..." onkeyup="dumplingFilterEmployees()" style="width: 250px;">
                                 <select id="dumplingSort" class="form-select" onchange="dumplingFilterEmployees()" style="width: 150px;">
                                     <option value="name">Sort by Name</option>
-                                    <option value="id">Sort by ID</option>
+                                    <option value="id" selected>Sort by ID</option>
                                 </select>
                             </div>
                         </div>
@@ -3679,7 +3679,8 @@
         let dumplingCurrentRound = 1;
         let dumplingCurrentProduct = 1;
         let dumplingEmployees = [];  // Department 01 employees
-        let dumplingProducts = [1, 2, 3, 4, 5];  // 5 products
+        let dumplingProducts = [];  // Department 01 products
+        let dumplingProductsMap = {};  // Map of product ID to product object
 
         // Data structure for rounds:
         // {
@@ -3726,6 +3727,26 @@
             }
         }
 
+        // Get product display name (both languages)
+        function dumplingGetProductName(productId) {
+            const product = dumplingProductsMap[productId];
+            if (!product) return `Product ${productId}`;
+
+            // Combine Thai and English names
+            const nameThai = product.nameThai || '';
+            const nameEn = product.nameEn || '';
+
+            if (nameThai && nameEn) {
+                return `${nameThai} / ${nameEn}`;
+            } else if (nameThai) {
+                return nameThai;
+            } else if (nameEn) {
+                return nameEn;
+            } else {
+                return `Product ${productId}`;
+            }
+        }
+
         // Initialize dumpling production page
         function initDumplingPage() {
             // Load employees from Department 01
@@ -3734,14 +3755,51 @@
                 emp.departmentId === 1 && emp.status === 'Active'
             );
 
+            // Load products from Department 01
+            loadProducts();
+            const dept01Products = products.filter(p => p.departmentId === 1 && p.status === 'Active');
+
+            // Sort products by ID for consistent display
+            dept01Products.sort((a, b) => a.id - b.id);
+
+            // Create products array (IDs only) and map
+            dumplingProducts = dept01Products.map(p => p.id);
+            dumplingProductsMap = {};
+            dept01Products.forEach(p => {
+                dumplingProductsMap[p.id] = p;
+            });
+
             // Load data
             loadDumplingData();
 
             // Render UI
+            dumplingRenderProductTabs();
             dumplingRenderRoundSelector();
             dumplingRenderEmployeeTable();
             dumplingRenderRoundHistory();
             dumplingUpdateUI();
+        }
+
+        // Render product tabs dynamically
+        function dumplingRenderProductTabs() {
+            const tabsContainer = document.querySelector('.dumpling-product-tabs');
+            if (!tabsContainer) return;
+
+            tabsContainer.innerHTML = '';
+
+            dumplingProducts.forEach((productId, index) => {
+                const button = document.createElement('button');
+                button.className = 'dumpling-product-tab';
+                if (index === 0) button.classList.add('active');
+                button.onclick = () => dumplingSelectProduct(productId);
+                button.textContent = dumplingGetProductName(productId);
+                tabsContainer.appendChild(button);
+            });
+
+            // Set first product as current if not already set
+            if (dumplingProducts.length > 0) {
+                dumplingCurrentProduct = dumplingProducts[0];
+            }
         }
 
         // Render round selector dropdown
@@ -3776,16 +3834,19 @@
 
             // Update tab active state
             const tabs = document.querySelectorAll('.dumpling-product-tab');
-            tabs.forEach((tab, index) => {
-                if (index + 1 === productId) {
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Find and activate the clicked tab
+            tabs.forEach(tab => {
+                if (tab.textContent === dumplingGetProductName(productId)) {
                     tab.classList.add('active');
-                } else {
-                    tab.classList.remove('active');
                 }
             });
 
             // Update current product display
-            document.getElementById('dumplingCurrentProduct').textContent = `Product ${productId}`;
+            document.getElementById('dumplingCurrentProduct').textContent = dumplingGetProductName(productId);
 
             // Re-render employee table for this product
             dumplingRenderEmployeeTable();
@@ -3813,7 +3874,7 @@
             // Apply search and sort
             let filteredEmployees = [...dumplingEmployees];
             const searchTerm = document.getElementById('dumplingSearch')?.value.toLowerCase() || '';
-            const sortBy = document.getElementById('dumplingSort')?.value || 'name';
+            const sortBy = document.getElementById('dumplingSort')?.value || 'id';  // Default to ID sort
 
             if (searchTerm) {
                 filteredEmployees = filteredEmployees.filter(emp =>
@@ -4128,13 +4189,26 @@
 
         // Render round history table
         function dumplingRenderRoundHistory() {
+            // Update table headers
+            const thead = document.querySelector('#dumplingHistoryBody').closest('table').querySelector('thead tr');
+            if (thead) {
+                thead.innerHTML = `
+                    <th>Round #</th>
+                    <th>Timestamp</th>
+                    <th>Initial</th>
+                    ${dumplingProducts.map(productId => `<th>${dumplingGetProductName(productId)}</th>`).join('')}
+                    <th>Grand Total</th>
+                    <th>Action</th>
+                `;
+            }
+
             const tbody = document.getElementById('dumplingHistoryBody');
             tbody.innerHTML = '';
 
             const draftRounds = dumplingRounds.filter(r => r.status === 'draft');
 
             if (draftRounds.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #999;">No rounds saved yet</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="${dumplingProducts.length + 5}" style="text-align: center; color: #999;">No rounds saved yet</td></tr>`;
                 return;
             }
 
@@ -4142,16 +4216,17 @@
                 const totals = dumplingCalculateRoundTotals(round);
                 const timestamp = new Date(round.savedAt).toLocaleString();
 
+                const productTotalsHtml = dumplingProducts.map(productId => {
+                    const total = totals.perProduct[productId] || 0;
+                    return `<td>${total.toFixed(1)}</td>`;
+                }).join('');
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${round.roundNo}</td>
                     <td style="font-size: 12px;">${timestamp}</td>
                     <td><strong>${round.initial}</strong></td>
-                    <td>${totals.perProduct[1].toFixed(1)}</td>
-                    <td>${totals.perProduct[2].toFixed(1)}</td>
-                    <td>${totals.perProduct[3].toFixed(1)}</td>
-                    <td>${totals.perProduct[4].toFixed(1)}</td>
-                    <td>${totals.perProduct[5].toFixed(1)}</td>
+                    ${productTotalsHtml}
                     <td><strong>${totals.grandTotal.toFixed(1)}</strong></td>
                     <td>
                         <button class="btn btn-secondary btn-small" onclick="dumplingViewRound(${round.roundNo})">
