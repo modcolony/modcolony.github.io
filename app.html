@@ -1629,6 +1629,36 @@
             color: #999;
         }
 
+        .dumpling-table .employee-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            font: inherit;
+            color: #333;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .dumpling-table .employee-toggle:focus {
+            outline: 2px solid #1976D2;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        .dumpling-table .employee-toggle .toggle-icon {
+            width: 18px;
+            display: inline-flex;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .dumpling-table .employee-row {
+            background: #f9f9f9;
+        }
+
         .dumpling-history-section {
             background: white;
             padding: 20px;
@@ -3681,6 +3711,7 @@
         let dumplingEmployees = [];  // Department 01 employees
         let dumplingProducts = [];  // Department 01 products
         let dumplingProductsMap = {};  // Map of product ID to product object
+        let dumplingExpandedProducts = {};  // Track expanded product employee lists
 
         // Data structure for rounds:
         // {
@@ -3895,10 +3926,16 @@
             // Build product rows
             dumplingProducts.forEach(productId => {
                 const tr = document.createElement('tr');
+                const isExpanded = !!dumplingExpandedProducts[productId];
 
                 // Product name cell
                 const productCell = document.createElement('td');
-                productCell.innerHTML = `<strong>${dumplingGetProductName(productId)}</strong>`;
+                productCell.innerHTML = `
+                    <button class="employee-toggle" type="button" data-product-id="${productId}" aria-expanded="${isExpanded}" onclick="dumplingToggleEmployeeRows(${productId})">
+                        <span class="toggle-icon">${isExpanded ? '▼' : '▶'}</span>
+                        <span><strong>${dumplingGetProductName(productId)}</strong></span>
+                    </button>
+                `;
                 tr.appendChild(productCell);
 
                 let productTotal = 0;
@@ -3938,8 +3975,6 @@
                 const sortedEmployees = [...dumplingEmployees].sort((a, b) => a.id - b.id);
 
                 sortedEmployees.forEach(emp => {
-                    // Check if this employee has any data for this product
-                    let hasData = false;
                     let employeeTotal = 0;
                     const employeeRoundData = [];
 
@@ -3952,7 +3987,6 @@
                                 const qtyNum = parseFloat(qty) || 0;
                                 employeeRoundData.push(qtyNum);
                                 employeeTotal += qtyNum;
-                                hasData = true;
                             } else {
                                 employeeRoundData.push(0);
                             }
@@ -3961,41 +3995,62 @@
                         }
                     });
 
-                    // Only show employee row if they have data for this product
-                    if (hasData) {
-                        const empTr = document.createElement('tr');
-                        empTr.style.background = '#f9f9f9';
-
-                        // Employee name cell (indented)
-                        const empCell = document.createElement('td');
-                        const empId = emp.id.toString().padStart(2, '0');
-                        const empName = dumplingEscapeHtml(emp.nameThai || emp.nameOther || 'N/A');
-                        empCell.innerHTML = `&nbsp;&nbsp;&nbsp;&nbsp;${empId} - ${empName}`;
-                        empCell.style.fontSize = '0.9em';
-                        empCell.style.color = '#666';
-                        empTr.appendChild(empCell);
-
-                        // Add quantity for each round
-                        employeeRoundData.forEach(qty => {
-                            const empRoundCell = document.createElement('td');
-                            empRoundCell.textContent = qty > 0 ? qty.toFixed(1) : '-';
-                            empRoundCell.style.fontSize = '0.9em';
-                            empRoundCell.style.color = '#666';
-                            empTr.appendChild(empRoundCell);
-                        });
-
-                        // Add employee total cell
-                        const empTotalCell = document.createElement('td');
-                        empTotalCell.textContent = employeeTotal.toFixed(1);
-                        empTotalCell.style.fontSize = '0.9em';
-                        empTotalCell.style.color = '#666';
-                        empTotalCell.style.background = '#f0f0f0';
-                        empTr.appendChild(empTotalCell);
-
-                        tbody.appendChild(empTr);
+                    const empTr = document.createElement('tr');
+                    empTr.classList.add('employee-row');
+                    empTr.dataset.productId = productId;
+                    if (!isExpanded) {
+                        empTr.style.display = 'none';
                     }
+
+                    // Employee name cell (indented)
+                    const empCell = document.createElement('td');
+                    const empId = emp.id.toString().padStart(2, '0');
+                    const empName = dumplingEscapeHtml(emp.nameThai || emp.nameOther || 'N/A');
+                    empCell.innerHTML = `&nbsp;&nbsp;&nbsp;&nbsp;${empId} - ${empName}`;
+                    empCell.style.fontSize = '0.9em';
+                    empCell.style.color = '#666';
+                    empTr.appendChild(empCell);
+
+                    // Add quantity for each round
+                    employeeRoundData.forEach(qty => {
+                        const empRoundCell = document.createElement('td');
+                        empRoundCell.textContent = qty > 0 ? qty.toFixed(1) : '-';
+                        empRoundCell.style.fontSize = '0.9em';
+                        empRoundCell.style.color = '#666';
+                        empTr.appendChild(empRoundCell);
+                    });
+
+                    // Add employee total cell
+                    const empTotalCell = document.createElement('td');
+                    empTotalCell.textContent = employeeTotal.toFixed(1);
+                    empTotalCell.style.fontSize = '0.9em';
+                    empTotalCell.style.color = '#666';
+                    empTotalCell.style.background = '#f0f0f0';
+                    empTr.appendChild(empTotalCell);
+
+                    tbody.appendChild(empTr);
                 });
             });
+        }
+
+        function dumplingToggleEmployeeRows(productId) {
+            dumplingExpandedProducts[productId] = !dumplingExpandedProducts[productId];
+            const tbody = document.getElementById('dumplingProductTableBody');
+            if (!tbody) return;
+
+            const rows = tbody.querySelectorAll(`tr.employee-row[data-product-id="${productId}"]`);
+            rows.forEach(row => {
+                row.style.display = dumplingExpandedProducts[productId] ? 'table-row' : 'none';
+            });
+
+            const toggleBtn = document.querySelector(`.employee-toggle[data-product-id="${productId}"]`);
+            if (toggleBtn) {
+                toggleBtn.setAttribute('aria-expanded', dumplingExpandedProducts[productId]);
+                const icon = toggleBtn.querySelector('.toggle-icon');
+                if (icon) {
+                    icon.textContent = dumplingExpandedProducts[productId] ? '▼' : '▶';
+                }
+            }
         }
 
         // Update employee data
