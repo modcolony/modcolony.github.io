@@ -1877,6 +1877,261 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ========== Inventory Summary Styles ========== */
+        .inv-summary-controls {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .inv-control-row {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .inv-control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .inv-control-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .inv-mode-selector {
+            display: flex;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .inv-mode-btn {
+            padding: 8px 20px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .inv-mode-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .inv-mode-btn.active {
+            background: #1976D2;
+            color: white;
+        }
+
+        .inv-summary-table-container {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: calc(100vh - 400px);
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .inv-summary-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 13px;
+        }
+
+        .inv-summary-table th {
+            background: #f5f5f5;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 3;
+        }
+
+        .inv-summary-table th.sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 4;
+            background: #f5f5f5;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+        }
+
+        .inv-summary-table th.num-col {
+            text-align: right;
+        }
+
+        .inv-summary-table th.month-total-header {
+            background: #E3F2FD;
+            color: #1976D2;
+            border-left: 2px solid #1976D2;
+        }
+
+        .inv-summary-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .inv-summary-table td.sticky-col {
+            position: sticky;
+            left: 0;
+            background: white;
+            z-index: 2;
+            font-weight: 500;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+        }
+
+        .inv-summary-table td.num-col {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .inv-summary-table td.month-total-col {
+            background: #F5F5F5;
+            border-left: 2px solid #1976D2;
+            font-weight: 600;
+        }
+
+        .inv-summary-table tr:hover td {
+            background: #FAFAFA;
+        }
+
+        .inv-summary-table tr:hover td.sticky-col {
+            background: #FAFAFA;
+        }
+
+        .inv-summary-table tr:hover td.month-total-col {
+            background: #EEEEEE;
+        }
+
+        .inv-summary-table tr.totals-row td {
+            background: #E8F5E9;
+            font-weight: 700;
+            border-top: 2px solid #4CAF50;
+            border-bottom: 2px solid #4CAF50;
+        }
+
+        .inv-summary-table tr.totals-row td.sticky-col {
+            background: #E8F5E9;
+        }
+
+        .inv-summary-table tr.totals-row td.month-total-col {
+            background: #C8E6C9;
+        }
+
+        .inv-day-header {
+            text-align: center;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+
+        .inv-subheader {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .inv-subheader th {
+            flex: 1;
+            font-size: 12px;
+            padding: 6px 8px;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .inv-subheader th:last-child {
+            border-right: none;
+        }
+
+        .inv-empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .inv-empty-state h3 {
+            margin: 0 0 8px;
+            color: #666;
+        }
+
+        .inv-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .inv-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .inv-search-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 250px;
+        }
+
+        .inv-date-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 160px;
+        }
+
+        .btn-export {
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        .btn-export:hover {
+            background: #45a049;
+        }
+
+        @media (max-width: 768px) {
+            .inv-control-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .inv-mode-selector {
+                width: 100%;
+            }
+
+            .inv-search-input,
+            .inv-date-input {
+                width: 100%;
+                min-width: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1972,6 +2227,7 @@
                 roles: ['admin'],
                 colorClass: 'admin-access',
                 submenu: [
+                    { id: 'inventory-summary', label: 'Summary' },
                     { id: 'inflow', label: 'Inflow' },
                     { id: 'outflow', label: 'Outflow' },
                     { id: 'net-change', label: 'Net change' }
@@ -2741,6 +2997,13 @@
                             </div>
                         </div>
                     </div>
+                `
+            },
+            'inventory-summary': {
+                title: 'Inventory Summary',
+                breadcrumb: 'Inventory Management / Summary',
+                content: `
+                    <div id="inventorySummaryContainer"></div>
                 `
             },
             'net-change': {
@@ -3903,6 +4166,13 @@
             if (pageId === 'product-outflow') {
                 setTimeout(() => {
                     initOutflowPage();
+                }, 10);
+            }
+
+            // If navigating to inventory summary page, initialize it
+            if (pageId === 'inventory-summary') {
+                setTimeout(() => {
+                    initInventorySummaryPage();
                 }, 10);
             }
         };
@@ -6610,6 +6880,846 @@
         }
 
         // ========== END OTHER PRODUCTION FEATURE ==========
+
+        // ========== INVENTORY SUMMARY FEATURE ==========
+
+        // Inventory summary state
+        let invSummaryState = {
+            mode: 'daily',
+            selectedDate: '',
+            selectedMonth: '',
+            selectedYear: '',
+            searchText: '',
+            showOnlyActive: false,
+            compactView: false
+        };
+
+        // Load inventory summary preferences from localStorage
+        function loadInvSummaryPreferences() {
+            const stored = localStorage.getItem('invSummaryPreferences');
+            if (stored) {
+                const prefs = JSON.parse(stored);
+                invSummaryState = { ...invSummaryState, ...prefs };
+            }
+
+            // Set defaults if not set
+            if (!invSummaryState.selectedDate) {
+                invSummaryState.selectedDate = new Date().toISOString().split('T')[0];
+            }
+            if (!invSummaryState.selectedMonth) {
+                const now = new Date();
+                invSummaryState.selectedMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            }
+            if (!invSummaryState.selectedYear) {
+                invSummaryState.selectedYear = String(new Date().getFullYear());
+            }
+        }
+
+        // Save inventory summary preferences to localStorage
+        function saveInvSummaryPreferences() {
+            localStorage.setItem('invSummaryPreferences', JSON.stringify(invSummaryState));
+        }
+
+        // Initialize inventory summary page
+        function initInventorySummaryPage() {
+            // Check admin access
+            if (currentRole !== 'admin') {
+                document.getElementById('inventorySummaryContainer').innerHTML = `
+                    <div class="inv-empty-state">
+                        <h3>Access Denied</h3>
+                        <p>Only administrators can access the Inventory Summary page.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            loadInvSummaryPreferences();
+            renderInventorySummary();
+        }
+
+        // Render inventory summary
+        function renderInventorySummary() {
+            const container = document.getElementById('inventorySummaryContainer');
+
+            container.innerHTML = `
+                <div class="inv-summary-controls">
+                    <div class="inv-control-row">
+                        <div class="inv-control-group">
+                            <label class="inv-control-label">View Mode</label>
+                            <div class="inv-mode-selector">
+                                <button class="inv-mode-btn ${invSummaryState.mode === 'daily' ? 'active' : ''}" onclick="invSetMode('daily')">Daily</button>
+                                <button class="inv-mode-btn ${invSummaryState.mode === 'monthly' ? 'active' : ''}" onclick="invSetMode('monthly')">Monthly</button>
+                                <button class="inv-mode-btn ${invSummaryState.mode === 'yearly' ? 'active' : ''}" onclick="invSetMode('yearly')">Yearly</button>
+                            </div>
+                        </div>
+
+                        <div class="inv-control-group" id="invDatePickerContainer">
+                            ${renderInvDatePicker()}
+                        </div>
+
+                        <div class="inv-control-group">
+                            <label class="inv-control-label">Search Product</label>
+                            <input type="text"
+                                   class="inv-search-input"
+                                   placeholder="Search by product name..."
+                                   value="${invSummaryState.searchText}"
+                                   oninput="invUpdateSearch(this.value)">
+                        </div>
+
+                        <div class="inv-control-group">
+                            <label class="inv-control-label">Export</label>
+                            <button class="btn-export" onclick="invExportCSV()">
+                                📊 Export CSV
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="inv-control-row">
+                        <label class="inv-toggle">
+                            <input type="checkbox"
+                                   ${invSummaryState.showOnlyActive ? 'checked' : ''}
+                                   onchange="invToggleOnlyActive(this.checked)">
+                            <span>Show only products with activity</span>
+                        </label>
+
+                        ${invSummaryState.mode === 'monthly' ? `
+                            <label class="inv-toggle">
+                                <input type="checkbox"
+                                       ${invSummaryState.compactView ? 'checked' : ''}
+                                       onchange="invToggleCompactView(this.checked)">
+                                <span>Compact view (Net only)</span>
+                            </label>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div id="invSummaryTableWrapper"></div>
+            `;
+
+            renderInvSummaryTable();
+        }
+
+        // Render date picker based on mode
+        function renderInvDatePicker() {
+            if (invSummaryState.mode === 'daily') {
+                return `
+                    <label class="inv-control-label">Date</label>
+                    <input type="date"
+                           class="inv-date-input"
+                           value="${invSummaryState.selectedDate}"
+                           onchange="invUpdateDate(this.value)">
+                `;
+            } else if (invSummaryState.mode === 'monthly') {
+                return `
+                    <label class="inv-control-label">Month</label>
+                    <input type="month"
+                           class="inv-date-input"
+                           value="${invSummaryState.selectedMonth}"
+                           onchange="invUpdateMonth(this.value)">
+                `;
+            } else {
+                return `
+                    <label class="inv-control-label">Year</label>
+                    <input type="number"
+                           class="inv-date-input"
+                           value="${invSummaryState.selectedYear}"
+                           min="2020"
+                           max="2099"
+                           onchange="invUpdateYear(this.value)">
+                `;
+            }
+        }
+
+        // Set mode and re-render
+        function invSetMode(mode) {
+            invSummaryState.mode = mode;
+            saveInvSummaryPreferences();
+            renderInventorySummary();
+        }
+
+        // Update date and re-render
+        function invUpdateDate(value) {
+            invSummaryState.selectedDate = value;
+            saveInvSummaryPreferences();
+            renderInvSummaryTable();
+        }
+
+        // Update month and re-render
+        function invUpdateMonth(value) {
+            invSummaryState.selectedMonth = value;
+            saveInvSummaryPreferences();
+            renderInvSummaryTable();
+        }
+
+        // Update year and re-render
+        function invUpdateYear(value) {
+            invSummaryState.selectedYear = value;
+            saveInvSummaryPreferences();
+            renderInvSummaryTable();
+        }
+
+        // Update search and re-render
+        function invUpdateSearch(value) {
+            invSummaryState.searchText = value;
+            saveInvSummaryPreferences();
+            renderInvSummaryTable();
+        }
+
+        // Toggle "only active" filter
+        function invToggleOnlyActive(checked) {
+            invSummaryState.showOnlyActive = checked;
+            saveInvSummaryPreferences();
+            renderInvSummaryTable();
+        }
+
+        // Toggle compact view
+        function invToggleCompactView(checked) {
+            invSummaryState.compactView = checked;
+            saveInvSummaryPreferences();
+            renderInvSummaryTable();
+        }
+
+        // Aggregate inflow data
+        function invAggregateInflow() {
+            const inflowData = {}; // { productId: { 'YYYY-MM-DD': quantity } }
+
+            // Aggregate from dumpling rounds
+            loadDumplingData();
+            dumplingRounds.forEach(round => {
+                const date = round.entryDate;
+                if (!date) return;
+
+                Object.keys(round.perProduct || {}).forEach(productId => {
+                    const productData = round.perProduct[productId];
+                    let totalQty = 0;
+
+                    Object.keys(productData.perEmployee || {}).forEach(empId => {
+                        const qty = parseInt(productData.perEmployee[empId]) || 0;
+                        totalQty += qty;
+                    });
+
+                    if (totalQty > 0) {
+                        if (!inflowData[productId]) inflowData[productId] = {};
+                        inflowData[productId][date] = (inflowData[productId][date] || 0) + totalQty;
+                    }
+                });
+            });
+
+            // Aggregate from other production records
+            loadOtherProductionData();
+            otherProductionRecords.forEach(record => {
+                const date = record.date;
+                const productId = String(record.productId);
+                const count = parseInt(record.count) || 0;
+
+                if (count > 0 && date) {
+                    if (!inflowData[productId]) inflowData[productId] = {};
+                    inflowData[productId][date] = (inflowData[productId][date] || 0) + count;
+                }
+            });
+
+            return inflowData;
+        }
+
+        // Aggregate outflow data
+        function invAggregateOutflow() {
+            const outflowData = {}; // { productId: { 'YYYY-MM-DD': quantity } }
+
+            loadOutflowRecords();
+            outflowRecords.forEach(record => {
+                const date = record.transactionDate;
+                const productId = String(record.productId);
+                const count = parseInt(record.count) || 0;
+
+                if (count > 0 && date) {
+                    if (!outflowData[productId]) outflowData[productId] = {};
+                    outflowData[productId][date] = (outflowData[productId][date] || 0) + count;
+                }
+            });
+
+            return outflowData;
+        }
+
+        // Get all unique product IDs from inflow and outflow
+        function invGetAllProductIds(inflowData, outflowData) {
+            const productIds = new Set();
+            Object.keys(inflowData).forEach(id => productIds.add(id));
+            Object.keys(outflowData).forEach(id => productIds.add(id));
+            return Array.from(productIds);
+        }
+
+        // Get product name
+        function invGetProductName(productId) {
+            const product = products.find(p => p.id === parseInt(productId));
+            if (!product) return `Product ${productId}`;
+
+            const nameThai = product.nameThai || '';
+            const nameEn = product.nameEn || '';
+
+            if (nameThai && nameEn) {
+                return `${nameThai} / ${nameEn}`;
+            } else if (nameThai) {
+                return nameThai;
+            } else if (nameEn) {
+                return nameEn;
+            } else {
+                return `Product ${productId}`;
+            }
+        }
+
+        // Filter products by search text
+        function invFilterProducts(productIds) {
+            if (!invSummaryState.searchText) return productIds;
+
+            const searchLower = invSummaryState.searchText.toLowerCase();
+            return productIds.filter(productId => {
+                const name = invGetProductName(productId).toLowerCase();
+                return name.includes(searchLower);
+            });
+        }
+
+        // Render summary table based on mode
+        function renderInvSummaryTable() {
+            const wrapper = document.getElementById('invSummaryTableWrapper');
+            if (!wrapper) return;
+
+            const inflowData = invAggregateInflow();
+            const outflowData = invAggregateOutflow();
+            let productIds = invGetAllProductIds(inflowData, outflowData);
+
+            // Filter by search
+            productIds = invFilterProducts(productIds);
+
+            // Sort products by name
+            productIds.sort((a, b) => {
+                const nameA = invGetProductName(a);
+                const nameB = invGetProductName(b);
+                return nameA.localeCompare(nameB);
+            });
+
+            if (invSummaryState.mode === 'daily') {
+                renderDailyView(wrapper, productIds, inflowData, outflowData);
+            } else if (invSummaryState.mode === 'monthly') {
+                renderMonthlyView(wrapper, productIds, inflowData, outflowData);
+            } else {
+                renderYearlyView(wrapper, productIds, inflowData, outflowData);
+            }
+        }
+
+        // Render Daily View
+        function renderDailyView(wrapper, productIds, inflowData, outflowData) {
+            const date = invSummaryState.selectedDate;
+
+            const rows = [];
+            let totalInflow = 0;
+            let totalOutflow = 0;
+
+            productIds.forEach(productId => {
+                const inflow = (inflowData[productId] && inflowData[productId][date]) || 0;
+                const outflow = (outflowData[productId] && outflowData[productId][date]) || 0;
+                const net = inflow - outflow;
+
+                if (invSummaryState.showOnlyActive && inflow === 0 && outflow === 0) {
+                    return;
+                }
+
+                totalInflow += inflow;
+                totalOutflow += outflow;
+
+                rows.push({
+                    product: invGetProductName(productId),
+                    inflow,
+                    outflow,
+                    net
+                });
+            });
+
+            if (rows.length === 0) {
+                wrapper.innerHTML = `
+                    <div class="inv-empty-state">
+                        <h3>No Data</h3>
+                        <p>No inflow/outflow records for ${date}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const totalNet = totalInflow - totalOutflow;
+
+            let html = `
+                <div class="inv-summary-table-container">
+                    <table class="inv-summary-table">
+                        <thead>
+                            <tr>
+                                <th class="sticky-col">Product</th>
+                                <th class="num-col">Inflow</th>
+                                <th class="num-col">Outflow</th>
+                                <th class="num-col">Net</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            rows.forEach(row => {
+                html += `
+                    <tr>
+                        <td class="sticky-col">${row.product}</td>
+                        <td class="num-col">${row.inflow}</td>
+                        <td class="num-col">${row.outflow}</td>
+                        <td class="num-col">${row.net}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                            <tr class="totals-row">
+                                <td class="sticky-col">TOTAL</td>
+                                <td class="num-col">${totalInflow}</td>
+                                <td class="num-col">${totalOutflow}</td>
+                                <td class="num-col">${totalNet}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            wrapper.innerHTML = html;
+        }
+
+        // Render Monthly View
+        function renderMonthlyView(wrapper, productIds, inflowData, outflowData) {
+            const month = invSummaryState.selectedMonth;
+            const [year, monthNum] = month.split('-');
+            const daysInMonth = new Date(parseInt(year), parseInt(monthNum), 0).getDate();
+
+            const rows = [];
+
+            productIds.forEach(productId => {
+                const row = { product: invGetProductName(productId), days: [], monthInflow: 0, monthOutflow: 0 };
+                let hasActivity = false;
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = `${year}-${monthNum}-${String(day).padStart(2, '0')}`;
+                    const inflow = (inflowData[productId] && inflowData[productId][date]) || 0;
+                    const outflow = (outflowData[productId] && outflowData[productId][date]) || 0;
+
+                    row.days.push({ inflow, outflow, net: inflow - outflow });
+                    row.monthInflow += inflow;
+                    row.monthOutflow += outflow;
+
+                    if (inflow > 0 || outflow > 0) hasActivity = true;
+                }
+
+                if (invSummaryState.showOnlyActive && !hasActivity) {
+                    return;
+                }
+
+                row.monthNet = row.monthInflow - row.monthOutflow;
+                rows.push(row);
+            });
+
+            if (rows.length === 0) {
+                wrapper.innerHTML = `
+                    <div class="inv-empty-state">
+                        <h3>No Data</h3>
+                        <p>No inflow/outflow records for ${month}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Calculate totals
+            const totals = { days: [], monthInflow: 0, monthOutflow: 0, monthNet: 0 };
+            for (let day = 0; day < daysInMonth; day++) {
+                let dayInflow = 0;
+                let dayOutflow = 0;
+                rows.forEach(row => {
+                    dayInflow += row.days[day].inflow;
+                    dayOutflow += row.days[day].outflow;
+                });
+                totals.days.push({ inflow: dayInflow, outflow: dayOutflow, net: dayInflow - dayOutflow });
+                totals.monthInflow += dayInflow;
+                totals.monthOutflow += dayOutflow;
+            }
+            totals.monthNet = totals.monthInflow - totals.monthOutflow;
+
+            let html = `
+                <div class="inv-summary-table-container">
+                    <table class="inv-summary-table">
+                        <thead>
+            `;
+
+            // Header row 1: Day numbers
+            html += '<tr><th class="sticky-col">Product</th>';
+
+            if (invSummaryState.compactView) {
+                for (let day = 1; day <= daysInMonth; day++) {
+                    html += `<th class="num-col">${String(day).padStart(2, '0')}</th>`;
+                }
+            } else {
+                for (let day = 1; day <= daysInMonth; day++) {
+                    html += `<th class="num-col" colspan="2" style="text-align: center; border-left: 1px solid #ddd;">${String(day).padStart(2, '0')}</th>`;
+                }
+            }
+
+            html += '<th class="month-total-header num-col" colspan="3" style="text-align: center;">Month Total</th></tr>';
+
+            // Header row 2: In/Out labels
+            if (!invSummaryState.compactView) {
+                html += '<tr><th class="sticky-col"></th>';
+                for (let day = 1; day <= daysInMonth; day++) {
+                    html += '<th class="num-col" style="font-size: 11px; border-left: 1px solid #ddd;">In</th>';
+                    html += '<th class="num-col" style="font-size: 11px;">Out</th>';
+                }
+                html += '<th class="month-total-header num-col" style="font-size: 11px;">In</th>';
+                html += '<th class="month-total-header num-col" style="font-size: 11px;">Out</th>';
+                html += '<th class="month-total-header num-col" style="font-size: 11px;">Net</th>';
+                html += '</tr>';
+            } else {
+                html += '<tr><th class="sticky-col"></th>';
+                for (let day = 1; day <= daysInMonth; day++) {
+                    html += '<th class="num-col" style="font-size: 11px;">Net</th>';
+                }
+                html += '<th class="month-total-header num-col" style="font-size: 11px;">In</th>';
+                html += '<th class="month-total-header num-col" style="font-size: 11px;">Out</th>';
+                html += '<th class="month-total-header num-col" style="font-size: 11px;">Net</th>';
+                html += '</tr>';
+            }
+
+            html += '</thead><tbody>';
+
+            // Data rows
+            rows.forEach(row => {
+                html += `<tr><td class="sticky-col">${row.product}</td>`;
+
+                if (invSummaryState.compactView) {
+                    row.days.forEach(day => {
+                        html += `<td class="num-col">${day.net || ''}</td>`;
+                    });
+                } else {
+                    row.days.forEach((day, idx) => {
+                        const borderStyle = 'border-left: 1px solid #ddd;';
+                        html += `<td class="num-col" style="${borderStyle}">${day.inflow || ''}</td>`;
+                        html += `<td class="num-col">${day.outflow || ''}</td>`;
+                    });
+                }
+
+                html += `<td class="month-total-col num-col">${row.monthInflow}</td>`;
+                html += `<td class="month-total-col num-col">${row.monthOutflow}</td>`;
+                html += `<td class="month-total-col num-col">${row.monthNet}</td>`;
+                html += '</tr>';
+            });
+
+            // Totals row
+            html += '<tr class="totals-row"><td class="sticky-col">TOTAL</td>';
+
+            if (invSummaryState.compactView) {
+                totals.days.forEach(day => {
+                    html += `<td class="num-col">${day.net || ''}</td>`;
+                });
+            } else {
+                totals.days.forEach((day, idx) => {
+                    const borderStyle = 'border-left: 1px solid #ddd;';
+                    html += `<td class="num-col" style="${borderStyle}">${day.inflow || ''}</td>`;
+                    html += `<td class="num-col">${day.outflow || ''}</td>`;
+                });
+            }
+
+            html += `<td class="month-total-col num-col">${totals.monthInflow}</td>`;
+            html += `<td class="month-total-col num-col">${totals.monthOutflow}</td>`;
+            html += `<td class="month-total-col num-col">${totals.monthNet}</td>`;
+            html += '</tr>';
+
+            html += '</tbody></table></div>';
+
+            wrapper.innerHTML = html;
+        }
+
+        // Render Yearly View
+        function renderYearlyView(wrapper, productIds, inflowData, outflowData) {
+            const year = invSummaryState.selectedYear;
+            const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+
+            const rows = [];
+
+            productIds.forEach(productId => {
+                const row = { product: invGetProductName(productId), months: [], yearInflow: 0, yearOutflow: 0 };
+                let hasActivity = false;
+
+                months.forEach(month => {
+                    let monthInflow = 0;
+                    let monthOutflow = 0;
+
+                    // Aggregate all days in this month
+                    const daysInMonth = new Date(parseInt(year), parseInt(month), 0).getDate();
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const date = `${year}-${month}-${String(day).padStart(2, '0')}`;
+                        monthInflow += (inflowData[productId] && inflowData[productId][date]) || 0;
+                        monthOutflow += (outflowData[productId] && outflowData[productId][date]) || 0;
+                    }
+
+                    row.months.push({ inflow: monthInflow, outflow: monthOutflow, net: monthInflow - monthOutflow });
+                    row.yearInflow += monthInflow;
+                    row.yearOutflow += monthOutflow;
+
+                    if (monthInflow > 0 || monthOutflow > 0) hasActivity = true;
+                });
+
+                if (invSummaryState.showOnlyActive && !hasActivity) {
+                    return;
+                }
+
+                row.yearNet = row.yearInflow - row.yearOutflow;
+                rows.push(row);
+            });
+
+            if (rows.length === 0) {
+                wrapper.innerHTML = `
+                    <div class="inv-empty-state">
+                        <h3>No Data</h3>
+                        <p>No inflow/outflow records for ${year}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Calculate totals
+            const totals = { months: [], yearInflow: 0, yearOutflow: 0, yearNet: 0 };
+            months.forEach((month, idx) => {
+                let monthInflow = 0;
+                let monthOutflow = 0;
+                rows.forEach(row => {
+                    monthInflow += row.months[idx].inflow;
+                    monthOutflow += row.months[idx].outflow;
+                });
+                totals.months.push({ inflow: monthInflow, outflow: monthOutflow, net: monthInflow - monthOutflow });
+                totals.yearInflow += monthInflow;
+                totals.yearOutflow += monthOutflow;
+            });
+            totals.yearNet = totals.yearInflow - totals.yearOutflow;
+
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            let html = `
+                <div class="inv-summary-table-container">
+                    <table class="inv-summary-table">
+                        <thead>
+            `;
+
+            // Header row 1: Month names
+            html += '<tr><th class="sticky-col">Product</th>';
+            monthNames.forEach(name => {
+                html += `<th class="num-col" colspan="3" style="text-align: center; border-left: 1px solid #ddd;">${name}</th>`;
+            });
+            html += '<th class="month-total-header num-col" colspan="3" style="text-align: center;">Year Total</th></tr>';
+
+            // Header row 2: In/Out/Net labels
+            html += '<tr><th class="sticky-col"></th>';
+            for (let i = 0; i < 12; i++) {
+                html += '<th class="num-col" style="font-size: 11px; border-left: 1px solid #ddd;">In</th>';
+                html += '<th class="num-col" style="font-size: 11px;">Out</th>';
+                html += '<th class="num-col" style="font-size: 11px;">Net</th>';
+            }
+            html += '<th class="month-total-header num-col" style="font-size: 11px;">In</th>';
+            html += '<th class="month-total-header num-col" style="font-size: 11px;">Out</th>';
+            html += '<th class="month-total-header num-col" style="font-size: 11px;">Net</th>';
+            html += '</tr>';
+
+            html += '</thead><tbody>';
+
+            // Data rows
+            rows.forEach(row => {
+                html += `<tr><td class="sticky-col">${row.product}</td>`;
+
+                row.months.forEach(month => {
+                    html += `<td class="num-col" style="border-left: 1px solid #ddd;">${month.inflow || ''}</td>`;
+                    html += `<td class="num-col">${month.outflow || ''}</td>`;
+                    html += `<td class="num-col">${month.net || ''}</td>`;
+                });
+
+                html += `<td class="month-total-col num-col">${row.yearInflow}</td>`;
+                html += `<td class="month-total-col num-col">${row.yearOutflow}</td>`;
+                html += `<td class="month-total-col num-col">${row.yearNet}</td>`;
+                html += '</tr>';
+            });
+
+            // Totals row
+            html += '<tr class="totals-row"><td class="sticky-col">TOTAL</td>';
+
+            totals.months.forEach(month => {
+                html += `<td class="num-col" style="border-left: 1px solid #ddd;">${month.inflow || ''}</td>`;
+                html += `<td class="num-col">${month.outflow || ''}</td>`;
+                html += `<td class="num-col">${month.net || ''}</td>`;
+            });
+
+            html += `<td class="month-total-col num-col">${totals.yearInflow}</td>`;
+            html += `<td class="month-total-col num-col">${totals.yearOutflow}</td>`;
+            html += `<td class="month-total-col num-col">${totals.yearNet}</td>`;
+            html += '</tr>';
+
+            html += '</tbody></table></div>';
+
+            wrapper.innerHTML = html;
+        }
+
+        // Export to CSV
+        function invExportCSV() {
+            const inflowData = invAggregateInflow();
+            const outflowData = invAggregateOutflow();
+            let productIds = invGetAllProductIds(inflowData, outflowData);
+
+            productIds = invFilterProducts(productIds);
+            productIds.sort((a, b) => invGetProductName(a).localeCompare(invGetProductName(b)));
+
+            let csv = '';
+
+            if (invSummaryState.mode === 'daily') {
+                csv = invExportDailyCSV(productIds, inflowData, outflowData);
+            } else if (invSummaryState.mode === 'monthly') {
+                csv = invExportMonthlyCSV(productIds, inflowData, outflowData);
+            } else {
+                csv = invExportYearlyCSV(productIds, inflowData, outflowData);
+            }
+
+            // Download CSV
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `inventory-summary-${invSummaryState.mode}-${new Date().toISOString().slice(0, 10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function invExportDailyCSV(productIds, inflowData, outflowData) {
+            const date = invSummaryState.selectedDate;
+            let csv = 'Product,Inflow,Outflow,Net\n';
+
+            let totalInflow = 0;
+            let totalOutflow = 0;
+
+            productIds.forEach(productId => {
+                const inflow = (inflowData[productId] && inflowData[productId][date]) || 0;
+                const outflow = (outflowData[productId] && outflowData[productId][date]) || 0;
+                const net = inflow - outflow;
+
+                if (invSummaryState.showOnlyActive && inflow === 0 && outflow === 0) return;
+
+                totalInflow += inflow;
+                totalOutflow += outflow;
+
+                csv += `"${invGetProductName(productId)}",${inflow},${outflow},${net}\n`;
+            });
+
+            csv += `TOTAL,${totalInflow},${totalOutflow},${totalInflow - totalOutflow}\n`;
+            return csv;
+        }
+
+        function invExportMonthlyCSV(productIds, inflowData, outflowData) {
+            const month = invSummaryState.selectedMonth;
+            const [year, monthNum] = month.split('-');
+            const daysInMonth = new Date(parseInt(year), parseInt(monthNum), 0).getDate();
+
+            let csv = 'Product';
+
+            if (invSummaryState.compactView) {
+                for (let day = 1; day <= daysInMonth; day++) {
+                    csv += `,${String(day).padStart(2, '0')}`;
+                }
+            } else {
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayStr = String(day).padStart(2, '0');
+                    csv += `,${dayStr}-In,${dayStr}-Out`;
+                }
+            }
+            csv += ',Month-In,Month-Out,Month-Net\n';
+
+            productIds.forEach(productId => {
+                let monthInflow = 0;
+                let monthOutflow = 0;
+                let hasActivity = false;
+                const dayData = [];
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = `${year}-${monthNum}-${String(day).padStart(2, '0')}`;
+                    const inflow = (inflowData[productId] && inflowData[productId][date]) || 0;
+                    const outflow = (outflowData[productId] && outflowData[productId][date]) || 0;
+
+                    dayData.push({ inflow, outflow, net: inflow - outflow });
+                    monthInflow += inflow;
+                    monthOutflow += outflow;
+                    if (inflow > 0 || outflow > 0) hasActivity = true;
+                }
+
+                if (invSummaryState.showOnlyActive && !hasActivity) return;
+
+                csv += `"${invGetProductName(productId)}"`;
+
+                if (invSummaryState.compactView) {
+                    dayData.forEach(day => {
+                        csv += `,${day.net || ''}`;
+                    });
+                } else {
+                    dayData.forEach(day => {
+                        csv += `,${day.inflow || ''},${day.outflow || ''}`;
+                    });
+                }
+
+                csv += `,${monthInflow},${monthOutflow},${monthInflow - monthOutflow}\n`;
+            });
+
+            return csv;
+        }
+
+        function invExportYearlyCSV(productIds, inflowData, outflowData) {
+            const year = invSummaryState.selectedYear;
+            const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            let csv = 'Product';
+            monthNames.forEach(name => {
+                csv += `,${name}-In,${name}-Out,${name}-Net`;
+            });
+            csv += ',Year-In,Year-Out,Year-Net\n';
+
+            productIds.forEach(productId => {
+                let yearInflow = 0;
+                let yearOutflow = 0;
+                let hasActivity = false;
+                const monthData = [];
+
+                months.forEach(month => {
+                    let monthInflow = 0;
+                    let monthOutflow = 0;
+
+                    const daysInMonth = new Date(parseInt(year), parseInt(month), 0).getDate();
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const date = `${year}-${month}-${String(day).padStart(2, '0')}`;
+                        monthInflow += (inflowData[productId] && inflowData[productId][date]) || 0;
+                        monthOutflow += (outflowData[productId] && outflowData[productId][date]) || 0;
+                    }
+
+                    monthData.push({ inflow: monthInflow, outflow: monthOutflow, net: monthInflow - monthOutflow });
+                    yearInflow += monthInflow;
+                    yearOutflow += monthOutflow;
+                    if (monthInflow > 0 || monthOutflow > 0) hasActivity = true;
+                });
+
+                if (invSummaryState.showOnlyActive && !hasActivity) return;
+
+                csv += `"${invGetProductName(productId)}"`;
+                monthData.forEach(month => {
+                    csv += `,${month.inflow || ''},${month.outflow || ''},${month.net || ''}`;
+                });
+                csv += `,${yearInflow},${yearOutflow},${yearInflow - yearOutflow}\n`;
+            });
+
+            return csv;
+        }
+
+        // ========== END INVENTORY SUMMARY FEATURE ==========
 
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
