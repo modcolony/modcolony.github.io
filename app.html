@@ -2132,6 +2132,284 @@
                 min-width: auto;
             }
         }
+
+        /* ========== STOCK COUNT @11:00 STYLES ========== */
+        .stock-count-controls {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .stock-count-control-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+        }
+
+        .stock-count-control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stock-count-control-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .stock-count-date-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 160px;
+        }
+
+        .stock-count-time-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 100px;
+        }
+
+        .stock-count-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stock-count-status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .stock-count-status-badge.open {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .stock-count-status-badge.closed {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .stock-count-status-badge.verified {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .stock-count-table-container {
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+
+        .stock-count-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .stock-count-table th {
+            background: #f5f5f5;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+            white-space: nowrap;
+        }
+
+        .stock-count-table th.num-col {
+            text-align: right;
+        }
+
+        .stock-count-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stock-count-table td.num-col {
+            text-align: right;
+        }
+
+        .stock-count-table tr:hover {
+            background: #fafafa;
+        }
+
+        .stock-count-input {
+            width: 100px;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .stock-count-input:focus {
+            outline: none;
+            border-color: #1976D2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+        }
+
+        .stock-count-input.error {
+            border-color: #f44336;
+            background: #FFF5F5;
+        }
+
+        .stock-count-initial-input {
+            width: 80px;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .stock-count-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-save-count {
+            padding: 10px 24px;
+            background: #1976D2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save-count:hover {
+            background: #1565C0;
+        }
+
+        .btn-save-count:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-close-cycle {
+            padding: 10px 24px;
+            background: #FF7043;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .btn-close-cycle:hover {
+            background: #F4511E;
+        }
+
+        .btn-reopen-cycle {
+            padding: 10px 24px;
+            background: #9E9E9E;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .btn-reopen-cycle:hover {
+            background: #757575;
+        }
+
+        .stock-count-info {
+            background: #FFF3E0;
+            border: 1px solid #FFE0B2;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stock-count-info h4 {
+            color: #E65100;
+            margin: 0 0 8px 0;
+            font-size: 14px;
+        }
+
+        .stock-count-info p {
+            color: #666;
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .stock-count-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .stock-count-verified-info {
+            background: #E3F2FD;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stock-count-verified-info .icon {
+            font-size: 24px;
+        }
+
+        .stock-count-verified-info .text {
+            font-size: 13px;
+            color: #1565C0;
+        }
+
+        /* Variance indicator styles */
+        .variance-positive {
+            color: #2E7D32;
+        }
+
+        .variance-negative {
+            color: #C62828;
+        }
+
+        .variance-warning {
+            color: #F57C00;
+        }
+
+        .data-anomaly {
+            background: #FFF3E0 !important;
+        }
+
+        .data-anomaly-indicator {
+            color: #E65100;
+            font-weight: bold;
+            cursor: help;
+        }
+
+        @media (max-width: 768px) {
+            .stock-count-control-row {
+                flex-direction: column;
+            }
+
+            .stock-count-date-input,
+            .stock-count-time-input {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2210,7 +2488,8 @@
                 colorClass: 'user-access',
                 submenu: [
                     { id: 'dumpling-production', label: 'Dumpling production' },
-                    { id: 'other-production', label: 'Other production' }
+                    { id: 'other-production', label: 'Other production' },
+                    { id: 'stock-count', label: 'Stock Count @11:00' }
                 ]
             },
             {
@@ -2705,6 +2984,13 @@
                             </div>
                         </div>
                     </div>
+                `
+            },
+            'stock-count': {
+                title: 'Stock Count @11:00',
+                breadcrumb: 'Product Management / Product Inflow / Stock Count @11:00',
+                content: `
+                    <div id="stockCountContainer"></div>
                 `
             },
             'product-outflow': {
@@ -4173,6 +4459,13 @@
             if (pageId === 'inventory-summary') {
                 setTimeout(() => {
                     initInventorySummaryPage();
+                }, 10);
+            }
+
+            // If navigating to stock count page, initialize it
+            if (pageId === 'stock-count') {
+                setTimeout(() => {
+                    initStockCountPage();
                 }, 10);
             }
         };
@@ -6881,6 +7174,369 @@
 
         // ========== END OTHER PRODUCTION FEATURE ==========
 
+        // ========== STOCK COUNT @11:00 FEATURE ==========
+
+        // Stock count state
+        let stockCounts = []; // { date, time, productId, count, countedBy, countedByInitial, verifiedBy, verifiedAt }
+        let stockCountCycleStatus = {}; // { 'YYYY-MM-DD': 'open' | 'closed' }
+        let currentStockCountDate = '';
+
+        // Load stock counts from localStorage
+        function loadStockCounts() {
+            const stored = localStorage.getItem('wontonStockCounts');
+            if (stored) {
+                stockCounts = JSON.parse(stored);
+            }
+        }
+
+        // Save stock counts to localStorage
+        function saveStockCounts() {
+            localStorage.setItem('wontonStockCounts', JSON.stringify(stockCounts));
+        }
+
+        // Load stock count cycle status from localStorage
+        function loadStockCountCycleStatus() {
+            const stored = localStorage.getItem('wontonStockCountCycleStatus');
+            if (stored) {
+                stockCountCycleStatus = JSON.parse(stored);
+            }
+        }
+
+        // Save stock count cycle status to localStorage
+        function saveStockCountCycleStatus() {
+            localStorage.setItem('wontonStockCountCycleStatus', JSON.stringify(stockCountCycleStatus));
+        }
+
+        // Initialize stock count page
+        function initStockCountPage() {
+            loadStockCounts();
+            loadStockCountCycleStatus();
+
+            if (!currentStockCountDate) {
+                currentStockCountDate = new Date().toISOString().split('T')[0];
+            }
+
+            renderStockCountPage();
+        }
+
+        // Render stock count page
+        function renderStockCountPage() {
+            const container = document.getElementById('stockCountContainer');
+            if (!container) return;
+
+            const cycleStatus = stockCountCycleStatus[currentStockCountDate] || 'open';
+            const isClosed = cycleStatus === 'closed';
+
+            // Get existing counts for this date
+            const existingCounts = getStockCountsForDate(currentStockCountDate);
+            const hasVerification = existingCounts.some(c => c.verifiedBy);
+
+            container.innerHTML = `
+                <div class="stock-count-info">
+                    <h4>📋 Stock Count Instructions</h4>
+                    <p>
+                        Record the physical count of each product at approximately 11:00 AM.
+                        This count represents inventory at the start of a new daily cycle (11:00 → 11:00 next day).
+                        All values must be whole numbers (no decimals).
+                    </p>
+                </div>
+
+                <div class="stock-count-controls">
+                    <div class="stock-count-control-row">
+                        <div class="stock-count-control-group">
+                            <label class="stock-count-control-label">Date</label>
+                            <input type="date"
+                                   class="stock-count-date-input"
+                                   value="${currentStockCountDate}"
+                                   onchange="handleStockCountDateChange(this.value)"
+                                   ${isClosed ? 'disabled' : ''}>
+                        </div>
+
+                        <div class="stock-count-control-group">
+                            <label class="stock-count-control-label">Time</label>
+                            <input type="time"
+                                   id="stockCountTime"
+                                   class="stock-count-time-input"
+                                   value="${existingCounts[0]?.time || '11:00'}"
+                                   ${isClosed ? 'disabled' : ''}>
+                        </div>
+
+                        <div class="stock-count-control-group">
+                            <label class="stock-count-control-label">Counted By (Initial)</label>
+                            <input type="text"
+                                   id="stockCountInitial"
+                                   class="stock-count-initial-input"
+                                   placeholder="XXXX"
+                                   maxlength="4"
+                                   value="${existingCounts[0]?.countedByInitial || ''}"
+                                   ${isClosed ? 'disabled' : ''}>
+                        </div>
+
+                        <div class="stock-count-status">
+                            <span class="stock-count-status-badge ${isClosed ? 'closed' : hasVerification ? 'verified' : 'open'}">
+                                ${isClosed ? '🔒 Closed' : hasVerification ? '✓ Verified' : '📝 Open'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                ${hasVerification ? `
+                    <div class="stock-count-verified-info">
+                        <span class="icon">✅</span>
+                        <span class="text">
+                            Verified by: ${existingCounts[0]?.verifiedBy || 'N/A'}
+                            on ${existingCounts[0]?.verifiedAt ? new Date(existingCounts[0].verifiedAt).toLocaleString() : 'N/A'}
+                        </span>
+                    </div>
+                ` : ''}
+
+                <div class="stock-count-table-container">
+                    ${renderStockCountTable(existingCounts, isClosed)}
+                </div>
+
+                <div class="stock-count-actions">
+                    ${!isClosed ? `
+                        <button class="btn-save-count" onclick="saveStockCount()">
+                            💾 Save Count
+                        </button>
+                        ${currentRole === 'admin' ? `
+                            <button class="btn-close-cycle" onclick="closeCycle()">
+                                🔒 Close Cycle
+                            </button>
+                            ${!hasVerification ? `
+                                <button class="btn-save-count" style="background: #4CAF50;" onclick="verifyStockCount()">
+                                    ✓ Verify & Save
+                                </button>
+                            ` : ''}
+                        ` : ''}
+                    ` : `
+                        ${currentRole === 'admin' ? `
+                            <button class="btn-reopen-cycle" onclick="reopenCycle()">
+                                🔓 Reopen Cycle
+                            </button>
+                        ` : `
+                            <p style="color: #666;">This cycle has been closed. Contact an admin to make changes.</p>
+                        `}
+                    `}
+                </div>
+            `;
+        }
+
+        // Render stock count table
+        function renderStockCountTable(existingCounts, isClosed) {
+            loadProducts();
+
+            if (products.length === 0) {
+                return `
+                    <div class="stock-count-empty">
+                        <h3>No Products</h3>
+                        <p>Please add products in the SETUP menu first.</p>
+                    </div>
+                `;
+            }
+
+            // Create a map of existing counts by productId
+            const countMap = {};
+            existingCounts.forEach(c => {
+                countMap[c.productId] = c.count;
+            });
+
+            // Sort products by name
+            const sortedProducts = [...products].sort((a, b) => {
+                const nameA = a.nameThai || a.nameEn || '';
+                const nameB = b.nameThai || b.nameEn || '';
+                return nameA.localeCompare(nameB);
+            });
+
+            let html = `
+                <table class="stock-count-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">ID</th>
+                            <th>Product Name</th>
+                            <th style="width: 100px;">Unit</th>
+                            <th class="num-col" style="width: 150px;">Count @11:00</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            sortedProducts.forEach(product => {
+                const existingCount = countMap[product.id] !== undefined ? countMap[product.id] : '';
+                const productName = (product.nameThai || '') + (product.nameThai && product.nameEn ? ' / ' : '') + (product.nameEn || '');
+
+                html += `
+                    <tr>
+                        <td>${String(product.id).padStart(2, '0')}</td>
+                        <td>${productName}</td>
+                        <td>${product.unit || '-'}</td>
+                        <td class="num-col">
+                            <input type="number"
+                                   class="stock-count-input"
+                                   id="stock-count-${product.id}"
+                                   value="${existingCount}"
+                                   min="0"
+                                   step="1"
+                                   placeholder="0"
+                                   ${isClosed ? 'disabled' : ''}
+                                   onchange="validateStockCountInput(this)"
+                                   oninput="validateStockCountInput(this)">
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            return html;
+        }
+
+        // Validate stock count input (integers only)
+        function validateStockCountInput(input) {
+            // Remove decimals
+            if (input.value.includes('.')) {
+                input.value = Math.floor(parseFloat(input.value));
+            }
+            // Ensure non-negative
+            if (parseInt(input.value) < 0) {
+                input.value = 0;
+            }
+            // Round to integer
+            if (input.value !== '') {
+                input.value = Math.round(parseFloat(input.value));
+            }
+        }
+
+        // Get stock counts for a specific date
+        function getStockCountsForDate(date) {
+            return stockCounts.filter(c => c.date === date);
+        }
+
+        // Get stock count for specific product on specific date
+        function getStockCountForProductDate(productId, date) {
+            const counts = stockCounts.filter(c => c.date === date && c.productId === productId);
+            return counts.length > 0 ? counts[0].count : null;
+        }
+
+        // Handle date change
+        function handleStockCountDateChange(value) {
+            currentStockCountDate = value;
+            renderStockCountPage();
+        }
+
+        // Save stock count
+        function saveStockCount() {
+            const time = document.getElementById('stockCountTime').value || '11:00';
+            const initial = document.getElementById('stockCountInitial').value.trim().toUpperCase();
+
+            if (!initial || initial.length < 2) {
+                alert('Please enter your initial (at least 2 characters).');
+                return;
+            }
+
+            loadProducts();
+
+            const timestamp = Date.now();
+            let savedCount = 0;
+
+            // Remove existing counts for this date first
+            stockCounts = stockCounts.filter(c => c.date !== currentStockCountDate);
+
+            products.forEach(product => {
+                const input = document.getElementById(`stock-count-${product.id}`);
+                if (input && input.value !== '') {
+                    const count = parseInt(input.value) || 0;
+                    stockCounts.push({
+                        id: timestamp + '-' + product.id,
+                        date: currentStockCountDate,
+                        time: time,
+                        productId: product.id,
+                        count: count,
+                        countedByInitial: initial,
+                        createdAt: timestamp,
+                        updatedAt: timestamp
+                    });
+                    savedCount++;
+                }
+            });
+
+            saveStockCounts();
+            alert(`Saved ${savedCount} stock count entries for ${currentStockCountDate}.`);
+            renderStockCountPage();
+        }
+
+        // Verify stock count (admin only)
+        function verifyStockCount() {
+            if (currentRole !== 'admin') {
+                alert('Only administrators can verify stock counts.');
+                return;
+            }
+
+            const verifyInitial = prompt('Enter your admin initial to verify:');
+            if (!verifyInitial || verifyInitial.trim().length < 2) {
+                alert('Verification cancelled or invalid initial.');
+                return;
+            }
+
+            // First save current counts
+            saveStockCount();
+
+            // Then add verification
+            const timestamp = Date.now();
+            stockCounts.forEach(c => {
+                if (c.date === currentStockCountDate) {
+                    c.verifiedBy = verifyInitial.trim().toUpperCase();
+                    c.verifiedAt = timestamp;
+                }
+            });
+
+            saveStockCounts();
+            alert('Stock count verified successfully!');
+            renderStockCountPage();
+        }
+
+        // Close cycle (admin only)
+        function closeCycle() {
+            if (currentRole !== 'admin') {
+                alert('Only administrators can close cycles.');
+                return;
+            }
+
+            const confirm = window.confirm(
+                `Are you sure you want to close the cycle for ${currentStockCountDate}?\n\n` +
+                `This will lock the stock count from further edits.`
+            );
+
+            if (confirm) {
+                stockCountCycleStatus[currentStockCountDate] = 'closed';
+                saveStockCountCycleStatus();
+                renderStockCountPage();
+            }
+        }
+
+        // Reopen cycle (admin only)
+        function reopenCycle() {
+            if (currentRole !== 'admin') {
+                alert('Only administrators can reopen cycles.');
+                return;
+            }
+
+            const pin = prompt('Enter admin PIN to reopen:');
+            if (pin !== DUMPLING_ADMIN_PIN) {
+                alert('Invalid PIN.');
+                return;
+            }
+
+            stockCountCycleStatus[currentStockCountDate] = 'open';
+            saveStockCountCycleStatus();
+            renderStockCountPage();
+        }
+
+        // ========== END STOCK COUNT FEATURE ==========
+
         // ========== INVENTORY SUMMARY FEATURE ==========
 
         // Inventory summary state
@@ -7129,22 +7785,110 @@
             outflowRecords.forEach(record => {
                 const date = record.transactionDate;
                 const productId = String(record.productId);
-                const count = parseInt(record.count) || 0;
+                // Use record.quantity (correct field name from outflow record structure)
+                const qty = parseInt(record.quantity) || 0;
 
-                if (count > 0 && date) {
+                if (qty > 0 && date) {
                     if (!outflowData[productId]) outflowData[productId] = {};
-                    outflowData[productId][date] = (outflowData[productId][date] || 0) + count;
+                    outflowData[productId][date] = (outflowData[productId][date] || 0) + qty;
                 }
             });
 
             return outflowData;
         }
 
-        // Get all unique product IDs from inflow and outflow
-        function invGetAllProductIds(inflowData, outflowData) {
+        // Aggregate stock count data
+        function invAggregateStockCounts() {
+            const stockCountData = {}; // { productId: { 'YYYY-MM-DD': count } }
+
+            loadStockCounts();
+            stockCounts.forEach(record => {
+                const date = record.date;
+                const productId = String(record.productId);
+                const count = parseInt(record.count) || 0;
+
+                if (date) {
+                    if (!stockCountData[productId]) stockCountData[productId] = {};
+                    stockCountData[productId][date] = count;
+                }
+            });
+
+            return stockCountData;
+        }
+
+        // Get stock count for a product on a specific date
+        function invGetStockCount(stockCountData, productId, date) {
+            if (!stockCountData[productId]) return null;
+            if (stockCountData[productId][date] === undefined) return null;
+            return stockCountData[productId][date];
+        }
+
+        // Get previous day's date
+        function invGetPrevDate(date) {
+            const d = new Date(date);
+            d.setDate(d.getDate() - 1);
+            return d.toISOString().split('T')[0];
+        }
+
+        // Calculate cycle data for a specific date (11:00 cycle)
+        // Cycle for date D = from 11:00 on day (D-1) to 11:00 on day D
+        // Since transactions don't have timestamps, we treat transactions on date D as belonging to cycle D
+        function invCalculateCycleData(productId, date, inflowData, outflowData, stockCountData) {
+            const prevDate = invGetPrevDate(date);
+
+            // Stock counts
+            const countPrev = invGetStockCount(stockCountData, productId, prevDate);
+            const countNow = invGetStockCount(stockCountData, productId, date);
+
+            // Inflow and outflow for the cycle (transactions on date D belong to cycle D)
+            const inflow = (inflowData[productId] && inflowData[productId][date]) || 0;
+            const outflowRecorded = (outflowData[productId] && outflowData[productId][date]) || 0;
+
+            // Calculate implied outflow and variance
+            let outflowImplied = null;
+            let expectedCount = null;
+            let variance = null;
+            let hasAnomaly = false;
+
+            if (countPrev !== null && countNow !== null) {
+                // Implied Outflow = CountPrev + Inflow - CountNow
+                outflowImplied = countPrev + inflow - countNow;
+
+                // If implied outflow is negative, it's a data anomaly
+                if (outflowImplied < 0) {
+                    hasAnomaly = true;
+                    outflowImplied = 0;
+                }
+
+                // Expected count if recorded outflow were complete
+                // ExpectedCount = CountPrev + Inflow - OutflowRecorded
+                expectedCount = countPrev + inflow - outflowRecorded;
+
+                // Variance = CountNow - ExpectedCount
+                variance = countNow - expectedCount;
+            }
+
+            return {
+                countPrev: countPrev !== null ? countPrev : 0,
+                countNow: countNow !== null ? countNow : 0,
+                inflow,
+                outflowRecorded,
+                outflowImplied: outflowImplied !== null ? outflowImplied : 0,
+                variance: variance !== null ? variance : 0,
+                hasCountPrev: countPrev !== null,
+                hasCountNow: countNow !== null,
+                hasAnomaly
+            };
+        }
+
+        // Get all unique product IDs from inflow, outflow, and stock counts
+        function invGetAllProductIds(inflowData, outflowData, stockCountData) {
             const productIds = new Set();
             Object.keys(inflowData).forEach(id => productIds.add(id));
             Object.keys(outflowData).forEach(id => productIds.add(id));
+            if (stockCountData) {
+                Object.keys(stockCountData).forEach(id => productIds.add(id));
+            }
             return Array.from(productIds);
         }
 
@@ -7185,7 +7929,8 @@
 
             const inflowData = invAggregateInflow();
             const outflowData = invAggregateOutflow();
-            let productIds = invGetAllProductIds(inflowData, outflowData);
+            const stockCountData = invAggregateStockCounts();
+            let productIds = invGetAllProductIds(inflowData, outflowData, stockCountData);
 
             // Filter by search
             productIds = invFilterProducts(productIds);
@@ -7198,39 +7943,50 @@
             });
 
             if (invSummaryState.mode === 'daily') {
-                renderDailyView(wrapper, productIds, inflowData, outflowData);
+                renderDailyView(wrapper, productIds, inflowData, outflowData, stockCountData);
             } else if (invSummaryState.mode === 'monthly') {
-                renderMonthlyView(wrapper, productIds, inflowData, outflowData);
+                renderMonthlyView(wrapper, productIds, inflowData, outflowData, stockCountData);
             } else {
-                renderYearlyView(wrapper, productIds, inflowData, outflowData);
+                renderYearlyView(wrapper, productIds, inflowData, outflowData, stockCountData);
             }
         }
 
-        // Render Daily View
-        function renderDailyView(wrapper, productIds, inflowData, outflowData) {
+        // Render Daily View - 11:00→11:00 Cycle
+        // For date D, cycle runs from 11:00 on D-1 to 11:00 on D
+        function renderDailyView(wrapper, productIds, inflowData, outflowData, stockCountData) {
             const date = invSummaryState.selectedDate;
+            const prevDate = invGetPrevDate(date);
 
             const rows = [];
             let totalInflow = 0;
-            let totalOutflow = 0;
+            let totalOutflowRecorded = 0;
+            let totalOutflowImplied = 0;
+            let hasAnyAnomaly = false;
 
             productIds.forEach(productId => {
-                const inflow = (inflowData[productId] && inflowData[productId][date]) || 0;
-                const outflow = (outflowData[productId] && outflowData[productId][date]) || 0;
-                const net = inflow - outflow;
+                const cycleData = invCalculateCycleData(productId, date, inflowData, outflowData, stockCountData);
 
-                if (invSummaryState.showOnlyActive && inflow === 0 && outflow === 0) {
+                // Check if product has any activity
+                const hasActivity = cycleData.inflow > 0 ||
+                                    cycleData.outflowRecorded > 0 ||
+                                    cycleData.hasCountPrev ||
+                                    cycleData.hasCountNow;
+
+                if (invSummaryState.showOnlyActive && !hasActivity) {
                     return;
                 }
 
-                totalInflow += inflow;
-                totalOutflow += outflow;
+                totalInflow += cycleData.inflow;
+                totalOutflowRecorded += cycleData.outflowRecorded;
+                totalOutflowImplied += cycleData.outflowImplied;
+
+                if (cycleData.hasAnomaly) {
+                    hasAnyAnomaly = true;
+                }
 
                 rows.push({
                     product: invGetProductName(productId),
-                    inflow,
-                    outflow,
-                    net
+                    ...cycleData
                 });
             });
 
@@ -7238,35 +7994,65 @@
                 wrapper.innerHTML = `
                     <div class="inv-empty-state">
                         <h3>No Data</h3>
-                        <p>No inflow/outflow records for ${date}</p>
+                        <p>No records for cycle ending ${date} at 11:00</p>
+                        <p style="margin-top: 8px; font-size: 12px; color: #999;">
+                            Cycle period: ${prevDate} 11:00 → ${date} 11:00
+                        </p>
                     </div>
                 `;
                 return;
             }
 
-            const totalNet = totalInflow - totalOutflow;
-
             let html = `
+                <div style="background: #E3F2FD; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 13px;">
+                    <strong>📅 Daily Cycle (11:00 → 11:00)</strong><br>
+                    <span style="color: #666;">
+                        Period: ${prevDate} 11:00 → ${date} 11:00<br>
+                        Count @11:00 (Prev) = stock count at 11:00 on ${prevDate}<br>
+                        Count @11:00 (Now) = stock count at 11:00 on ${date}
+                    </span>
+                </div>
+
+                ${hasAnyAnomaly ? `
+                    <div style="background: #FFF3E0; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #FF9800;">
+                        <strong style="color: #E65100;">⚠️ Data Anomaly Detected</strong><br>
+                        <span style="color: #666; font-size: 13px;">
+                            Some rows have negative implied outflow (marked with ⚠️), indicating data inconsistency.
+                            Check stock counts and inflow records.
+                        </span>
+                    </div>
+                ` : ''}
+
                 <div class="inv-summary-table-container">
                     <table class="inv-summary-table">
                         <thead>
                             <tr>
                                 <th class="sticky-col">Product</th>
-                                <th class="num-col">Inflow</th>
-                                <th class="num-col">Outflow</th>
-                                <th class="num-col">Net</th>
+                                <th class="num-col" title="Stock count at 11:00 on previous day">Count @11:00<br>(Prev)</th>
+                                <th class="num-col" title="Total inflow during the 11:00-11:00 cycle">Inflow<br>(11→11)</th>
+                                <th class="num-col" title="Recorded outflow during the cycle">Outflow Recorded<br>(11→11)</th>
+                                <th class="num-col" title="Stock count at 11:00 on selected day">Count @11:00<br>(Now)</th>
+                                <th class="num-col" title="Implied outflow = CountPrev + Inflow - CountNow">Outflow<br>(Implied)</th>
+                                <th class="num-col" title="Variance = CountNow - ExpectedCount">Variance</th>
                             </tr>
                         </thead>
                         <tbody>
             `;
 
             rows.forEach(row => {
+                const varianceClass = row.variance > 0 ? 'variance-positive' :
+                                      row.variance < 0 ? 'variance-negative' : '';
+                const anomalyClass = row.hasAnomaly ? 'data-anomaly' : '';
+
                 html += `
-                    <tr>
+                    <tr class="${anomalyClass}">
                         <td class="sticky-col">${row.product}</td>
+                        <td class="num-col">${row.hasCountPrev ? row.countPrev : '<span style="color:#999">-</span>'}</td>
                         <td class="num-col">${row.inflow}</td>
-                        <td class="num-col">${row.outflow}</td>
-                        <td class="num-col">${row.net}</td>
+                        <td class="num-col">${row.outflowRecorded}</td>
+                        <td class="num-col">${row.hasCountNow ? row.countNow : '<span style="color:#999">-</span>'}</td>
+                        <td class="num-col">${row.hasCountPrev && row.hasCountNow ? row.outflowImplied : '<span style="color:#999">-</span>'}${row.hasAnomaly ? ' <span class="data-anomaly-indicator" title="Data anomaly: negative implied outflow">⚠️</span>' : ''}</td>
+                        <td class="num-col ${varianceClass}">${row.hasCountPrev && row.hasCountNow ? row.variance : '<span style="color:#999">-</span>'}</td>
                     </tr>
                 `;
             });
@@ -7274,9 +8060,12 @@
             html += `
                             <tr class="totals-row">
                                 <td class="sticky-col">TOTAL</td>
+                                <td class="num-col">-</td>
                                 <td class="num-col">${totalInflow}</td>
-                                <td class="num-col">${totalOutflow}</td>
-                                <td class="num-col">${totalNet}</td>
+                                <td class="num-col">${totalOutflowRecorded}</td>
+                                <td class="num-col">-</td>
+                                <td class="num-col">${totalOutflowImplied}</td>
+                                <td class="num-col">-</td>
                             </tr>
                         </tbody>
                     </table>
@@ -7286,8 +8075,8 @@
             wrapper.innerHTML = html;
         }
 
-        // Render Monthly View
-        function renderMonthlyView(wrapper, productIds, inflowData, outflowData) {
+        // Render Monthly View with 11:00→11:00 cycle data
+        function renderMonthlyView(wrapper, productIds, inflowData, outflowData, stockCountData) {
             const month = invSummaryState.selectedMonth;
             const [year, monthNum] = month.split('-');
             const daysInMonth = new Date(parseInt(year), parseInt(monthNum), 0).getDate();
@@ -7295,26 +8084,35 @@
             const rows = [];
 
             productIds.forEach(productId => {
-                const row = { product: invGetProductName(productId), days: [], monthInflow: 0, monthOutflow: 0 };
+                const row = {
+                    product: invGetProductName(productId),
+                    days: [],
+                    monthInflow: 0,
+                    monthOutflowRecorded: 0,
+                    monthOutflowImplied: 0
+                };
                 let hasActivity = false;
 
                 for (let day = 1; day <= daysInMonth; day++) {
                     const date = `${year}-${monthNum}-${String(day).padStart(2, '0')}`;
-                    const inflow = (inflowData[productId] && inflowData[productId][date]) || 0;
-                    const outflow = (outflowData[productId] && outflowData[productId][date]) || 0;
+                    const cycleData = invCalculateCycleData(productId, date, inflowData, outflowData, stockCountData);
 
-                    row.days.push({ inflow, outflow, net: inflow - outflow });
-                    row.monthInflow += inflow;
-                    row.monthOutflow += outflow;
+                    row.days.push(cycleData);
+                    row.monthInflow += cycleData.inflow;
+                    row.monthOutflowRecorded += cycleData.outflowRecorded;
+                    row.monthOutflowImplied += cycleData.outflowImplied;
 
-                    if (inflow > 0 || outflow > 0) hasActivity = true;
+                    if (cycleData.inflow > 0 || cycleData.outflowRecorded > 0 ||
+                        cycleData.hasCountPrev || cycleData.hasCountNow) {
+                        hasActivity = true;
+                    }
                 }
 
                 if (invSummaryState.showOnlyActive && !hasActivity) {
                     return;
                 }
 
-                row.monthNet = row.monthInflow - row.monthOutflow;
+                row.monthVariance = row.monthInflow - row.monthOutflowImplied;
                 rows.push(row);
             });
 
@@ -7322,28 +8120,50 @@
                 wrapper.innerHTML = `
                     <div class="inv-empty-state">
                         <h3>No Data</h3>
-                        <p>No inflow/outflow records for ${month}</p>
+                        <p>No records for ${month}</p>
                     </div>
                 `;
                 return;
             }
 
             // Calculate totals
-            const totals = { days: [], monthInflow: 0, monthOutflow: 0, monthNet: 0 };
+            const totals = {
+                days: [],
+                monthInflow: 0,
+                monthOutflowRecorded: 0,
+                monthOutflowImplied: 0
+            };
+
             for (let day = 0; day < daysInMonth; day++) {
                 let dayInflow = 0;
-                let dayOutflow = 0;
+                let dayOutflowRecorded = 0;
+                let dayOutflowImplied = 0;
+
                 rows.forEach(row => {
                     dayInflow += row.days[day].inflow;
-                    dayOutflow += row.days[day].outflow;
+                    dayOutflowRecorded += row.days[day].outflowRecorded;
+                    dayOutflowImplied += row.days[day].outflowImplied;
                 });
-                totals.days.push({ inflow: dayInflow, outflow: dayOutflow, net: dayInflow - dayOutflow });
+
+                totals.days.push({
+                    inflow: dayInflow,
+                    outflowRecorded: dayOutflowRecorded,
+                    outflowImplied: dayOutflowImplied
+                });
                 totals.monthInflow += dayInflow;
-                totals.monthOutflow += dayOutflow;
+                totals.monthOutflowRecorded += dayOutflowRecorded;
+                totals.monthOutflowImplied += dayOutflowImplied;
             }
-            totals.monthNet = totals.monthInflow - totals.monthOutflow;
 
             let html = `
+                <div style="background: #E3F2FD; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 13px;">
+                    <strong>📅 Monthly View (11:00 → 11:00 cycles)</strong><br>
+                    <span style="color: #666;">
+                        Each day column shows data for the cycle ending at 11:00 on that day.
+                        ${invSummaryState.compactView ? 'Compact view shows Outflow (Implied) only.' : 'Full view shows Inflow / Outflow Implied per day.'}
+                    </span>
+                </div>
+
                 <div class="inv-summary-table-container">
                     <table class="inv-summary-table">
                         <thead>
@@ -7368,21 +8188,21 @@
             if (!invSummaryState.compactView) {
                 html += '<tr><th class="sticky-col"></th>';
                 for (let day = 1; day <= daysInMonth; day++) {
-                    html += '<th class="num-col" style="font-size: 11px; border-left: 1px solid #ddd;">In</th>';
-                    html += '<th class="num-col" style="font-size: 11px;">Out</th>';
+                    html += '<th class="num-col" style="font-size: 10px; border-left: 1px solid #ddd;">In</th>';
+                    html += '<th class="num-col" style="font-size: 10px;">Out*</th>';
                 }
-                html += '<th class="month-total-header num-col" style="font-size: 11px;">In</th>';
-                html += '<th class="month-total-header num-col" style="font-size: 11px;">Out</th>';
-                html += '<th class="month-total-header num-col" style="font-size: 11px;">Net</th>';
+                html += '<th class="month-total-header num-col" style="font-size: 10px;">In</th>';
+                html += '<th class="month-total-header num-col" style="font-size: 10px;">Out*</th>';
+                html += '<th class="month-total-header num-col" style="font-size: 10px;">Net</th>';
                 html += '</tr>';
             } else {
                 html += '<tr><th class="sticky-col"></th>';
                 for (let day = 1; day <= daysInMonth; day++) {
-                    html += '<th class="num-col" style="font-size: 11px;">Net</th>';
+                    html += '<th class="num-col" style="font-size: 10px;">Out*</th>';
                 }
-                html += '<th class="month-total-header num-col" style="font-size: 11px;">In</th>';
-                html += '<th class="month-total-header num-col" style="font-size: 11px;">Out</th>';
-                html += '<th class="month-total-header num-col" style="font-size: 11px;">Net</th>';
+                html += '<th class="month-total-header num-col" style="font-size: 10px;">In</th>';
+                html += '<th class="month-total-header num-col" style="font-size: 10px;">Out*</th>';
+                html += '<th class="month-total-header num-col" style="font-size: 10px;">Net</th>';
                 html += '</tr>';
             }
 
@@ -7394,19 +8214,22 @@
 
                 if (invSummaryState.compactView) {
                     row.days.forEach(day => {
-                        html += `<td class="num-col">${day.net || ''}</td>`;
+                        const val = day.hasCountPrev && day.hasCountNow ? day.outflowImplied : '';
+                        html += `<td class="num-col">${val || ''}</td>`;
                     });
                 } else {
-                    row.days.forEach((day, idx) => {
+                    row.days.forEach(day => {
                         const borderStyle = 'border-left: 1px solid #ddd;';
+                        const outVal = day.hasCountPrev && day.hasCountNow ? day.outflowImplied : '';
                         html += `<td class="num-col" style="${borderStyle}">${day.inflow || ''}</td>`;
-                        html += `<td class="num-col">${day.outflow || ''}</td>`;
+                        html += `<td class="num-col">${outVal || ''}</td>`;
                     });
                 }
 
+                const monthNet = row.monthInflow - row.monthOutflowImplied;
                 html += `<td class="month-total-col num-col">${row.monthInflow}</td>`;
-                html += `<td class="month-total-col num-col">${row.monthOutflow}</td>`;
-                html += `<td class="month-total-col num-col">${row.monthNet}</td>`;
+                html += `<td class="month-total-col num-col">${row.monthOutflowImplied}</td>`;
+                html += `<td class="month-total-col num-col">${monthNet}</td>`;
                 html += '</tr>';
             });
 
@@ -7415,61 +8238,73 @@
 
             if (invSummaryState.compactView) {
                 totals.days.forEach(day => {
-                    html += `<td class="num-col">${day.net || ''}</td>`;
+                    html += `<td class="num-col">${day.outflowImplied || ''}</td>`;
                 });
             } else {
-                totals.days.forEach((day, idx) => {
+                totals.days.forEach(day => {
                     const borderStyle = 'border-left: 1px solid #ddd;';
                     html += `<td class="num-col" style="${borderStyle}">${day.inflow || ''}</td>`;
-                    html += `<td class="num-col">${day.outflow || ''}</td>`;
+                    html += `<td class="num-col">${day.outflowImplied || ''}</td>`;
                 });
             }
 
+            const totalNet = totals.monthInflow - totals.monthOutflowImplied;
             html += `<td class="month-total-col num-col">${totals.monthInflow}</td>`;
-            html += `<td class="month-total-col num-col">${totals.monthOutflow}</td>`;
-            html += `<td class="month-total-col num-col">${totals.monthNet}</td>`;
+            html += `<td class="month-total-col num-col">${totals.monthOutflowImplied}</td>`;
+            html += `<td class="month-total-col num-col">${totalNet}</td>`;
             html += '</tr>';
 
             html += '</tbody></table></div>';
+            html += '<p style="font-size: 11px; color: #666; margin-top: 8px;">* Out = Outflow (Implied) calculated from stock counts</p>';
 
             wrapper.innerHTML = html;
         }
 
-        // Render Yearly View
-        function renderYearlyView(wrapper, productIds, inflowData, outflowData) {
+        // Render Yearly View with aggregated implied outflow
+        function renderYearlyView(wrapper, productIds, inflowData, outflowData, stockCountData) {
             const year = invSummaryState.selectedYear;
             const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 
             const rows = [];
 
             productIds.forEach(productId => {
-                const row = { product: invGetProductName(productId), months: [], yearInflow: 0, yearOutflow: 0 };
+                const row = {
+                    product: invGetProductName(productId),
+                    months: [],
+                    yearInflow: 0,
+                    yearOutflowImplied: 0
+                };
                 let hasActivity = false;
 
                 months.forEach(month => {
                     let monthInflow = 0;
-                    let monthOutflow = 0;
+                    let monthOutflowImplied = 0;
 
-                    // Aggregate all days in this month
+                    // Aggregate all days in this month using cycle data
                     const daysInMonth = new Date(parseInt(year), parseInt(month), 0).getDate();
                     for (let day = 1; day <= daysInMonth; day++) {
                         const date = `${year}-${month}-${String(day).padStart(2, '0')}`;
-                        monthInflow += (inflowData[productId] && inflowData[productId][date]) || 0;
-                        monthOutflow += (outflowData[productId] && outflowData[productId][date]) || 0;
+                        const cycleData = invCalculateCycleData(productId, date, inflowData, outflowData, stockCountData);
+                        monthInflow += cycleData.inflow;
+                        monthOutflowImplied += cycleData.outflowImplied;
+
+                        if (cycleData.inflow > 0 || cycleData.outflowRecorded > 0 ||
+                            cycleData.hasCountPrev || cycleData.hasCountNow) {
+                            hasActivity = true;
+                        }
                     }
 
-                    row.months.push({ inflow: monthInflow, outflow: monthOutflow, net: monthInflow - monthOutflow });
+                    const monthNet = monthInflow - monthOutflowImplied;
+                    row.months.push({ inflow: monthInflow, outflow: monthOutflowImplied, net: monthNet });
                     row.yearInflow += monthInflow;
-                    row.yearOutflow += monthOutflow;
-
-                    if (monthInflow > 0 || monthOutflow > 0) hasActivity = true;
+                    row.yearOutflowImplied += monthOutflowImplied;
                 });
 
                 if (invSummaryState.showOnlyActive && !hasActivity) {
                     return;
                 }
 
-                row.yearNet = row.yearInflow - row.yearOutflow;
+                row.yearNet = row.yearInflow - row.yearOutflowImplied;
                 rows.push(row);
             });
 
@@ -7477,7 +8312,7 @@
                 wrapper.innerHTML = `
                     <div class="inv-empty-state">
                         <h3>No Data</h3>
-                        <p>No inflow/outflow records for ${year}</p>
+                        <p>No records for ${year}</p>
                     </div>
                 `;
                 return;
@@ -7501,6 +8336,13 @@
             const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
             let html = `
+                <div style="background: #E3F2FD; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 13px;">
+                    <strong>📅 Yearly View (Aggregated 11:00 → 11:00 cycles)</strong><br>
+                    <span style="color: #666;">
+                        Shows monthly totals of Inflow, Outflow (Implied), and Net change.
+                    </span>
+                </div>
+
                 <div class="inv-summary-table-container">
                     <table class="inv-summary-table">
                         <thead>
@@ -7516,13 +8358,13 @@
             // Header row 2: In/Out/Net labels
             html += '<tr><th class="sticky-col"></th>';
             for (let i = 0; i < 12; i++) {
-                html += '<th class="num-col" style="font-size: 11px; border-left: 1px solid #ddd;">In</th>';
-                html += '<th class="num-col" style="font-size: 11px;">Out</th>';
-                html += '<th class="num-col" style="font-size: 11px;">Net</th>';
+                html += '<th class="num-col" style="font-size: 10px; border-left: 1px solid #ddd;">In</th>';
+                html += '<th class="num-col" style="font-size: 10px;">Out*</th>';
+                html += '<th class="num-col" style="font-size: 10px;">Net</th>';
             }
-            html += '<th class="month-total-header num-col" style="font-size: 11px;">In</th>';
-            html += '<th class="month-total-header num-col" style="font-size: 11px;">Out</th>';
-            html += '<th class="month-total-header num-col" style="font-size: 11px;">Net</th>';
+            html += '<th class="month-total-header num-col" style="font-size: 10px;">In</th>';
+            html += '<th class="month-total-header num-col" style="font-size: 10px;">Out*</th>';
+            html += '<th class="month-total-header num-col" style="font-size: 10px;">Net</th>';
             html += '</tr>';
 
             html += '</thead><tbody>';
@@ -7538,7 +8380,7 @@
                 });
 
                 html += `<td class="month-total-col num-col">${row.yearInflow}</td>`;
-                html += `<td class="month-total-col num-col">${row.yearOutflow}</td>`;
+                html += `<td class="month-total-col num-col">${row.yearOutflowImplied}</td>`;
                 html += `<td class="month-total-col num-col">${row.yearNet}</td>`;
                 html += '</tr>';
             });
@@ -7558,6 +8400,7 @@
             html += '</tr>';
 
             html += '</tbody></table></div>';
+            html += '<p style="font-size: 11px; color: #666; margin-top: 8px;">* Out = Outflow (Implied) calculated from stock counts</p>';
 
             wrapper.innerHTML = html;
         }
@@ -7566,7 +8409,8 @@
         function invExportCSV() {
             const inflowData = invAggregateInflow();
             const outflowData = invAggregateOutflow();
-            let productIds = invGetAllProductIds(inflowData, outflowData);
+            const stockCountData = invAggregateStockCounts();
+            let productIds = invGetAllProductIds(inflowData, outflowData, stockCountData);
 
             productIds = invFilterProducts(productIds);
             productIds.sort((a, b) => invGetProductName(a).localeCompare(invGetProductName(b)));
@@ -7574,11 +8418,11 @@
             let csv = '';
 
             if (invSummaryState.mode === 'daily') {
-                csv = invExportDailyCSV(productIds, inflowData, outflowData);
+                csv = invExportDailyCSV(productIds, inflowData, outflowData, stockCountData);
             } else if (invSummaryState.mode === 'monthly') {
-                csv = invExportMonthlyCSV(productIds, inflowData, outflowData);
+                csv = invExportMonthlyCSV(productIds, inflowData, outflowData, stockCountData);
             } else {
-                csv = invExportYearlyCSV(productIds, inflowData, outflowData);
+                csv = invExportYearlyCSV(productIds, inflowData, outflowData, stockCountData);
             }
 
             // Download CSV
@@ -7593,31 +8437,41 @@
             document.body.removeChild(link);
         }
 
-        function invExportDailyCSV(productIds, inflowData, outflowData) {
+        function invExportDailyCSV(productIds, inflowData, outflowData, stockCountData) {
             const date = invSummaryState.selectedDate;
-            let csv = 'Product,Inflow,Outflow,Net\n';
+            let csv = 'Product,Count@11:00(Prev),Inflow(11-11),OutflowRecorded(11-11),Count@11:00(Now),OutflowImplied,Variance\n';
 
             let totalInflow = 0;
-            let totalOutflow = 0;
+            let totalOutflowRecorded = 0;
+            let totalOutflowImplied = 0;
 
             productIds.forEach(productId => {
-                const inflow = (inflowData[productId] && inflowData[productId][date]) || 0;
-                const outflow = (outflowData[productId] && outflowData[productId][date]) || 0;
-                const net = inflow - outflow;
+                const cycleData = invCalculateCycleData(productId, date, inflowData, outflowData, stockCountData);
 
-                if (invSummaryState.showOnlyActive && inflow === 0 && outflow === 0) return;
+                const hasActivity = cycleData.inflow > 0 ||
+                                    cycleData.outflowRecorded > 0 ||
+                                    cycleData.hasCountPrev ||
+                                    cycleData.hasCountNow;
 
-                totalInflow += inflow;
-                totalOutflow += outflow;
+                if (invSummaryState.showOnlyActive && !hasActivity) return;
 
-                csv += `"${invGetProductName(productId)}",${inflow},${outflow},${net}\n`;
+                totalInflow += cycleData.inflow;
+                totalOutflowRecorded += cycleData.outflowRecorded;
+                totalOutflowImplied += cycleData.outflowImplied;
+
+                const countPrevVal = cycleData.hasCountPrev ? cycleData.countPrev : '';
+                const countNowVal = cycleData.hasCountNow ? cycleData.countNow : '';
+                const outflowImpliedVal = cycleData.hasCountPrev && cycleData.hasCountNow ? cycleData.outflowImplied : '';
+                const varianceVal = cycleData.hasCountPrev && cycleData.hasCountNow ? cycleData.variance : '';
+
+                csv += `"${invGetProductName(productId)}",${countPrevVal},${cycleData.inflow},${cycleData.outflowRecorded},${countNowVal},${outflowImpliedVal},${varianceVal}\n`;
             });
 
-            csv += `TOTAL,${totalInflow},${totalOutflow},${totalInflow - totalOutflow}\n`;
+            csv += `TOTAL,-,${totalInflow},${totalOutflowRecorded},-,${totalOutflowImplied},-\n`;
             return csv;
         }
 
-        function invExportMonthlyCSV(productIds, inflowData, outflowData) {
+        function invExportMonthlyCSV(productIds, inflowData, outflowData, stockCountData) {
             const month = invSummaryState.selectedMonth;
             const [year, monthNum] = month.split('-');
             const daysInMonth = new Date(parseInt(year), parseInt(monthNum), 0).getDate();
@@ -7626,31 +8480,34 @@
 
             if (invSummaryState.compactView) {
                 for (let day = 1; day <= daysInMonth; day++) {
-                    csv += `,${String(day).padStart(2, '0')}`;
+                    csv += `,${String(day).padStart(2, '0')}-OutImplied`;
                 }
             } else {
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dayStr = String(day).padStart(2, '0');
-                    csv += `,${dayStr}-In,${dayStr}-Out`;
+                    csv += `,${dayStr}-In,${dayStr}-OutImplied`;
                 }
             }
-            csv += ',Month-In,Month-Out,Month-Net\n';
+            csv += ',Month-In,Month-OutImplied,Month-Net\n';
 
             productIds.forEach(productId => {
                 let monthInflow = 0;
-                let monthOutflow = 0;
+                let monthOutflowImplied = 0;
                 let hasActivity = false;
                 const dayData = [];
 
                 for (let day = 1; day <= daysInMonth; day++) {
                     const date = `${year}-${monthNum}-${String(day).padStart(2, '0')}`;
-                    const inflow = (inflowData[productId] && inflowData[productId][date]) || 0;
-                    const outflow = (outflowData[productId] && outflowData[productId][date]) || 0;
+                    const cycleData = invCalculateCycleData(productId, date, inflowData, outflowData, stockCountData);
 
-                    dayData.push({ inflow, outflow, net: inflow - outflow });
-                    monthInflow += inflow;
-                    monthOutflow += outflow;
-                    if (inflow > 0 || outflow > 0) hasActivity = true;
+                    dayData.push(cycleData);
+                    monthInflow += cycleData.inflow;
+                    monthOutflowImplied += cycleData.outflowImplied;
+
+                    if (cycleData.inflow > 0 || cycleData.outflowRecorded > 0 ||
+                        cycleData.hasCountPrev || cycleData.hasCountNow) {
+                        hasActivity = true;
+                    }
                 }
 
                 if (invSummaryState.showOnlyActive && !hasActivity) return;
@@ -7659,52 +8516,59 @@
 
                 if (invSummaryState.compactView) {
                     dayData.forEach(day => {
-                        csv += `,${day.net || ''}`;
+                        const val = day.hasCountPrev && day.hasCountNow ? day.outflowImplied : '';
+                        csv += `,${val}`;
                     });
                 } else {
                     dayData.forEach(day => {
-                        csv += `,${day.inflow || ''},${day.outflow || ''}`;
+                        const outVal = day.hasCountPrev && day.hasCountNow ? day.outflowImplied : '';
+                        csv += `,${day.inflow || ''},${outVal}`;
                     });
                 }
 
-                csv += `,${monthInflow},${monthOutflow},${monthInflow - monthOutflow}\n`;
+                csv += `,${monthInflow},${monthOutflowImplied},${monthInflow - monthOutflowImplied}\n`;
             });
 
             return csv;
         }
 
-        function invExportYearlyCSV(productIds, inflowData, outflowData) {
+        function invExportYearlyCSV(productIds, inflowData, outflowData, stockCountData) {
             const year = invSummaryState.selectedYear;
             const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
             const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
             let csv = 'Product';
             monthNames.forEach(name => {
-                csv += `,${name}-In,${name}-Out,${name}-Net`;
+                csv += `,${name}-In,${name}-OutImplied,${name}-Net`;
             });
-            csv += ',Year-In,Year-Out,Year-Net\n';
+            csv += ',Year-In,Year-OutImplied,Year-Net\n';
 
             productIds.forEach(productId => {
                 let yearInflow = 0;
-                let yearOutflow = 0;
+                let yearOutflowImplied = 0;
                 let hasActivity = false;
                 const monthData = [];
 
                 months.forEach(month => {
                     let monthInflow = 0;
-                    let monthOutflow = 0;
+                    let monthOutflowImplied = 0;
 
                     const daysInMonth = new Date(parseInt(year), parseInt(month), 0).getDate();
                     for (let day = 1; day <= daysInMonth; day++) {
                         const date = `${year}-${month}-${String(day).padStart(2, '0')}`;
-                        monthInflow += (inflowData[productId] && inflowData[productId][date]) || 0;
-                        monthOutflow += (outflowData[productId] && outflowData[productId][date]) || 0;
+                        const cycleData = invCalculateCycleData(productId, date, inflowData, outflowData, stockCountData);
+                        monthInflow += cycleData.inflow;
+                        monthOutflowImplied += cycleData.outflowImplied;
+
+                        if (cycleData.inflow > 0 || cycleData.outflowRecorded > 0 ||
+                            cycleData.hasCountPrev || cycleData.hasCountNow) {
+                            hasActivity = true;
+                        }
                     }
 
-                    monthData.push({ inflow: monthInflow, outflow: monthOutflow, net: monthInflow - monthOutflow });
+                    monthData.push({ inflow: monthInflow, outflow: monthOutflowImplied, net: monthInflow - monthOutflowImplied });
                     yearInflow += monthInflow;
-                    yearOutflow += monthOutflow;
-                    if (monthInflow > 0 || monthOutflow > 0) hasActivity = true;
+                    yearOutflowImplied += monthOutflowImplied;
                 });
 
                 if (invSummaryState.showOnlyActive && !hasActivity) return;
@@ -7713,7 +8577,7 @@
                 monthData.forEach(month => {
                     csv += `,${month.inflow || ''},${month.outflow || ''},${month.net || ''}`;
                 });
-                csv += `,${yearInflow},${yearOutflow},${yearInflow - yearOutflow}\n`;
+                csv += `,${yearInflow},${yearOutflowImplied},${yearInflow - yearOutflowImplied}\n`;
             });
 
             return csv;
@@ -7730,6 +8594,8 @@
             loadOutflowRecords();
             loadOutflowDraft();
             loadOutflowDayStatus();
+            loadStockCounts();
+            loadStockCountCycleStatus();
             init();
         });
     </script>
