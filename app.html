@@ -3194,6 +3194,25 @@
             renderMenu();
         }
 
+        // Switch setup tab
+        function switchSetupTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('#product-tab, #department-tab, #employee-tab, #customer-tab').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Remove active class from all tab buttons in the setup page
+            document.querySelectorAll('.tab-container .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(`${tab}-tab`).classList.add('active');
+
+            // Set active button
+            event.target.classList.add('active');
+        }
+
         // Product Management Functions
         let products = [];
         let editingProductId = null;
