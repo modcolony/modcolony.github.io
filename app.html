@@ -1795,6 +1795,50 @@
             cursor: not-allowed;
         }
 
+        #cameraScanBtn {
+            padding: 12px 16px;
+            background: #1976D2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        #cameraScanBtn:hover {
+            background: #1565C0;
+        }
+
+        /* Camera Scan Modal */
+        #cameraScanModal .modal-content {
+            max-width: 400px;
+            text-align: center;
+        }
+
+        #cameraPreview {
+            width: 100%;
+            max-width: 320px;
+            height: auto;
+            border-radius: 8px;
+            background: #000;
+            margin: 0 auto 16px;
+            display: block;
+        }
+
+        #cameraStatus {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+            min-height: 20px;
+        }
+
+        #cameraStatus.error {
+            color: #F44336;
+        }
+
         .decoded-display {
             display: flex;
             flex-wrap: wrap;
@@ -3170,6 +3214,9 @@
                                         <label for="scanInput">Scan Code</label>
                                         <input type="text" id="scanInput" autocomplete="off" placeholder="Scan 4-digit code (XXYY)">
                                     </div>
+                                    <div class="scanner-field" style="justify-content: flex-end;">
+                                        <button id="cameraScanBtn">Scan with Camera</button>
+                                    </div>
                                     <div class="scanner-field">
                                         <label for="qtyInput">Quantity</label>
                                         <input type="text" id="qtyInput" inputmode="numeric" placeholder="Qty (integer)">
@@ -3293,6 +3340,20 @@
                             <div class="modal-actions">
                                 <button class="btn btn-secondary" onclick="hideModal('dumplingAdminModal')">Cancel</button>
                                 <button class="btn btn-success" onclick="dumplingConfirmEntryToggle()">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Camera Scan Modal -->
+                    <div id="cameraScanModal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-title">Scan with Camera</div>
+                            <div class="modal-body">
+                                <video id="cameraPreview" autoplay playsinline></video>
+                                <div id="cameraStatus">Initializing camera...</div>
+                            </div>
+                            <div class="modal-actions" style="justify-content: center;">
+                                <button class="btn btn-secondary" onclick="closeCameraScan()">Close</button>
                             </div>
                         </div>
                     </div>
@@ -5599,6 +5660,124 @@
             if (okBtn) {
                 okBtn.addEventListener('click', handleOkClick);
             }
+
+            // Camera scan button click handler
+            const cameraScanBtn = document.getElementById('cameraScanBtn');
+            if (cameraScanBtn) {
+                cameraScanBtn.addEventListener('click', openCameraScan);
+            }
+        }
+
+        // Camera scanning state
+        let cameraStream = null;
+        let barcodeDetector = null;
+        let detectionInterval = null;
+
+        // Open camera scan modal
+        function openCameraScan() {
+            const modal = document.getElementById('cameraScanModal');
+            const video = document.getElementById('cameraPreview');
+            const status = document.getElementById('cameraStatus');
+
+            if (!modal || !video || !status) return;
+
+            // Show modal
+            showModal('cameraScanModal');
+
+            // Check for BarcodeDetector support
+            if (!('BarcodeDetector' in window)) {
+                status.textContent = 'Camera scanning not supported on this browser. Use hardware scanner or type code.';
+                status.classList.add('error');
+                video.style.display = 'none';
+                return;
+            }
+
+            // Reset status
+            status.textContent = 'Initializing camera...';
+            status.classList.remove('error');
+            video.style.display = 'block';
+
+            // Request camera access
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' }
+            })
+            .then(function(stream) {
+                cameraStream = stream;
+                video.srcObject = stream;
+                status.textContent = 'Scanning for barcode...';
+
+                // Create barcode detector
+                barcodeDetector = new BarcodeDetector();
+
+                // Start polling for barcodes
+                detectionInterval = setInterval(function() {
+                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                        barcodeDetector.detect(video)
+                            .then(function(barcodes) {
+                                if (barcodes.length > 0) {
+                                    const rawValue = barcodes[0].rawValue;
+                                    handleBarcodeDetected(rawValue);
+                                }
+                            })
+                            .catch(function(err) {
+                                console.error('Barcode detection error:', err);
+                            });
+                    }
+                }, 200);
+            })
+            .catch(function(err) {
+                console.error('Camera access error:', err);
+                status.textContent = 'Could not access camera. Please check permissions.';
+                status.classList.add('error');
+                video.style.display = 'none';
+            });
+        }
+
+        // Handle detected barcode
+        function handleBarcodeDetected(rawValue) {
+            // Sanitize to digits only
+            const sanitized = rawValue.replace(/[^\d]/g, '');
+
+            // Validate: exactly 4 digits (same as hardware scanner)
+            if (sanitized.length !== 4) {
+                // Ignore non-4-digit codes, keep scanning
+                return;
+            }
+
+            // Valid code detected - stop camera and close modal
+            closeCameraScan();
+
+            // Process the scan (same as hardware scanner)
+            processScan(sanitized);
+        }
+
+        // Close camera scan modal and cleanup
+        function closeCameraScan() {
+            // Stop detection interval
+            if (detectionInterval) {
+                clearInterval(detectionInterval);
+                detectionInterval = null;
+            }
+
+            // Stop camera tracks
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(function(track) {
+                    track.stop();
+                });
+                cameraStream = null;
+            }
+
+            // Reset video element
+            const video = document.getElementById('cameraPreview');
+            if (video) {
+                video.srcObject = null;
+            }
+
+            // Reset barcode detector
+            barcodeDetector = null;
+
+            // Hide modal
+            hideModal('cameraScanModal');
         }
 
         // Data structure for rounds:
