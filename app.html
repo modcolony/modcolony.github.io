@@ -3099,42 +3099,10 @@
                     <div class="dumpling-header">
                         <div class="dumpling-round-controls">
                             <div class="control-group">
-                                <label class="control-label">Entry Date</label>
-                                <input type="date" id="dumplingEntryDate" class="form-input" onchange="dumplingUpdateEntryDate(this.value)" style="min-width: 170px;">
-                            </div>
-                            <div class="control-group">
-                                <label class="control-label">Round</label>
-                                <select id="dumplingRoundSelector" class="form-select" onchange="dumplingSelectRound()" style="min-width: 120px;">
-                                    <option value="1">Round 1</option>
-                                </select>
-                            </div>
-                            <div class="control-group">
-                                <label class="control-label">Status</label>
-                                <span id="dumplingRoundStatus" class="status-badge badge-open">Editing</span>
-                            </div>
-                            <div class="control-group">
                                 <label class="control-label">Entry Status</label>
                                 <span id="dumplingEntryStatus" class="day-status-badge open">
                                     <span>●</span> <span id="dumplingEntryStatusText">Open</span>
                                 </span>
-                            </div>
-                            <div class="control-group">
-                                <label class="control-label">Initial *</label>
-                                <input type="text" id="dumplingInitial" class="form-input" placeholder="Your initial" maxlength="4" style="width: 120px; text-transform: uppercase;" disabled>
-                                <div id="dumplingInitialError" class="field-error">Initial is required.</div>
-                            </div>
-                            <div class="control-group">
-                                <button id="dumplingAddRoundBtn" class="btn btn-primary btn-small" onclick="dumplingAddRound()" disabled>
-                                    ➕ Add Round
-                                </button>
-                                <div id="dumplingAddRoundHint" class="inline-hint" style="display: none;">
-                                    Save current round as Draft (with Initial) to add a new round.
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <button id="dumplingSaveDraftBtn" class="btn btn-success" onclick="dumplingSaveDraft()">
-                                    💾 Save Draft
-                                </button>
                             </div>
                             <div class="control-group">
                                 <button id="dumplingUnlockBtn" class="btn btn-edit btn-small" onclick="dumplingUnlockRound()" style="display: none;">
@@ -3148,6 +3116,20 @@
                             </div>
                         </div>
                         <div id="dumplingInlineMessage" class="inline-message"></div>
+                    </div>
+
+                    <!-- Hidden elements for backward compatibility -->
+                    <div style="display: none;">
+                        <input type="date" id="dumplingEntryDate">
+                        <select id="dumplingRoundSelector">
+                            <option value="1">Round 1</option>
+                        </select>
+                        <span id="dumplingRoundStatus"></span>
+                        <input type="text" id="dumplingInitial">
+                        <div id="dumplingInitialError"></div>
+                        <button id="dumplingAddRoundBtn"></button>
+                        <div id="dumplingAddRoundHint"></div>
+                        <button id="dumplingSaveDraftBtn"></button>
                     </div>
 
                     <!-- Info Note -->
