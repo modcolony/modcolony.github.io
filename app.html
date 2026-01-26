@@ -8050,11 +8050,9 @@
                 countMap[c.productId] = c.count;
             });
 
-            // Sort products by name
+            // Sort products by ID
             const sortedProducts = [...products].sort((a, b) => {
-                const nameA = a.nameThai || a.nameEn || '';
-                const nameB = b.nameThai || b.nameEn || '';
-                return nameA.localeCompare(nameB);
+                return (a.id || 0) - (b.id || 0);
             });
 
             let html = `
