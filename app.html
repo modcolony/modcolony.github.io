@@ -3109,7 +3109,15 @@
                                         <option value="1">Round 1</option>
                                         <option value="2">Round 2</option>
                                         <option value="3">Round 3</option>
+                                        <option value="4">Round 4</option>
+                                        <option value="5">Round 5</option>
+                                        <option value="6">Round 6</option>
+                                        <option value="7">Round 7</option>
+                                        <option value="8">Round 8</option>
+                                        <option value="9">Round 9</option>
+                                        <option value="10">Round 10</option>
                                     </select>
+                                    <span id="roundSelectedAtLabel" style="font-size: 11px; color: #666; margin-top: 2px; display: block;"></span>
                                 </div>
                                 <div class="control-group">
                                     <label class="control-label">Inspector Initial</label>
@@ -5006,6 +5014,86 @@
         let dumplingEmployeeSortKey = 'id';
         const DUMPLING_ADMIN_PIN = '2580';
 
+        // ========== INSPECTION STATE TRACKING ==========
+
+        // Inspection state object
+        let inspectionState = {
+            inspectionDate: '',
+            inspectionRound: '1',
+            roundSelectedAt: '',
+            inspectorInitial: ''
+        };
+
+        // Helper function to get current time as HH:MM:SS (24h, zero padded)
+        function nowHMS() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Get today's date as YYYY-MM-DD
+        function todayYMD() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Initialize inspection state and bind UI elements
+        function initInspectionState() {
+            const dateInput = document.getElementById('inspectionDate');
+            const roundSelect = document.getElementById('inspectionRound');
+            const initialInput = document.getElementById('inspectorInitial');
+            const scanInput = document.getElementById('scanInput');
+
+            if (!dateInput || !roundSelect) return;
+
+            // Default inspection date to today
+            inspectionState.inspectionDate = todayYMD();
+            dateInput.value = inspectionState.inspectionDate;
+
+            // Initialize round from current selection
+            inspectionState.inspectionRound = roundSelect.value;
+
+            // Initialize inspector initial if present
+            if (initialInput) {
+                inspectionState.inspectorInitial = initialInput.value;
+            }
+
+            // Date change handler
+            dateInput.addEventListener('change', function() {
+                inspectionState.inspectionDate = this.value;
+            });
+
+            // Round change handler
+            roundSelect.addEventListener('change', function() {
+                inspectionState.inspectionRound = this.value;
+                inspectionState.roundSelectedAt = nowHMS();
+
+                // Update the roundSelectedAt label
+                const label = document.getElementById('roundSelectedAtLabel');
+                if (label) {
+                    label.textContent = `Selected at ${inspectionState.roundSelectedAt}`;
+                }
+
+                // Refocus scanInput after round selection
+                if (scanInput) {
+                    scanInput.focus();
+                }
+            });
+
+            // Inspector initial change handler
+            if (initialInput) {
+                initialInput.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase();
+                    inspectionState.inspectorInitial = this.value;
+                });
+            }
+        }
+
         // Data structure for rounds:
         // {
         //   roundNo: 1,
@@ -5151,6 +5239,9 @@
             dumplingRenderRoundSelector();
             dumplingRenderProductTable();
             dumplingUpdateUI();
+
+            // Initialize inspection state tracking
+            initInspectionState();
 
             const initialInput = document.getElementById('dumplingInitial');
             if (initialInput) {
