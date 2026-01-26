@@ -5024,6 +5024,129 @@
             inspectorInitial: ''
         };
 
+        // Decoded scan state
+        let decoded = {
+            codeRaw: '',
+            productCode: '',
+            employeeCode: '',
+            product: null,
+            employee: null
+        };
+
+        // Lookup product by 2-digit code (e.g., "03" or "12")
+        function getProductBy2DigitCode(code) {
+            const codeNum = parseInt(code, 10);
+            // Search in dumplingProductsMap first (active department 01 products)
+            for (const productId in dumplingProductsMap) {
+                if (parseInt(productId, 10) === codeNum) {
+                    return dumplingProductsMap[productId];
+                }
+            }
+            return null;
+        }
+
+        // Lookup employee by 2-digit code (e.g., "12" or "05")
+        function getEmployeeBy2DigitCode(code) {
+            const codeNum = parseInt(code, 10);
+            // Search in dumplingEmployees (active department 01 employees)
+            for (const emp of dumplingEmployees) {
+                if (emp.id === codeNum) {
+                    return emp;
+                }
+            }
+            return null;
+        }
+
+        // Process scanned code (4-digit XXYY format)
+        function processScan(code) {
+            const scanInput = document.getElementById('scanInput');
+            const qtyInput = document.getElementById('qtyInput');
+            const decodedProductEl = document.getElementById('decodedProduct');
+            const decodedEmployeeEl = document.getElementById('decodedEmployee');
+            const scanErrorEl = document.getElementById('scanError');
+
+            // Sanitize: remove non-digits
+            const sanitized = code.replace(/[^\d]/g, '');
+
+            // Validate: exactly 4 digits
+            if (sanitized.length !== 4) {
+                // Show error
+                if (scanErrorEl) scanErrorEl.textContent = 'Invalid code: must be exactly 4 digits';
+                if (decodedProductEl) decodedProductEl.textContent = '—';
+                if (decodedEmployeeEl) decodedEmployeeEl.textContent = '—';
+                // Clear decoded state
+                decoded.codeRaw = code;
+                decoded.productCode = '';
+                decoded.employeeCode = '';
+                decoded.product = null;
+                decoded.employee = null;
+                // Keep focus on scanInput
+                if (scanInput) scanInput.focus();
+                return;
+            }
+
+            // Extract codes
+            const productCode = sanitized.substring(0, 2);
+            const employeeCode = sanitized.substring(2, 4);
+
+            // Lookup product
+            const product = getProductBy2DigitCode(productCode);
+            if (!product) {
+                if (scanErrorEl) scanErrorEl.textContent = `Unknown product code ${productCode}`;
+                if (decodedProductEl) decodedProductEl.textContent = '—';
+                if (decodedEmployeeEl) decodedEmployeeEl.textContent = '—';
+                // Clear decoded state
+                decoded.codeRaw = code;
+                decoded.productCode = productCode;
+                decoded.employeeCode = employeeCode;
+                decoded.product = null;
+                decoded.employee = null;
+                if (scanInput) scanInput.focus();
+                return;
+            }
+
+            // Lookup employee
+            const employee = getEmployeeBy2DigitCode(employeeCode);
+            if (!employee) {
+                if (scanErrorEl) scanErrorEl.textContent = `Unknown employee code ${employeeCode}`;
+                if (decodedProductEl) decodedProductEl.textContent = '—';
+                if (decodedEmployeeEl) decodedEmployeeEl.textContent = '—';
+                // Clear decoded state
+                decoded.codeRaw = code;
+                decoded.productCode = productCode;
+                decoded.employeeCode = employeeCode;
+                decoded.product = product;
+                decoded.employee = null;
+                if (scanInput) scanInput.focus();
+                return;
+            }
+
+            // Both found - update decoded state
+            decoded.codeRaw = code;
+            decoded.productCode = productCode;
+            decoded.employeeCode = employeeCode;
+            decoded.product = product;
+            decoded.employee = employee;
+
+            // Display decoded product (code + name)
+            const productName = product.nameThai || product.nameEn || `Product ${product.id}`;
+            if (decodedProductEl) {
+                decodedProductEl.textContent = `${productCode} - ${productName}`;
+            }
+
+            // Display decoded employee (code + name)
+            const employeeName = employee.nameThai || employee.nameOther || `Employee ${employee.id}`;
+            if (decodedEmployeeEl) {
+                decodedEmployeeEl.textContent = `${employeeCode} - ${employeeName}`;
+            }
+
+            // Clear error
+            if (scanErrorEl) scanErrorEl.textContent = '—';
+
+            // Focus qtyInput
+            if (qtyInput) qtyInput.focus();
+        }
+
         // Helper function to get current time as HH:MM:SS (24h, zero padded)
         function nowHMS() {
             const now = new Date();
@@ -5090,6 +5213,18 @@
                 initialInput.addEventListener('input', function() {
                     this.value = this.value.toUpperCase();
                     inspectionState.inspectorInitial = this.value;
+                });
+            }
+
+            // Scan input keydown handler (Enter/Tab to process scan)
+            if (scanInput) {
+                scanInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === 'Tab') {
+                        e.preventDefault();
+                        const code = scanInput.value.trim();
+                        scanInput.value = '';
+                        processScan(code);
+                    }
                 });
             }
         }
