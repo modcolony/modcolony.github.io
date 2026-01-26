@@ -1855,6 +1855,38 @@
             text-align: center;
         }
 
+        .entries-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .entries-table th,
+        .entries-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .entries-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .entries-table tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .entries-table td:last-child {
+            text-align: right;
+        }
+
+        .entries-table th:last-child {
+            text-align: right;
+        }
+
         .dumpling-product-section {
             background: white;
             padding: 20px;
@@ -5033,6 +5065,9 @@
             employee: null
         };
 
+        // Entries state: { [date]: { [round]: { roundSelectedAt, entries: [] } } }
+        let entriesByDateRound = {};
+
         // Lookup product by 2-digit code (e.g., "03" or "12")
         function getProductBy2DigitCode(code) {
             const codeNum = parseInt(code, 10);
@@ -5165,12 +5200,147 @@
             return `${year}-${month}-${day}`;
         }
 
+        // Handle OK button click - validate and create entry
+        function handleOkClick() {
+            const qtyInput = document.getElementById('qtyInput');
+            const scanInput = document.getElementById('scanInput');
+            const decodedProductEl = document.getElementById('decodedProduct');
+            const decodedEmployeeEl = document.getElementById('decodedEmployee');
+            const scanErrorEl = document.getElementById('scanError');
+
+            // Validate decoded product and employee exist
+            if (!decoded.product || !decoded.employee) {
+                if (scanErrorEl) scanErrorEl.textContent = 'Please scan a valid code first';
+                if (scanInput) scanInput.focus();
+                return;
+            }
+
+            // Validate qty is non-empty
+            const qtyVal = qtyInput ? qtyInput.value.trim() : '';
+            if (qtyVal === '') {
+                if (scanErrorEl) scanErrorEl.textContent = 'Please enter a quantity';
+                if (qtyInput) qtyInput.focus();
+                return;
+            }
+
+            const qty = parseInt(qtyVal, 10);
+            if (isNaN(qty) || qty < 0) {
+                if (scanErrorEl) scanErrorEl.textContent = 'Invalid quantity';
+                if (qtyInput) qtyInput.focus();
+                return;
+            }
+
+            // Create entry object
+            const productName = decoded.product.nameThai || decoded.product.nameEn || `Product ${decoded.product.id}`;
+            const employeeName = decoded.employee.nameThai || decoded.employee.nameOther || `Employee ${decoded.employee.id}`;
+
+            const entry = {
+                entryAt: nowHMS(),
+                code: decoded.productCode + decoded.employeeCode,
+                productCode: decoded.productCode,
+                employeeCode: decoded.employeeCode,
+                productId: decoded.product.id,
+                productName: productName,
+                employeeId: decoded.employee.id,
+                employeeName: employeeName,
+                qty: qty
+            };
+
+            // Get current date and round
+            const date = inspectionState.inspectionDate || todayYMD();
+            const round = inspectionState.inspectionRound || '1';
+
+            // Initialize state structure if needed
+            if (!entriesByDateRound[date]) {
+                entriesByDateRound[date] = {};
+            }
+            if (!entriesByDateRound[date][round]) {
+                entriesByDateRound[date][round] = {
+                    roundSelectedAt: inspectionState.roundSelectedAt || nowHMS(),
+                    entries: []
+                };
+            }
+
+            // Append entry
+            entriesByDateRound[date][round].entries.push(entry);
+
+            // Render updated entries table
+            renderEntries();
+
+            // Clear qtyInput
+            if (qtyInput) qtyInput.value = '';
+
+            // Clear decoded display fields
+            if (decodedProductEl) decodedProductEl.textContent = '—';
+            if (decodedEmployeeEl) decodedEmployeeEl.textContent = '—';
+            if (scanErrorEl) scanErrorEl.textContent = '—';
+
+            // Clear decoded state
+            decoded.codeRaw = '';
+            decoded.productCode = '';
+            decoded.employeeCode = '';
+            decoded.product = null;
+            decoded.employee = null;
+
+            // Focus scanInput
+            if (scanInput) scanInput.focus();
+        }
+
+        // Render entries table into #entriesContainer
+        function renderEntries() {
+            const container = document.getElementById('entriesContainer');
+            if (!container) return;
+
+            // Get current date and round
+            const date = inspectionState.inspectionDate || todayYMD();
+            const round = inspectionState.inspectionRound || '1';
+
+            // Get entries for current date/round
+            const roundData = entriesByDateRound[date]?.[round];
+            const entries = roundData?.entries || [];
+
+            if (entries.length === 0) {
+                container.innerHTML = 'No entries yet. Scan a code to begin.';
+                return;
+            }
+
+            // Build table with newest entry at top
+            let html = `<table class="entries-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Code</th>
+                        <th>Product</th>
+                        <th>Employee</th>
+                        <th>Qty</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            // Iterate in reverse order (newest first)
+            for (let i = entries.length - 1; i >= 0; i--) {
+                const e = entries[i];
+                html += `<tr>
+                    <td>${e.entryAt}</td>
+                    <td>${e.code}</td>
+                    <td>${e.productName}</td>
+                    <td>${e.employeeName}</td>
+                    <td>${e.qty}</td>
+                </tr>`;
+            }
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
         // Initialize inspection state and bind UI elements
         function initInspectionState() {
             const dateInput = document.getElementById('inspectionDate');
             const roundSelect = document.getElementById('inspectionRound');
             const initialInput = document.getElementById('inspectorInitial');
             const scanInput = document.getElementById('scanInput');
+            const qtyInput = document.getElementById('qtyInput');
+            const okBtn = document.getElementById('okBtn');
 
             if (!dateInput || !roundSelect) return;
 
@@ -5189,6 +5359,7 @@
             // Date change handler
             dateInput.addEventListener('change', function() {
                 inspectionState.inspectionDate = this.value;
+                renderEntries();
             });
 
             // Round change handler
@@ -5201,6 +5372,9 @@
                 if (label) {
                     label.textContent = `Selected at ${inspectionState.roundSelectedAt}`;
                 }
+
+                // Update entries table for new round
+                renderEntries();
 
                 // Refocus scanInput after round selection
                 if (scanInput) {
@@ -5226,6 +5400,26 @@
                         processScan(code);
                     }
                 });
+            }
+
+            // Quantity input: integer-only filtering (no decimals, no negatives)
+            if (qtyInput) {
+                qtyInput.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^\d]/g, '');
+                });
+
+                // Enter key triggers OK button behavior
+                qtyInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleOkClick();
+                    }
+                });
+            }
+
+            // OK button click handler
+            if (okBtn) {
+                okBtn.addEventListener('click', handleOkClick);
             }
         }
 
