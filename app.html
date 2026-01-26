@@ -1665,6 +1665,196 @@
             overflow-x: auto;
         }
 
+        /* Scanner Entry Panel Styles */
+        .scanner-entry-panel {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .scanner-controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+            padding: 16px 20px;
+            background: #f9f9f9;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .scanner-controls-row .control-group {
+            flex: 0 0 auto;
+            min-width: auto;
+        }
+
+        .scanner-controls-row .form-input,
+        .scanner-controls-row .form-select {
+            min-width: 140px;
+        }
+
+        .scanner-controls-row #inspectorInitial {
+            width: 100px;
+            text-transform: uppercase;
+        }
+
+        #draftStatusMsg {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        #draftStatusMsg.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        #draftStatusMsg.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .scanner-input-panel {
+            padding: 20px;
+        }
+
+        .scanner-input-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .scanner-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .scanner-field label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        #scanInput {
+            width: 200px;
+            padding: 12px 14px;
+            border: 2px solid #1976D2;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: monospace;
+        }
+
+        #scanInput:focus {
+            outline: none;
+            border-color: #1565C0;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        #qtyInput {
+            width: 120px;
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        #qtyInput:focus {
+            outline: none;
+            border-color: #1976D2;
+        }
+
+        #okBtn {
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #okBtn:hover {
+            background: #43A047;
+        }
+
+        #okBtn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .decoded-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .decoded-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .decoded-field-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: #999;
+            text-transform: uppercase;
+        }
+
+        #decodedProduct,
+        #decodedEmployee {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            min-height: 20px;
+        }
+
+        #scanError {
+            color: #c62828;
+            font-size: 13px;
+            min-height: 20px;
+        }
+
+        .entries-section {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .entries-section h4 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        #entriesContainer {
+            min-height: 100px;
+            background: #fafafa;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            color: #999;
+            font-size: 13px;
+            text-align: center;
+        }
+
         .dumpling-product-section {
             background: white;
             padding: 20px;
@@ -2903,6 +3093,74 @@
                         </div>
                         <div id="dumplingEntryLockHint" class="draft-indicator" style="display: none;">
                             🔒 This round is in Draft. Unlock to edit.
+                        </div>
+
+                        <!-- Scanner Entry Panel -->
+                        <div class="scanner-entry-panel">
+                            <!-- Sticky Top Control Row -->
+                            <div class="scanner-controls-row">
+                                <div class="control-group">
+                                    <label class="control-label">Inspection Date</label>
+                                    <input type="date" id="inspectionDate" class="form-input">
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Round</label>
+                                    <select id="inspectionRound" class="form-select">
+                                        <option value="1">Round 1</option>
+                                        <option value="2">Round 2</option>
+                                        <option value="3">Round 3</option>
+                                    </select>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Inspector Initial</label>
+                                    <input type="text" id="inspectorInitial" class="form-input" placeholder="Initial" maxlength="4">
+                                </div>
+                                <div class="control-group">
+                                    <button id="saveDraftBtn" class="btn btn-success">💾 Save Draft</button>
+                                </div>
+                                <div class="control-group">
+                                    <span id="draftStatusMsg"></span>
+                                </div>
+                            </div>
+
+                            <!-- Scanner Input Panel -->
+                            <div class="scanner-input-panel">
+                                <div class="scanner-input-row">
+                                    <div class="scanner-field">
+                                        <label for="scanInput">Scan Code</label>
+                                        <input type="text" id="scanInput" autocomplete="off" placeholder="Scan 4-digit code (XXYY)">
+                                    </div>
+                                    <div class="scanner-field">
+                                        <label for="qtyInput">Quantity</label>
+                                        <input type="text" id="qtyInput" inputmode="numeric" placeholder="Qty (integer)">
+                                    </div>
+                                    <div class="scanner-field" style="justify-content: flex-end;">
+                                        <button id="okBtn">OK</button>
+                                    </div>
+                                </div>
+
+                                <!-- Decoded Display -->
+                                <div class="decoded-display">
+                                    <div class="decoded-field">
+                                        <span class="decoded-field-label">Product</span>
+                                        <div id="decodedProduct">—</div>
+                                    </div>
+                                    <div class="decoded-field">
+                                        <span class="decoded-field-label">Employee</span>
+                                        <div id="decodedEmployee">—</div>
+                                    </div>
+                                    <div class="decoded-field">
+                                        <span class="decoded-field-label">Status</span>
+                                        <div id="scanError" class="error">—</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Today's Entries Section -->
+                            <div class="entries-section">
+                                <h4>Today's Entries</h4>
+                                <div id="entriesContainer">No entries yet. Scan a code to begin.</div>
+                            </div>
                         </div>
 
                         <div class="dumpling-product-tabs dumpling-entry-tabs" id="dumplingEntryTabs"></div>
