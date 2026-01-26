@@ -5437,8 +5437,14 @@
             // Append entry
             entriesByDateRound[date][round].entries.push(entry);
 
+            // Save to localStorage
+            saveInspectionScansData();
+
             // Render updated entries table
             renderEntries();
+
+            // Update product dashboard
+            dumplingRenderProductTable();
 
             // Clear qtyInput
             if (qtyInput) qtyInput.value = '';
@@ -5540,6 +5546,8 @@
             dateInput.addEventListener('change', function() {
                 inspectionState.inspectionDate = this.value;
                 loadEntriesForCurrentDateRound();
+                // Update product dashboard for new date
+                dumplingRenderProductTable();
             });
 
             // Round change handler
@@ -5871,15 +5879,15 @@
             loadDumplingData();
             loadDumplingEntryClosedState();
 
+            // Initialize inspection state tracking (must be before product table render)
+            initInspectionState();
+
             // Render UI
             dumplingRenderProductTabs();
             dumplingRenderEntryTable();
             dumplingRenderRoundSelector();
             dumplingRenderProductTable();
             dumplingUpdateUI();
-
-            // Initialize inspection state tracking
-            initInspectionState();
 
             const initialInput = document.getElementById('dumplingInitial');
             if (initialInput) {
@@ -5962,7 +5970,7 @@
             return dumplingRounds.find(r => r.roundNo === dumplingCurrentRound);
         }
 
-        // Render product-round consolidated table
+        // Render product-round consolidated table using inspection scan data
         function dumplingRenderProductTable() {
             const thead = document.getElementById('dumplingProductTableHead');
             const tbody = document.getElementById('dumplingProductTableBody');
@@ -5973,6 +5981,21 @@
             thead.innerHTML = '';
             tbody.innerHTML = '';
 
+            // Get current inspection date
+            const date = inspectionState.inspectionDate || todayYMD();
+            const dateRounds = entriesByDateRound[date] || {};
+
+            // Build rounds data from inspection scans
+            // Collect all round numbers and sort them
+            const roundNumbers = Object.keys(dateRounds).map(r => parseInt(r, 10)).sort((a, b) => a - b);
+
+            // If no rounds exist, show empty state
+            if (roundNumbers.length === 0) {
+                thead.innerHTML = '<tr><th>Product</th><th>Total</th></tr>';
+                tbody.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #666;">No data for this date. Start scanning to add entries.</td></tr>';
+                return;
+            }
+
             // Build header row with round columns
             const headerRow = document.createElement('tr');
             const productHeader = document.createElement('th');
@@ -5980,14 +6003,13 @@
             productHeader.textContent = 'Product';
             headerRow.appendChild(productHeader);
 
-            const roundsToDisplay = dumplingRounds;
-
             // Add a column for each round
-            roundsToDisplay.forEach(round => {
+            roundNumbers.forEach(roundNo => {
                 const roundHeader = document.createElement('th');
                 roundHeader.style.width = '150px';
-                roundHeader.textContent = `Round ${round.roundNo}`;
-                if (round.status === 'draft') {
+                const roundData = dateRounds[roundNo.toString()];
+                roundHeader.textContent = `Round ${roundNo}`;
+                if (roundData && roundData.status === 'draft') {
                     roundHeader.textContent += ' (Draft)';
                 }
                 headerRow.appendChild(roundHeader);
@@ -6000,6 +6022,32 @@
             headerRow.appendChild(totalHeader);
 
             thead.appendChild(headerRow);
+
+            // Aggregate entries by product and employee for each round
+            // Structure: { [productId]: { [roundNo]: { [employeeId]: totalQty } } }
+            const aggregatedData = {};
+
+            roundNumbers.forEach(roundNo => {
+                const roundData = dateRounds[roundNo.toString()];
+                const entries = roundData?.entries || [];
+
+                entries.forEach(entry => {
+                    const productId = entry.productId;
+                    const employeeId = entry.employeeId;
+                    const qty = parseInt(entry.qty, 10) || 0;
+
+                    if (!aggregatedData[productId]) {
+                        aggregatedData[productId] = {};
+                    }
+                    if (!aggregatedData[productId][roundNo]) {
+                        aggregatedData[productId][roundNo] = {};
+                    }
+                    if (!aggregatedData[productId][roundNo][employeeId]) {
+                        aggregatedData[productId][roundNo][employeeId] = 0;
+                    }
+                    aggregatedData[productId][roundNo][employeeId] += qty;
+                });
+            });
 
             // Build product rows
             dumplingProducts.forEach(productId => {
@@ -6019,17 +6067,15 @@
                 let productTotal = 0;
 
                 // Add data for each round
-                roundsToDisplay.forEach(round => {
+                roundNumbers.forEach(roundNo => {
                     const roundCell = document.createElement('td');
-                    const productData = round.perProduct[productId];
+                    const productRoundData = aggregatedData[productId]?.[roundNo];
 
-                    if (productData && productData.perEmployee) {
-                        // Calculate total produced for this product in this round (excluding rejects)
+                    if (productRoundData) {
+                        // Calculate total produced for this product in this round
                         let roundTotal = 0;
-                        Object.values(productData.perEmployee).forEach(empData => {
-                            if (empData.qtyProduced !== undefined && empData.qtyProduced !== '') {
-                                roundTotal += parseInt(empData.qtyProduced, 10) || 0;
-                            }
+                        Object.values(productRoundData).forEach(empQty => {
+                            roundTotal += empQty;
                         });
                         roundCell.textContent = roundTotal.toString();
                         productTotal += roundTotal;
@@ -6054,6 +6100,7 @@
 
                 sortedEmployees.forEach(emp => {
                     let employeeTotal = 0;
+                    let hasAnyData = false;
 
                     const empTr = document.createElement('tr');
                     empTr.classList.add('employee-row');
@@ -6072,12 +6119,10 @@
                     empTr.appendChild(empCell);
 
                     // Add quantity for each round
-                    roundsToDisplay.forEach(round => {
-                        const productData = round.perProduct[productId];
-                        const empData = productData?.perEmployee?.[emp.id];
-                        const qtyValue = empData?.qtyProduced ?? '';
-                        const qtyNum = qtyValue === '' ? 0 : parseInt(qtyValue, 10) || 0;
+                    roundNumbers.forEach(roundNo => {
+                        const qtyNum = aggregatedData[productId]?.[roundNo]?.[emp.id] || 0;
                         employeeTotal += qtyNum;
+                        if (qtyNum > 0) hasAnyData = true;
 
                         const empRoundCell = document.createElement('td');
                         empRoundCell.textContent = qtyNum > 0 ? qtyNum.toString() : '-';
