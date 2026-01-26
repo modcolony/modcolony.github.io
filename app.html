@@ -5068,6 +5068,166 @@
         // Entries state: { [date]: { [round]: { roundSelectedAt, entries: [] } } }
         let entriesByDateRound = {};
 
+        // localStorage key for inspection scans
+        const INSPECTION_SCANS_KEY = 'dumpling_inspections_scans_v1';
+
+        // Load inspection scan data from localStorage
+        function loadInspectionScansData() {
+            const stored = localStorage.getItem(INSPECTION_SCANS_KEY);
+            if (stored) {
+                try {
+                    const data = JSON.parse(stored);
+                    // Convert stored format to entriesByDateRound format
+                    for (const date in data) {
+                        if (data[date] && data[date].rounds) {
+                            if (!entriesByDateRound[date]) {
+                                entriesByDateRound[date] = {};
+                            }
+                            for (const roundNo in data[date].rounds) {
+                                const roundData = data[date].rounds[roundNo];
+                                entriesByDateRound[date][roundNo] = {
+                                    roundNo: roundData.roundNo,
+                                    roundSelectedAt: roundData.roundSelectedAt || '',
+                                    status: roundData.status || 'draft',
+                                    inspectorInitial: roundData.inspectorInitial || '',
+                                    savedAt: roundData.savedAt || '',
+                                    entries: roundData.entries || []
+                                };
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error loading inspection scans data:', e);
+                }
+            }
+        }
+
+        // Save inspection scan data to localStorage
+        function saveInspectionScansData() {
+            // Convert entriesByDateRound to storage format
+            const data = {};
+            for (const date in entriesByDateRound) {
+                if (!data[date]) {
+                    data[date] = { rounds: {} };
+                }
+                for (const roundNo in entriesByDateRound[date]) {
+                    const roundData = entriesByDateRound[date][roundNo];
+                    data[date].rounds[roundNo] = {
+                        roundNo: parseInt(roundNo, 10),
+                        roundSelectedAt: roundData.roundSelectedAt || '',
+                        status: roundData.status || 'draft',
+                        inspectorInitial: roundData.inspectorInitial || '',
+                        savedAt: roundData.savedAt || '',
+                        entries: roundData.entries || []
+                    };
+                }
+            }
+            localStorage.setItem(INSPECTION_SCANS_KEY, JSON.stringify(data));
+        }
+
+        // Save current inspection as draft
+        function saveInspectionDraft() {
+            const draftStatusMsg = document.getElementById('draftStatusMsg');
+            const initialInput = document.getElementById('inspectorInitial');
+
+            // Validate inspector initial is non-empty
+            const initial = initialInput ? initialInput.value.trim() : '';
+            if (!initial) {
+                if (draftStatusMsg) {
+                    draftStatusMsg.textContent = 'Error: Inspector Initial required';
+                    draftStatusMsg.className = 'error';
+                }
+                if (initialInput) initialInput.focus();
+                return;
+            }
+
+            // Get current date and round
+            const date = inspectionState.inspectionDate || todayYMD();
+            const round = inspectionState.inspectionRound || '1';
+
+            // Initialize state structure if needed
+            if (!entriesByDateRound[date]) {
+                entriesByDateRound[date] = {};
+            }
+            if (!entriesByDateRound[date][round]) {
+                entriesByDateRound[date][round] = {
+                    roundNo: parseInt(round, 10),
+                    roundSelectedAt: inspectionState.roundSelectedAt || '',
+                    status: 'draft',
+                    inspectorInitial: initial,
+                    savedAt: '',
+                    entries: []
+                };
+            }
+
+            // Update round data
+            const roundData = entriesByDateRound[date][round];
+            roundData.roundNo = parseInt(round, 10);
+            roundData.status = 'draft';
+            roundData.inspectorInitial = initial;
+            roundData.savedAt = new Date().toISOString();
+            if (!roundData.roundSelectedAt) {
+                roundData.roundSelectedAt = inspectionState.roundSelectedAt || '';
+            }
+
+            // Save to localStorage
+            saveInspectionScansData();
+
+            // Update status message
+            if (draftStatusMsg) {
+                draftStatusMsg.textContent = `Saved (Draft) at ${nowHMS()}`;
+                draftStatusMsg.className = 'success';
+            }
+        }
+
+        // Load entries for current date/round from stored data
+        function loadEntriesForCurrentDateRound() {
+            const date = inspectionState.inspectionDate || todayYMD();
+            const round = inspectionState.inspectionRound || '1';
+            const initialInput = document.getElementById('inspectorInitial');
+            const roundSelectedAtLabel = document.getElementById('roundSelectedAtLabel');
+            const draftStatusMsg = document.getElementById('draftStatusMsg');
+
+            // Check if we have stored data for this date/round
+            const roundData = entriesByDateRound[date]?.[round];
+
+            if (roundData) {
+                // Restore inspector initial
+                if (initialInput && roundData.inspectorInitial) {
+                    initialInput.value = roundData.inspectorInitial;
+                    inspectionState.inspectorInitial = roundData.inspectorInitial;
+                }
+
+                // Restore roundSelectedAt
+                if (roundData.roundSelectedAt) {
+                    inspectionState.roundSelectedAt = roundData.roundSelectedAt;
+                    if (roundSelectedAtLabel) {
+                        roundSelectedAtLabel.textContent = `Selected at ${roundData.roundSelectedAt}`;
+                    }
+                }
+
+                // Show saved status
+                if (draftStatusMsg && roundData.savedAt) {
+                    const savedTime = new Date(roundData.savedAt);
+                    const timeStr = savedTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    draftStatusMsg.textContent = `Saved (Draft) at ${timeStr}`;
+                    draftStatusMsg.className = 'success';
+                }
+            } else {
+                // Clear UI for new date/round
+                if (roundSelectedAtLabel) {
+                    roundSelectedAtLabel.textContent = '';
+                }
+                if (draftStatusMsg) {
+                    draftStatusMsg.textContent = '';
+                    draftStatusMsg.className = '';
+                }
+            }
+
+            // Render entries table
+            renderEntries();
+        }
+
         // Lookup product by 2-digit code (e.g., "03" or "12")
         function getProductBy2DigitCode(code) {
             const codeNum = parseInt(code, 10);
@@ -5341,8 +5501,12 @@
             const scanInput = document.getElementById('scanInput');
             const qtyInput = document.getElementById('qtyInput');
             const okBtn = document.getElementById('okBtn');
+            const saveDraftBtn = document.getElementById('saveDraftBtn');
 
             if (!dateInput || !roundSelect) return;
+
+            // Load stored inspection scan data from localStorage
+            loadInspectionScansData();
 
             // Default inspection date to today
             inspectionState.inspectionDate = todayYMD();
@@ -5356,25 +5520,34 @@
                 inspectionState.inspectorInitial = initialInput.value;
             }
 
+            // Load entries for current date/round (restores UI state)
+            loadEntriesForCurrentDateRound();
+
             // Date change handler
             dateInput.addEventListener('change', function() {
                 inspectionState.inspectionDate = this.value;
-                renderEntries();
+                loadEntriesForCurrentDateRound();
             });
 
             // Round change handler
             roundSelect.addEventListener('change', function() {
                 inspectionState.inspectionRound = this.value;
-                inspectionState.roundSelectedAt = nowHMS();
 
-                // Update the roundSelectedAt label
-                const label = document.getElementById('roundSelectedAtLabel');
-                if (label) {
-                    label.textContent = `Selected at ${inspectionState.roundSelectedAt}`;
+                // Check if we have stored data for this round
+                const date = inspectionState.inspectionDate || todayYMD();
+                const round = this.value;
+                const storedRoundData = entriesByDateRound[date]?.[round];
+
+                if (storedRoundData && storedRoundData.roundSelectedAt) {
+                    // Use stored roundSelectedAt
+                    inspectionState.roundSelectedAt = storedRoundData.roundSelectedAt;
+                } else {
+                    // Set new roundSelectedAt for fresh round
+                    inspectionState.roundSelectedAt = nowHMS();
                 }
 
-                // Update entries table for new round
-                renderEntries();
+                // Load entries for selected date/round
+                loadEntriesForCurrentDateRound();
 
                 // Refocus scanInput after round selection
                 if (scanInput) {
@@ -5388,6 +5561,11 @@
                     this.value = this.value.toUpperCase();
                     inspectionState.inspectorInitial = this.value;
                 });
+            }
+
+            // Save Draft button click handler
+            if (saveDraftBtn) {
+                saveDraftBtn.addEventListener('click', saveInspectionDraft);
             }
 
             // Scan input keydown handler (Enter/Tab to process scan)
