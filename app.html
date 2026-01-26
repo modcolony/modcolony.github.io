@@ -5336,14 +5336,14 @@
             decoded.product = product;
             decoded.employee = employee;
 
-            // Display decoded product (code + name)
-            const productName = product.nameThai || product.nameEn || `Product ${product.id}`;
+            // Display decoded product (code + name in both languages)
+            const productName = dumplingGetProductNameFromObj(product);
             if (decodedProductEl) {
                 decodedProductEl.textContent = `${productCode} - ${productName}`;
             }
 
-            // Display decoded employee (code + name)
-            const employeeName = employee.nameThai || employee.nameOther || `Employee ${employee.id}`;
+            // Display decoded employee (code + name in both languages)
+            const employeeName = dumplingGetEmployeeName(employee);
             if (decodedEmployeeEl) {
                 decodedEmployeeEl.textContent = `${employeeCode} - ${employeeName}`;
             }
@@ -5403,9 +5403,9 @@
                 return;
             }
 
-            // Create entry object
-            const productName = decoded.product.nameThai || decoded.product.nameEn || `Product ${decoded.product.id}`;
-            const employeeName = decoded.employee.nameThai || decoded.employee.nameOther || `Employee ${decoded.employee.id}`;
+            // Create entry object with bilingual names
+            const productName = dumplingGetProductNameFromObj(decoded.product);
+            const employeeName = dumplingGetEmployeeName(decoded.employee);
 
             const entry = {
                 entryAt: nowHMS(),
@@ -5833,6 +5833,42 @@
                 return nameEn;
             } else {
                 return `Product ${productId}`;
+            }
+        }
+
+        // Get product display name from product object (both languages)
+        function dumplingGetProductNameFromObj(product) {
+            if (!product) return 'Unknown Product';
+
+            const nameThai = product.nameThai || '';
+            const nameEn = product.nameEn || '';
+
+            if (nameThai && nameEn) {
+                return `${nameThai} / ${nameEn}`;
+            } else if (nameThai) {
+                return nameThai;
+            } else if (nameEn) {
+                return nameEn;
+            } else {
+                return `Product ${product.id}`;
+            }
+        }
+
+        // Get employee display name (both languages)
+        function dumplingGetEmployeeName(employee) {
+            if (!employee) return 'Unknown Employee';
+
+            const nameThai = employee.nameThai || '';
+            const nameOther = employee.nameOther || '';
+
+            if (nameThai && nameOther) {
+                return `${nameThai} / ${nameOther}`;
+            } else if (nameThai) {
+                return nameThai;
+            } else if (nameOther) {
+                return nameOther;
+            } else {
+                return `Employee ${employee.id}`;
             }
         }
 
