@@ -5499,11 +5499,16 @@
             // Iterate in reverse order (newest first)
             for (let i = entries.length - 1; i >= 0; i--) {
                 const e = entries[i];
+                // Look up current product/employee data for bilingual display
+                const product = products.find(p => p.id === e.productId);
+                const employee = employees.find(emp => emp.id === e.employeeId);
+                const productDisplay = dumplingEscapeHtml(dumplingGetProductNameFromObj(product));
+                const employeeDisplay = dumplingEscapeHtml(dumplingGetEmployeeName(employee));
                 html += `<tr>
                     <td>${e.entryAt}</td>
                     <td>${e.code}</td>
-                    <td>${e.productName}</td>
-                    <td>${e.employeeName}</td>
+                    <td>${productDisplay}</td>
+                    <td>${employeeDisplay}</td>
                     <td>${e.qty}</td>
                 </tr>`;
             }
@@ -6148,7 +6153,7 @@
                     // Employee name cell (indented)
                     const empCell = document.createElement('td');
                     const empId = emp.id.toString().padStart(2, '0');
-                    const empName = dumplingEscapeHtml(emp.nameThai || emp.nameOther || 'N/A');
+                    const empName = dumplingEscapeHtml(dumplingGetEmployeeName(emp));
                     empCell.innerHTML = `&nbsp;&nbsp;&nbsp;&nbsp;${empId} - ${empName}`;
                     empCell.style.fontSize = '0.9em';
                     empCell.style.color = '#666';
