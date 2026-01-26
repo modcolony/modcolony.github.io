@@ -2745,14 +2745,14 @@
                 id: 'inventory',
                 label: 'Inventory',
                 icon: '📦',
-                roles: ['admin'],
-                colorClass: 'admin-access',
+                roles: ['user', 'admin'],
+                colorClass: 'user-access',
                 submenu: [
-                    { id: 'stock-count', label: 'Stock Count @11:00' },
-                    { id: 'inventory-summary', label: 'Summary' },
-                    { id: 'inflow', label: 'Inflow' },
-                    { id: 'outflow', label: 'Outflow' },
-                    { id: 'net-change', label: 'Net change' }
+                    { id: 'stock-count', label: 'Stock Count @11:00', roles: ['user', 'admin'] },
+                    { id: 'inventory-summary', label: 'Summary', roles: ['admin'] },
+                    { id: 'inflow', label: 'Inflow', roles: ['admin'] },
+                    { id: 'outflow', label: 'Outflow', roles: ['admin'] },
+                    { id: 'net-change', label: 'Net change', roles: ['admin'] }
                 ]
             },
             {
@@ -3870,6 +3870,17 @@
                 navigateToPage('home');
             }
 
+            // Also check if current page is a submenu item with restricted roles
+            for (const item of menuConfig) {
+                if (item.submenu) {
+                    const subItem = item.submenu.find(sub => sub.id === currentPage);
+                    if (subItem && subItem.roles && !subItem.roles.includes(currentRole)) {
+                        navigateToPage('home');
+                        break;
+                    }
+                }
+            }
+
             if (currentPage === 'other-production') {
                 updateOtherProductionStatusUI();
                 renderOtherProductionTable(otherProductionDraft[currentOtherProductionDate] || []);
@@ -3884,6 +3895,10 @@
                 dumplingRenderProductTabs();
                 dumplingRenderEntryTable();
                 dumplingUpdateUI();
+            }
+
+            if (currentPage === 'stock-count') {
+                renderStockCountPage();
             }
         }
 
@@ -3935,6 +3950,10 @@
                     submenu.className = 'submenu' + (isExpanded ? ' show' : '');
 
                     item.submenu.forEach(subItem => {
+                        // Check if user has access to this submenu item
+                        if (subItem.roles && !subItem.roles.includes(currentRole)) {
+                            return;
+                        }
                         const submenuItem = document.createElement('div');
                         submenuItem.className = 'submenu-item';
                         if (currentPage === subItem.id) {
