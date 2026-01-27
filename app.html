@@ -1354,6 +1354,161 @@
             background: #fafafa;
         }
 
+        .reconciliation-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .reconciliation-controls .control-group {
+            min-width: 220px;
+        }
+
+        .reconciliation-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .reconciliation-table th,
+        .reconciliation-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .reconciliation-table th.num-col,
+        .reconciliation-table td.num-col {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .reconciliation-table tbody tr {
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .reconciliation-table tbody tr:hover {
+            background: #f7f7f7;
+        }
+
+        .reconciliation-muted {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .reconciliation-drawer {
+            position: fixed;
+            inset: 0;
+            display: none;
+            z-index: 2000;
+        }
+
+        .reconciliation-drawer.open {
+            display: block;
+        }
+
+        .reconciliation-drawer-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        .reconciliation-drawer-panel {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: min(520px, 92vw);
+            background: #fff;
+            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.12);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .reconciliation-drawer-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .reconciliation-drawer-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .reconciliation-drawer-subtitle {
+            font-size: 12px;
+            color: #777;
+            margin-top: 4px;
+        }
+
+        .reconciliation-drawer-body {
+            padding: 20px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .reconciliation-section {
+            margin-bottom: 20px;
+        }
+
+        .reconciliation-section h4 {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .reconciliation-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .reconciliation-metric {
+            background: #f8f8f8;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .reconciliation-metric-label {
+            font-size: 11px;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .reconciliation-metric-value {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        .reconciliation-tx-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .reconciliation-tx-item {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .reconciliation-tx-item strong {
+            display: block;
+            font-size: 13px;
+        }
+
+        .reconciliation-tx-meta {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
         .clickable-row {
             cursor: pointer;
         }
@@ -3411,8 +3566,28 @@
                 title: 'Reconciliation',
                 breadcrumb: 'Planning / Reconciliation',
                 content: `
-                    <h2>Reconciliation</h2>
-                    <p style="margin-top: 16px; color: #666;">Coming soon.</p>
+                    <div class="reconciliation-page">
+                        <div class="reconciliation-controls">
+                            <div class="control-group">
+                                <label class="control-label">Operational Day (11:00 → 11:00)</label>
+                                <input type="date" id="reconciliationDate" class="form-input" onchange="updateReconciliationDate(this.value)">
+                            </div>
+                        </div>
+                        <div class="report-table reconciliation-table" id="reconciliationTableContainer"></div>
+                    </div>
+                    <div class="reconciliation-drawer" id="reconciliationDrawer">
+                        <div class="reconciliation-drawer-overlay" onclick="closeReconciliationDrawer()"></div>
+                        <div class="reconciliation-drawer-panel">
+                            <div class="reconciliation-drawer-header">
+                                <div>
+                                    <div class="reconciliation-drawer-title" id="reconciliationDrawerTitle">Product</div>
+                                    <div class="reconciliation-drawer-subtitle" id="reconciliationDrawerSubtitle"></div>
+                                </div>
+                                <button class="btn btn-secondary" onclick="closeReconciliationDrawer()">Close</button>
+                            </div>
+                            <div class="reconciliation-drawer-body" id="reconciliationDrawerBody"></div>
+                        </div>
+                    </div>
                 `
             },
             'pre-orders': {
@@ -5734,6 +5909,12 @@
             if (pageId === 'pre-orders') {
                 setTimeout(() => {
                     initPreOrdersPage();
+                }, 10);
+            }
+
+            if (pageId === 'reconciliation') {
+                setTimeout(() => {
+                    initReconciliationPage();
                 }, 10);
             }
         };
@@ -10612,6 +10793,321 @@
         }
 
         // ========== END INVENTORY SUMMARY FEATURE ==========
+
+        // ========== RECONCILIATION FEATURE ==========
+        const reconciliationState = {
+            selectedDate: localStorage.getItem('wontonReconciliationDate') || new Date().toISOString().split('T')[0]
+        };
+
+        function initReconciliationPage() {
+            const dateInput = document.getElementById('reconciliationDate');
+            if (!dateInput) return;
+
+            dateInput.value = reconciliationState.selectedDate;
+            renderReconciliationTable();
+        }
+
+        function updateReconciliationDate(value) {
+            reconciliationState.selectedDate = value;
+            localStorage.setItem('wontonReconciliationDate', value);
+            renderReconciliationTable();
+        }
+
+        function reconciliationFormatMissing(value) {
+            if (value === null || value === undefined) {
+                return '<span class="reconciliation-muted">—</span>';
+            }
+            return value;
+        }
+
+        function reconciliationGetActiveProducts() {
+            return products.filter(product => (product.status || 'Active') === 'Active');
+        }
+
+        function renderReconciliationTable() {
+            const container = document.getElementById('reconciliationTableContainer');
+            if (!container) return;
+
+            const date = reconciliationState.selectedDate;
+            if (!date) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-text">Select an operational day to view reconciliation.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const prevDate = invGetPrevDate(date);
+            const inflowData = invAggregateInflow();
+            const outflowData = invAggregateOutflow();
+            const stockCountData = invAggregateStockCounts();
+            const productList = reconciliationGetActiveProducts().sort((a, b) => {
+                const nameA = invGetProductName(a.id);
+                const nameB = invGetProductName(b.id);
+                return nameA.localeCompare(nameB);
+            });
+
+            if (productList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-text">No active products found.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div style="background: #E3F2FD; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 13px;">
+                    <strong>📅 Operational Day (11:00 → 11:00)</strong><br>
+                    <span style="color: #666;">
+                        Baseline = stock count at ${prevDate} 11:00<br>
+                        Actual next = stock count at ${date} 11:00
+                    </span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th class="num-col">Baseline</th>
+                            <th class="num-col">Inflow</th>
+                            <th class="num-col">Outflow</th>
+                            <th class="num-col">Expected next</th>
+                            <th class="num-col">Actual next</th>
+                            <th class="num-col">Variance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            productList.forEach(product => {
+                const productId = String(product.id);
+                const baseline = invGetStockCount(stockCountData, productId, prevDate);
+                const actual = invGetStockCount(stockCountData, productId, date);
+                const inflow = (inflowData[productId] && inflowData[productId][date]) || 0;
+                const outflow = (outflowData[productId] && outflowData[productId][date]) || 0;
+                const expected = baseline !== null ? baseline + inflow - outflow : null;
+                const variance = expected !== null && actual !== null ? actual - expected : null;
+                const varianceClass = variance > 0 ? 'variance-positive' : variance < 0 ? 'variance-negative' : '';
+
+                html += `
+                    <tr onclick="openReconciliationDrawer('${productId}')">
+                        <td>${invGetProductName(productId)}</td>
+                        <td class="num-col">${reconciliationFormatMissing(baseline)}</td>
+                        <td class="num-col">${inflow}</td>
+                        <td class="num-col">${outflow}</td>
+                        <td class="num-col">${expected === null ? reconciliationFormatMissing(expected) : expected}</td>
+                        <td class="num-col">${reconciliationFormatMissing(actual)}</td>
+                        <td class="num-col ${varianceClass}">${variance === null ? reconciliationFormatMissing(variance) : variance}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                <div class="reconciliation-muted" style="margin-top: 8px;">
+                    Tip: click any product row to see the underlying transactions and stock counts.
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function reconciliationGetStockCountRecord(productId, date) {
+            loadStockCounts();
+            return stockCounts.find(record => record.date === date && String(record.productId) === String(productId)) || null;
+        }
+
+        function reconciliationGetEmployeeName(employeeId) {
+            const employee = employees.find(emp => emp.id === parseInt(employeeId));
+            if (!employee) return `Employee ${employeeId}`;
+            return `${employee.nameThai || employee.name || ''}`.trim() || `Employee ${employeeId}`;
+        }
+
+        function reconciliationGetCustomerName(customerId) {
+            const customer = customers.find(cust => cust.id === parseInt(customerId));
+            if (!customer) return `Customer ${customerId}`;
+            return `${customer.nameThai || customer.nameBurmese || ''}`.trim() || `Customer ${customerId}`;
+        }
+
+        function reconciliationCollectInflowDetails(productId, date) {
+            const details = [];
+
+            loadDumplingData();
+            dumplingRounds.forEach(round => {
+                if (round.entryDate !== date) return;
+                const productData = round.perProduct && round.perProduct[productId];
+                if (!productData) return;
+
+                Object.keys(productData.perEmployee || {}).forEach(empId => {
+                    const empData = productData.perEmployee[empId];
+                    const qty = typeof empData === 'object' ? parseInt(empData.qtyProduced, 10) || 0 : parseInt(empData, 10) || 0;
+                    if (qty <= 0) return;
+
+                    details.push({
+                        source: `Dumpling Round ${round.roundNo}`,
+                        qty,
+                        meta: `Employee: ${reconciliationGetEmployeeName(empId)}${empData?.note ? ` • Note: ${empData.note}` : ''}`
+                    });
+                });
+            });
+
+            loadOtherProductionData();
+            otherProductionRecords
+                .filter(record => record.date === date && String(record.productId) === String(productId))
+                .forEach(record => {
+                    const qty = parseInt(record.count, 10) || 0;
+                    if (qty <= 0) return;
+                    details.push({
+                        source: `Other Production${record.batch ? ` (Batch ${record.batch})` : ''}`,
+                        qty,
+                        meta: record.notes ? `Notes: ${record.notes}` : 'Recorded in other production'
+                    });
+                });
+
+            return details;
+        }
+
+        function reconciliationCollectOutflowDetails(productId, date) {
+            const details = [];
+
+            loadOutflowRecords();
+            outflowRecords
+                .filter(record => record.transactionDate === date && String(record.productId) === String(productId))
+                .forEach(record => {
+                    const qty = parseFloat(record.quantity) || 0;
+                    if (qty <= 0) return;
+                    details.push({
+                        source: reconciliationGetCustomerName(record.customerId),
+                        qty,
+                        meta: `Seller: ${record.sellerId || '—'}${record.note ? ` • Note: ${record.note}` : ''}`
+                    });
+                });
+
+            return details;
+        }
+
+        function reconciliationRenderTransactions(title, transactions) {
+            if (!transactions.length) {
+                return `
+                    <div class="reconciliation-section">
+                        <h4>${title}</h4>
+                        <div class="reconciliation-muted">No ${title.toLowerCase()} records for this day.</div>
+                    </div>
+                `;
+            }
+
+            const items = transactions.map(item => `
+                <div class="reconciliation-tx-item">
+                    <strong>${item.source}</strong>
+                    <div class="reconciliation-tx-meta">Qty: ${item.qty}${item.meta ? ` • ${item.meta}` : ''}</div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="reconciliation-section">
+                    <h4>${title}</h4>
+                    <div class="reconciliation-tx-list">${items}</div>
+                </div>
+            `;
+        }
+
+        function openReconciliationDrawer(productId) {
+            const drawer = document.getElementById('reconciliationDrawer');
+            if (!drawer) return;
+
+            const date = reconciliationState.selectedDate;
+            const prevDate = invGetPrevDate(date);
+            const productName = invGetProductName(productId);
+
+            const inflowDetails = reconciliationCollectInflowDetails(productId, date);
+            const outflowDetails = reconciliationCollectOutflowDetails(productId, date);
+
+            const baselineRecord = reconciliationGetStockCountRecord(productId, prevDate);
+            const actualRecord = reconciliationGetStockCountRecord(productId, date);
+            const baseline = baselineRecord ? parseInt(baselineRecord.count, 10) || 0 : null;
+            const actual = actualRecord ? parseInt(actualRecord.count, 10) || 0 : null;
+            const inflowTotal = inflowDetails.reduce((sum, item) => sum + item.qty, 0);
+            const outflowTotal = outflowDetails.reduce((sum, item) => sum + item.qty, 0);
+            const expected = baseline !== null ? baseline + inflowTotal - outflowTotal : null;
+            const variance = expected !== null && actual !== null ? actual - expected : null;
+
+            const title = document.getElementById('reconciliationDrawerTitle');
+            const subtitle = document.getElementById('reconciliationDrawerSubtitle');
+            const body = document.getElementById('reconciliationDrawerBody');
+
+            if (title) title.textContent = productName;
+            if (subtitle) subtitle.textContent = `Cycle: ${prevDate} 11:00 → ${date} 11:00`;
+
+            const countSummary = `
+                <div class="reconciliation-section">
+                    <h4>Counts & Expectations</h4>
+                    <div class="reconciliation-metrics">
+                        <div class="reconciliation-metric">
+                            <div class="reconciliation-metric-label">Baseline</div>
+                            <div class="reconciliation-metric-value">${reconciliationFormatMissing(baseline)}</div>
+                            <div class="reconciliation-muted">Count @ ${prevDate} ${baselineRecord?.time || '11:00'}</div>
+                        </div>
+                        <div class="reconciliation-metric">
+                            <div class="reconciliation-metric-label">Expected next</div>
+                            <div class="reconciliation-metric-value">${reconciliationFormatMissing(expected)}</div>
+                            <div class="reconciliation-muted">Baseline + inflow - outflow</div>
+                        </div>
+                        <div class="reconciliation-metric">
+                            <div class="reconciliation-metric-label">Actual next</div>
+                            <div class="reconciliation-metric-value">${reconciliationFormatMissing(actual)}</div>
+                            <div class="reconciliation-muted">Count @ ${date} ${actualRecord?.time || '11:00'}</div>
+                        </div>
+                        <div class="reconciliation-metric">
+                            <div class="reconciliation-metric-label">Variance</div>
+                            <div class="reconciliation-metric-value">${reconciliationFormatMissing(variance)}</div>
+                            <div class="reconciliation-muted">Actual - expected</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const countRecords = `
+                <div class="reconciliation-section">
+                    <h4>Stock Count Notes</h4>
+                    <div class="reconciliation-tx-list">
+                        <div class="reconciliation-tx-item">
+                            <strong>Baseline count (${prevDate})</strong>
+                            <div class="reconciliation-tx-meta">
+                                ${baselineRecord ? `Counted by: ${baselineRecord.countedByInitial || '—'}${baselineRecord.verifiedBy ? ` • Verified: ${baselineRecord.verifiedBy}` : ''}` : 'No stock count recorded'}
+                            </div>
+                        </div>
+                        <div class="reconciliation-tx-item">
+                            <strong>Actual count (${date})</strong>
+                            <div class="reconciliation-tx-meta">
+                                ${actualRecord ? `Counted by: ${actualRecord.countedByInitial || '—'}${actualRecord.verifiedBy ? ` • Verified: ${actualRecord.verifiedBy}` : ''}` : 'No stock count recorded'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (body) {
+                body.innerHTML = `
+                    ${countSummary}
+                    ${reconciliationRenderTransactions('Inflow', inflowDetails)}
+                    ${reconciliationRenderTransactions('Outflow', outflowDetails)}
+                    ${countRecords}
+                `;
+            }
+
+            drawer.classList.add('open');
+        }
+
+        function closeReconciliationDrawer() {
+            const drawer = document.getElementById('reconciliationDrawer');
+            if (drawer) {
+                drawer.classList.remove('open');
+            }
+        }
+
+        // ========== END RECONCILIATION FEATURE ==========
 
         // ========== MOVEMENT REPORT FEATURE ==========
         let movementReportState = {
