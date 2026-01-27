@@ -2600,6 +2600,39 @@
             margin-top: 8px;
         }
 
+        .movement-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+
+        .movement-badge.missing {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .movement-subtext {
+            font-size: 11px;
+            color: #777;
+            margin-top: 4px;
+        }
+
+        .movement-note {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .movement-table .totals-row td {
+            font-weight: 600;
+            background: #fff;
+            border-top: 1px solid #ddd;
+        }
+
         .movement-empty {
             padding: 24px;
             text-align: center;
@@ -10695,35 +10728,385 @@
             }
         }
 
-        function movementReportGetPlaceholderPeriods() {
-            if (movementReportState.aggregation === 'yearly') {
-                return ['2022', '2023', '2024'];
-            }
-            if (movementReportState.aggregation === 'monthly') {
-                return ['Jan 2024', 'Feb 2024', 'Mar 2024'];
-            }
-            return ['Mon 01', 'Tue 02', 'Wed 03'];
+        function movementReportParseTimestamp(value) {
+            if (!value && value !== 0) return null;
+            if (typeof value === 'number') return value;
+            const parsed = new Date(value).getTime();
+            return Number.isNaN(parsed) ? null : parsed;
         }
 
-        function movementReportBuildRows(type) {
-            const periods = movementReportGetPlaceholderPeriods();
-            return periods.map(period => {
+        function movementReportTimestampFromDate(dateStr, timeStr) {
+            if (!dateStr) return null;
+            const time = timeStr || '11:00';
+            const parsed = new Date(`${dateStr}T${time}`);
+            return Number.isNaN(parsed.getTime()) ? null : parsed.getTime();
+        }
+
+        function movementReportAddDays(dateStr, days) {
+            const date = new Date(`${dateStr}T00:00:00`);
+            date.setDate(date.getDate() + days);
+            return date.toISOString().split('T')[0];
+        }
+
+        function movementReportGetDateRange(startDate, endDate) {
+            const dates = [];
+            if (!startDate || !endDate) return dates;
+            let current = startDate;
+            while (current <= endDate) {
+                dates.push(current);
+                current = movementReportAddDays(current, 1);
+            }
+            return dates;
+        }
+
+        function movementReportResolveTimestamp(primary, fallbackDate, fallbackTime) {
+            const primaryStamp = movementReportParseTimestamp(primary);
+            if (primaryStamp !== null) return primaryStamp;
+            return movementReportTimestampFromDate(fallbackDate, fallbackTime || '12:00');
+        }
+
+        function movementReportCollectInflowEntries() {
+            const entries = [];
+
+            loadDumplingData();
+            dumplingRounds.forEach(round => {
+                const timestamp = movementReportResolveTimestamp(
+                    round.savedAt || round.createdAt,
+                    round.entryDate,
+                    '12:00'
+                );
+                if (!timestamp) return;
+
+                Object.keys(round.perProduct || {}).forEach(productId => {
+                    const productData = round.perProduct[productId];
+                    let totalQty = 0;
+
+                    Object.keys(productData.perEmployee || {}).forEach(empId => {
+                        const empData = productData.perEmployee[empId];
+                        const qty = typeof empData === 'object' ? empData.qtyProduced : empData;
+                        totalQty += parseInt(qty, 10) || 0;
+                    });
+
+                    if (totalQty > 0) {
+                        entries.push({
+                            productId: String(productId),
+                            qty: totalQty,
+                            timestamp
+                        });
+                    }
+                });
+            });
+
+            loadOtherProductionData();
+            otherProductionRecords.forEach(record => {
+                const qty = parseInt(record.count, 10) || 0;
+                if (qty <= 0) return;
+
+                const timestamp = movementReportResolveTimestamp(
+                    record.createdAt || record.updatedAt,
+                    record.date,
+                    '12:00'
+                );
+
+                if (!timestamp) return;
+
+                entries.push({
+                    productId: String(record.productId),
+                    qty,
+                    timestamp
+                });
+            });
+
+            return entries;
+        }
+
+        function movementReportCollectOutflowEntries() {
+            const entries = [];
+
+            loadOutflowRecords();
+            outflowRecords.forEach(record => {
+                const qty = parseFloat(record.quantity) || 0;
+                if (qty <= 0) return;
+
+                const timestamp = movementReportResolveTimestamp(
+                    record.createdAt || record.updatedAt,
+                    record.transactionDate,
+                    '12:00'
+                );
+
+                if (!timestamp) return;
+
+                entries.push({
+                    productId: String(record.productId),
+                    qty,
+                    timestamp
+                });
+            });
+
+            return entries;
+        }
+
+        function movementReportFindBaseline(productId, date) {
+            const record = stockCounts.find(c => c.date === date && String(c.productId) === String(productId));
+            if (!record) return null;
+            const time = record.time || '11:00';
+            const timestamp = movementReportTimestampFromDate(date, time);
+            return {
+                count: parseInt(record.count, 10) || 0,
+                time,
+                timestamp,
+                createdAt: record.createdAt || null
+            };
+        }
+
+        function movementReportBuildDailyBuckets(productId, startDate, endDate, inflowEntries, outflowEntries) {
+            const dates = movementReportGetDateRange(startDate, endDate);
+            return dates.map(date => {
+                const baseline = movementReportFindBaseline(productId, date);
+                const bucketStart = movementReportTimestampFromDate(date, '11:00');
+                const nextDate = movementReportAddDays(date, 1);
+                const bucketEnd = movementReportTimestampFromDate(nextDate, '11:00') - 1;
+                const baselineTimestamp = baseline?.timestamp || bucketStart;
+                const filterStart = Math.max(bucketStart, baselineTimestamp || bucketStart);
+
+                const inflowMatches = inflowEntries.filter(entry =>
+                    entry.productId === String(productId) &&
+                    entry.timestamp > filterStart &&
+                    entry.timestamp <= bucketEnd
+                );
+
+                const outflowMatches = outflowEntries.filter(entry =>
+                    entry.productId === String(productId) &&
+                    entry.timestamp > filterStart &&
+                    entry.timestamp <= bucketEnd
+                );
+
+                const inflowQty = inflowMatches.reduce((sum, entry) => sum + entry.qty, 0);
+                const outflowQty = outflowMatches.reduce((sum, entry) => sum + entry.qty, 0);
+
+                return {
+                    date,
+                    label: movementReportFormatPeriodLabel(date, 'daily'),
+                    baselineCount: baseline?.count ?? null,
+                    baselineTime: baseline?.time ?? '11:00',
+                    baselineTimestamp: baseline?.timestamp ?? null,
+                    hasBaseline: Boolean(baseline),
+                    inflow: inflowQty,
+                    inflowTx: inflowMatches.length,
+                    outflow: outflowQty,
+                    outflowTx: outflowMatches.length,
+                    net: inflowQty - outflowQty
+                };
+            });
+        }
+
+        // Sample checks (unit-test-like):
+        // const inflowSample = [{ productId: '1', qty: 5, timestamp: movementReportTimestampFromDate('2024-06-01', '12:00') }];
+        // const outflowSample = [{ productId: '1', qty: 2, timestamp: movementReportTimestampFromDate('2024-06-01', '13:00') }];
+        // const bucketsSample = movementReportBuildDailyBuckets('1', '2024-06-01', '2024-06-01', inflowSample, outflowSample);
+        // console.log(bucketsSample[0].net === 3);
+
+        function movementReportAggregateBuckets(buckets, aggregation) {
+            if (aggregation === 'daily') {
+                return buckets.map(bucket => ({
+                    key: bucket.date,
+                    label: bucket.label,
+                    inflow: bucket.inflow,
+                    inflowTx: bucket.inflowTx,
+                    outflow: bucket.outflow,
+                    outflowTx: bucket.outflowTx,
+                    net: bucket.net,
+                    hasBaseline: bucket.hasBaseline,
+                    baselineCount: bucket.baselineCount,
+                    baselineTime: bucket.baselineTime,
+                    totalBuckets: 1,
+                    completeBuckets: bucket.hasBaseline ? 1 : 0,
+                    hasMovement: bucket.inflow > 0 || bucket.outflow > 0
+                }));
+            }
+
+            const grouped = {};
+            buckets.forEach(bucket => {
+                const date = new Date(`${bucket.date}T00:00:00`);
+                const key = aggregation === 'monthly'
+                    ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+                    : String(date.getFullYear());
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        key,
+                        label: movementReportFormatPeriodLabel(bucket.date, aggregation),
+                        inflow: 0,
+                        inflowTx: 0,
+                        outflow: 0,
+                        outflowTx: 0,
+                        net: 0,
+                        totalBuckets: 0,
+                        completeBuckets: 0,
+                        hasMovement: false
+                    };
+                }
+
+                grouped[key].totalBuckets += 1;
+                if (bucket.hasBaseline) {
+                    grouped[key].completeBuckets += 1;
+                }
+                grouped[key].inflow += bucket.inflow;
+                grouped[key].inflowTx += bucket.inflowTx;
+                grouped[key].outflow += bucket.outflow;
+                grouped[key].outflowTx += bucket.outflowTx;
+                grouped[key].net += bucket.net;
+                if (bucket.inflow > 0 || bucket.outflow > 0) {
+                    grouped[key].hasMovement = true;
+                }
+            });
+
+            return Object.values(grouped).sort((a, b) => a.key.localeCompare(b.key));
+        }
+
+        function movementReportFormatPeriodLabel(dateStr, aggregation) {
+            const date = new Date(`${dateStr}T00:00:00`);
+            if (aggregation === 'monthly') {
+                return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            }
+            if (aggregation === 'yearly') {
+                return date.getFullYear().toString();
+            }
+            return date.toLocaleDateString('en-US', { weekday: 'short', day: '2-digit', month: 'short' });
+        }
+
+        function movementReportFormatDateTime(timestamp) {
+            if (!timestamp) return '--';
+            const date = new Date(timestamp);
+            return date.toLocaleString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function movementReportBuildSummary(buckets, startDate, endDate) {
+            const startBucket = buckets.find(bucket => bucket.date === startDate);
+            const endBucket = buckets.find(bucket => bucket.date === endDate);
+            const opening = startBucket?.hasBaseline ? startBucket.baselineCount : null;
+            const closing = endBucket?.hasBaseline ? endBucket.baselineCount : null;
+            const variance = opening !== null && closing !== null ? closing - opening : null;
+            const lastBaselineTimestamp = endBucket?.baselineTimestamp || startBucket?.baselineTimestamp || null;
+            const missingBaselineDays = buckets.filter(bucket => !bucket.hasBaseline).length;
+
+            return {
+                opening,
+                closing,
+                variance,
+                recordedAt: movementReportFormatDateTime(lastBaselineTimestamp),
+                missingBaselineDays,
+                totalDays: buckets.length,
+                completeDays: buckets.length - missingBaselineDays
+            };
+        }
+
+        function movementReportBuildData(productId, startDate, endDate, aggregation) {
+            loadStockCounts();
+            const inflowEntries = movementReportCollectInflowEntries();
+            const outflowEntries = movementReportCollectOutflowEntries();
+            const buckets = movementReportBuildDailyBuckets(
+                productId,
+                startDate,
+                endDate,
+                inflowEntries,
+                outflowEntries
+            );
+            const rows = movementReportAggregateBuckets(buckets, aggregation);
+            const summary = movementReportBuildSummary(buckets, startDate, endDate);
+            return { buckets, rows, summary };
+        }
+
+        function movementReportRenderPeriodCell(row, aggregation) {
+            const missingBaseline = row.completeBuckets !== row.totalBuckets;
+            const baselineText = aggregation === 'daily'
+                ? (row.baselineCount !== null
+                    ? `Baseline: ${row.baselineCount} @ ${row.baselineTime || '11:00'}`
+                    : 'Baseline: missing')
+                : `Baselines: ${row.completeBuckets}/${row.totalBuckets}`;
+
+            return `
+                <div>
+                    <div>${row.label}${missingBaseline ? '<span class="movement-badge missing">Missing baseline</span>' : ''}</div>
+                    <div class="movement-subtext">${baselineText}</div>
+                </div>
+            `;
+        }
+
+        function movementReportComputeTotals(buckets) {
+            const totals = {
+                inflow: 0,
+                inflowTx: 0,
+                outflow: 0,
+                outflowTx: 0,
+                net: 0
+            };
+            buckets.filter(bucket => bucket.hasBaseline).forEach(bucket => {
+                totals.inflow += bucket.inflow;
+                totals.inflowTx += bucket.inflowTx;
+                totals.outflow += bucket.outflow;
+                totals.outflowTx += bucket.outflowTx;
+                totals.net += bucket.net;
+            });
+            return totals;
+        }
+
+        function movementReportBuildTableRows(type, rows, aggregation, showOnlyMovement, totals) {
+            const filteredRows = showOnlyMovement
+                ? rows.filter(row => row.hasMovement)
+                : rows;
+
+            if (filteredRows.length === 0) {
+                const colSpan = type === 'net' ? 2 : 3;
+                return `<tr><td colspan="${colSpan}" class="movement-empty">No movement for selected range.</td></tr>`;
+            }
+
+            const rowsHtml = filteredRows.map(row => {
                 if (type === 'net') {
                     return `
                         <tr>
-                            <td>${period}</td>
-                            <td style="text-align: right;">--</td>
+                            <td>${movementReportRenderPeriodCell(row, aggregation)}</td>
+                            <td style="text-align: right;">${row.net}</td>
                         </tr>
                     `;
                 }
+                const qty = type === 'inflow' ? row.inflow : row.outflow;
+                const tx = type === 'inflow' ? row.inflowTx : row.outflowTx;
                 return `
                     <tr>
-                        <td>${period}</td>
-                        <td style="text-align: right;">--</td>
-                        <td style="text-align: right;">--</td>
+                        <td>${movementReportRenderPeriodCell(row, aggregation)}</td>
+                        <td style="text-align: right;">${qty}</td>
+                        <td style="text-align: right;">${tx}</td>
                     </tr>
                 `;
             }).join('');
+
+            const totalRow = totals ? (() => {
+                if (type === 'net') {
+                    return `
+                        <tr class="totals-row">
+                            <td>Total (complete baselines only)</td>
+                            <td style="text-align: right;">${totals.net}</td>
+                        </tr>
+                    `;
+                }
+                const qtyTotal = type === 'inflow' ? totals.inflow : totals.outflow;
+                const txTotal = type === 'inflow' ? totals.inflowTx : totals.outflowTx;
+                return `
+                    <tr class="totals-row">
+                        <td>Total (complete baselines only)</td>
+                        <td style="text-align: right;">${qtyTotal}</td>
+                        <td style="text-align: right;">${txTotal}</td>
+                    </tr>
+                `;
+            })() : '';
+
+            return rowsHtml + totalRow;
         }
 
         function renderMovementReport() {
@@ -10733,6 +11116,15 @@
             const filteredProducts = movementReportGetFilteredProducts();
             movementReportEnsureSelection(filteredProducts);
             const selectedProduct = filteredProducts.find(product => product.id === movementReportState.selectedProductId);
+            const movementReportData = selectedProduct
+                ? movementReportBuildData(
+                    selectedProduct.id,
+                    movementReportState.startDate,
+                    movementReportState.endDate,
+                    movementReportState.aggregation
+                )
+                : null;
+            const movementTotals = movementReportData ? movementReportComputeTotals(movementReportData.buckets) : null;
 
             const productListHtml = filteredProducts.length
                 ? filteredProducts.map(product => `
@@ -10767,20 +11159,23 @@
                         <div class="movement-metric-grid">
                             <div class="movement-metric">
                                 <div class="movement-metric-label">Opening Count</div>
-                                <div class="movement-metric-value">--</div>
+                                <div class="movement-metric-value">${movementReportData.summary.opening ?? '--'}</div>
                             </div>
                             <div class="movement-metric">
                                 <div class="movement-metric-label">Last Count</div>
-                                <div class="movement-metric-value">--</div>
+                                <div class="movement-metric-value">${movementReportData.summary.closing ?? '--'}</div>
                             </div>
                             <div class="movement-metric">
                                 <div class="movement-metric-label">Variance</div>
-                                <div class="movement-metric-value">--</div>
+                                <div class="movement-metric-value">${movementReportData.summary.variance ?? '--'}</div>
                             </div>
                             <div class="movement-metric">
                                 <div class="movement-metric-label">Recorded At</div>
-                                <div class="movement-metric-value">--</div>
+                                <div class="movement-metric-value">${movementReportData.summary.recordedAt}</div>
                             </div>
+                        </div>
+                        <div class="movement-note">
+                            Totals exclude day buckets missing baselines (${movementReportData.summary.completeDays}/${movementReportData.summary.totalDays} complete).
                         </div>
                     </div>
                     <div class="movement-card">
@@ -10795,7 +11190,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${movementReportBuildRows('inflow')}
+                                    ${movementReportBuildTableRows(
+                                        'inflow',
+                                        movementReportData.rows,
+                                        movementReportState.aggregation,
+                                        movementReportState.showOnlyMovement,
+                                        movementTotals
+                                    )}
                                 </tbody>
                             </table>
                         </div>
@@ -10812,7 +11213,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${movementReportBuildRows('outflow')}
+                                    ${movementReportBuildTableRows(
+                                        'outflow',
+                                        movementReportData.rows,
+                                        movementReportState.aggregation,
+                                        movementReportState.showOnlyMovement,
+                                        movementTotals
+                                    )}
                                 </tbody>
                             </table>
                         </div>
@@ -10828,7 +11235,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${movementReportBuildRows('net')}
+                                    ${movementReportBuildTableRows(
+                                        'net',
+                                        movementReportData.rows,
+                                        movementReportState.aggregation,
+                                        movementReportState.showOnlyMovement,
+                                        movementTotals
+                                    )}
                                 </tbody>
                             </table>
                         </div>
