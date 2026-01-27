@@ -3243,6 +3243,28 @@
                 colorClass: 'user-access'
             },
             {
+                id: 'orders',
+                label: 'Orders',
+                icon: '🧾',
+                roles: ['user', 'admin'],
+                colorClass: 'user-access',
+                submenu: [
+                    { id: 'pre-orders', label: 'Pre-orders' }
+                ]
+            },
+            {
+                id: 'planning',
+                label: 'Planning',
+                icon: '🗓️',
+                roles: ['user', 'admin'],
+                colorClass: 'user-access',
+                submenu: [
+                    { id: 'production-plan', label: 'Production Plan' },
+                    { id: 'raw-material-plan', label: 'Raw Material Plan' },
+                    { id: 'reconciliation', label: 'Reconciliation' }
+                ]
+            },
+            {
                 id: 'inventory',
                 label: 'Inventory',
                 icon: '📦',
@@ -3254,16 +3276,6 @@
                     { id: 'outflow', label: 'Outflow', roles: ['admin'] },
                     { id: 'net-change', label: 'Net change', roles: ['admin'] },
                     { id: 'movement-report', label: 'Movement Report', roles: ['admin'] }
-                ]
-            },
-            {
-                id: 'orders',
-                label: 'Orders',
-                icon: '🧾',
-                roles: ['user', 'admin'],
-                colorClass: 'user-access',
-                submenu: [
-                    { id: 'pre-orders', label: 'Pre-orders' }
                 ]
             },
             {
@@ -3344,6 +3356,30 @@
                     <p style="margin-top: 16px; color: #666;">
                         Track and manage customer orders across channels.
                     </p>
+                `
+            },
+            'production-plan': {
+                title: 'Production Plan',
+                breadcrumb: 'Planning / Production Plan',
+                content: `
+                    <h2>Production Plan</h2>
+                    <p style="margin-top: 16px; color: #666;">Coming soon.</p>
+                `
+            },
+            'raw-material-plan': {
+                title: 'Raw Material Plan',
+                breadcrumb: 'Planning / Raw Material Plan',
+                content: `
+                    <h2>Raw Material Plan</h2>
+                    <p style="margin-top: 16px; color: #666;">Coming soon.</p>
+                `
+            },
+            'reconciliation': {
+                title: 'Reconciliation',
+                breadcrumb: 'Planning / Reconciliation',
+                content: `
+                    <h2>Reconciliation</h2>
+                    <p style="margin-top: 16px; color: #666;">Coming soon.</p>
                 `
             },
             'pre-orders': {
