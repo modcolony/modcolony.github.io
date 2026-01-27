@@ -3214,6 +3214,16 @@
                 ]
             },
             {
+                id: 'orders',
+                label: 'Orders',
+                icon: '🧾',
+                roles: ['user', 'admin'],
+                colorClass: 'user-access',
+                submenu: [
+                    { id: 'pre-orders', label: 'Pre-orders' }
+                ]
+            },
+            {
                 id: 'sale',
                 label: 'Sale',
                 icon: '💰',
@@ -3280,6 +3290,26 @@
                     <h2>Product Inflow Management</h2>
                     <p style="margin-top: 16px; color: #666;">
                         Track and manage incoming products from production facilities.
+                    </p>
+                `
+            },
+            'orders': {
+                title: 'Orders',
+                breadcrumb: 'Orders',
+                content: `
+                    <h2>Orders</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        Track and manage customer orders across channels.
+                    </p>
+                `
+            },
+            'pre-orders': {
+                title: 'Pre-orders',
+                breadcrumb: 'Orders / Pre-orders',
+                content: `
+                    <h2>Pre-orders</h2>
+                    <p style="margin-top: 16px; color: #666;">
+                        Placeholder for upcoming pre-order workflows.
                     </p>
                 `
             },
