@@ -3015,7 +3015,6 @@
                 colorClass: 'user-access',
                 submenu: [
                     { id: 'stock-count', label: 'Stock Count @11:00', roles: ['user', 'admin'] },
-                    { id: 'inventory-summary', label: 'Summary', roles: ['admin'] },
                     { id: 'inflow', label: 'Inflow', roles: ['admin'] },
                     { id: 'outflow', label: 'Outflow', roles: ['admin'] },
                     { id: 'net-change', label: 'Net change', roles: ['admin'] }
@@ -3837,13 +3836,6 @@
                             </div>
                         </div>
                     </div>
-                `
-            },
-            'inventory-summary': {
-                title: 'Inventory Summary',
-                breadcrumb: 'Inventory Management / Summary',
-                content: `
-                    <div id="inventorySummaryContainer"></div>
                 `
             },
             'net-change': {
@@ -5025,13 +5017,6 @@
             if (pageId === 'product-outflow') {
                 setTimeout(() => {
                     initOutflowPage();
-                }, 10);
-            }
-
-            // If navigating to inventory summary page, initialize it
-            if (pageId === 'inventory-summary') {
-                setTimeout(() => {
-                    initInventorySummaryPage();
                 }, 10);
             }
 
