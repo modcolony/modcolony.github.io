@@ -2129,6 +2129,221 @@
             text-align: right;
         }
 
+        /* Other Production Quick Add (Barcode) Scanner Styles */
+        .other-scanner-panel {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .other-scanner-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: #f9f9f9;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .other-scanner-header h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .other-scanner-body {
+            padding: 20px;
+        }
+
+        .other-scanner-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .other-scanner-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .other-scanner-field label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        #otherScanInput {
+            width: 220px;
+            padding: 12px 14px;
+            border: 2px solid #1976D2;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: monospace;
+        }
+
+        #otherScanInput:focus {
+            outline: none;
+            border-color: #1565C0;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        #otherScanInput:disabled {
+            border-color: #ccc;
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        #otherScanQty {
+            width: 100px;
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        #otherScanQty:focus {
+            outline: none;
+            border-color: #1976D2;
+        }
+
+        #otherScanQty:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        #otherScanOkBtn {
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #otherScanOkBtn:hover {
+            background: #43A047;
+        }
+
+        #otherScanOkBtn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #otherScanCameraBtn {
+            padding: 12px 16px;
+            background: #1976D2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        #otherScanCameraBtn:hover {
+            background: #1565C0;
+        }
+
+        #otherScanCameraBtn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .other-scanner-detected {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .other-scanner-detected-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .other-scanner-detected-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: #999;
+            text-transform: uppercase;
+        }
+
+        .other-scanner-detected-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            min-height: 20px;
+        }
+
+        .other-scanner-detected-value.success {
+            color: #2e7d32;
+        }
+
+        .other-scanner-detected-value.error {
+            color: #c62828;
+        }
+
+        .other-scanner-detected-value.warning {
+            color: #e65100;
+        }
+
+        /* Map Barcode Modal Styles */
+        #otherMapBarcodeModal .modal-content {
+            max-width: 500px;
+        }
+
+        .map-barcode-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .map-barcode-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .map-barcode-field label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .map-barcode-field input,
+        .map-barcode-field select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .map-barcode-field input:focus,
+        .map-barcode-field select:focus {
+            outline: none;
+            border-color: #1976D2;
+        }
+
+        .map-barcode-field input[readonly] {
+            background: #f5f5f5;
+            color: #666;
+        }
+
         .dumpling-product-section {
             background: white;
             padding: 20px;
@@ -3738,6 +3953,100 @@
                         <!-- Info Note -->
                         <div class="info-note">
                             ℹ️ <strong>Note:</strong> Add products as they are produced. Saved entries stay visible here for the full day. Admins close the day to lock edits.
+                        </div>
+
+                        <!-- Quick Add (Barcode) Section -->
+                        <div class="other-scanner-panel" id="otherScannerPanel">
+                            <div class="other-scanner-header">
+                                <h4>Quick Add (Barcode)</h4>
+                            </div>
+                            <div class="other-scanner-body">
+                                <div class="other-scanner-row">
+                                    <div class="other-scanner-field">
+                                        <label for="otherScanInput">Scan Code</label>
+                                        <input type="text" id="otherScanInput" autocomplete="off" placeholder="Scan or type barcode" autofocus>
+                                    </div>
+                                    <div class="other-scanner-field" style="justify-content: flex-end;">
+                                        <button id="otherScanCameraBtn" onclick="openOtherCameraScan()">Scan with Camera</button>
+                                    </div>
+                                    <div class="other-scanner-field">
+                                        <label for="otherScanQty">Quantity</label>
+                                        <input type="number" id="otherScanQty" value="1" min="1" step="1" placeholder="1">
+                                    </div>
+                                    <div class="other-scanner-field" style="justify-content: flex-end;">
+                                        <button id="otherScanOkBtn" onclick="processOtherScan()">OK</button>
+                                    </div>
+                                </div>
+                                <div class="other-scanner-detected">
+                                    <div class="other-scanner-detected-field">
+                                        <span class="other-scanner-detected-label">Product</span>
+                                        <div id="otherScanProduct" class="other-scanner-detected-value">—</div>
+                                    </div>
+                                    <div class="other-scanner-detected-field">
+                                        <span class="other-scanner-detected-label">Unit</span>
+                                        <div id="otherScanUnit" class="other-scanner-detected-value">—</div>
+                                    </div>
+                                    <div class="other-scanner-detected-field">
+                                        <span class="other-scanner-detected-label">Status</span>
+                                        <div id="otherScanStatus" class="other-scanner-detected-value">—</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Map Barcode Modal -->
+                        <div id="otherMapBarcodeModal" class="modal">
+                            <div class="modal-content">
+                                <div class="modal-title">Map Barcode</div>
+                                <div class="modal-body">
+                                    <div class="map-barcode-form">
+                                        <div class="map-barcode-field">
+                                            <label>Raw Barcode</label>
+                                            <input type="text" id="mapBarcodeRaw" readonly>
+                                        </div>
+                                        <div class="map-barcode-field">
+                                            <label>Product</label>
+                                            <select id="mapBarcodeProduct" class="form-select">
+                                                <option value="">-- Select Product --</option>
+                                            </select>
+                                        </div>
+                                        <div class="map-barcode-field">
+                                            <label>Unit (optional, uses product default if blank)</label>
+                                            <input type="text" id="mapBarcodeUnit" placeholder="e.g., kg, pack, piece">
+                                        </div>
+                                        <div class="map-barcode-field">
+                                            <label>Default Batch (optional)</label>
+                                            <input type="text" id="mapBarcodeBatch" placeholder="Leave blank for no default">
+                                        </div>
+                                        <div class="map-barcode-field">
+                                            <label>Default Quality Check</label>
+                                            <select id="mapBarcodeQC" class="form-select">
+                                                <option value="Pending">Pending</option>
+                                                <option value="OK">Pass</option>
+                                                <option value="Not OK">Not Pass</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-actions">
+                                    <button class="btn btn-secondary" onclick="hideModal('otherMapBarcodeModal')">Cancel</button>
+                                    <button class="btn btn-primary" onclick="saveBarcodeMapping()">Save Mapping</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Other Production Camera Scan Modal -->
+                        <div id="otherCameraScanModal" class="modal">
+                            <div class="modal-content" style="max-width: 400px; text-align: center;">
+                                <div class="modal-title">Scan with Camera</div>
+                                <div class="modal-body">
+                                    <video id="otherCameraPreview" autoplay playsinline style="width: 100%; max-width: 320px; height: auto; border-radius: 8px; background: #000; margin: 0 auto 16px; display: block;"></video>
+                                    <div id="otherCameraStatus" style="font-size: 14px; color: #666; margin-bottom: 16px; min-height: 20px;">Initializing camera...</div>
+                                </div>
+                                <div class="modal-actions" style="justify-content: center;">
+                                    <button class="btn btn-secondary" onclick="closeOtherCameraScan()">Close</button>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Flat Table Entry -->
@@ -7403,6 +7712,18 @@
         let otherIsDirty = false;
         let otherReportContext = { selectedYear: null, selectedMonth: null };
 
+        // Barcode map: maps barcode string to { productId, unit?, defaultBatch?, defaultQC? }
+        // Stored in localStorage under key 'otherProductionBarcodeMap'
+        let otherBarcodeMap = {};
+
+        // Camera scanning state for Other Production
+        let otherCameraStream = null;
+        let otherBarcodeDetector = null;
+        let otherDetectionInterval = null;
+
+        // Pending scan code (for re-processing after mapping)
+        let pendingScanCode = null;
+
         // Load other production data from localStorage
         function loadOtherProductionData() {
             const storedRecords = localStorage.getItem('otherProductionRecords');
@@ -7419,6 +7740,12 @@
             if (storedDayStatus) {
                 otherProductionDayStatus = JSON.parse(storedDayStatus);
             }
+
+            // Load barcode map
+            const storedBarcodeMap = localStorage.getItem('otherProductionBarcodeMap');
+            if (storedBarcodeMap) {
+                otherBarcodeMap = JSON.parse(storedBarcodeMap);
+            }
         }
 
         // Save other production data to localStorage
@@ -7432,6 +7759,469 @@
 
         function saveOtherProductionDayStatus() {
             localStorage.setItem('otherProductionDayStatus', JSON.stringify(otherProductionDayStatus));
+        }
+
+        // Save barcode map to localStorage
+        function saveOtherBarcodeMap() {
+            localStorage.setItem('otherProductionBarcodeMap', JSON.stringify(otherBarcodeMap));
+        }
+
+        // ========== OTHER PRODUCTION BARCODE SCANNING ==========
+
+        // Initialize scanner inputs and event handlers
+        function initOtherScannerInputs() {
+            const scanInput = document.getElementById('otherScanInput');
+            const qtyInput = document.getElementById('otherScanQty');
+
+            if (scanInput) {
+                // Enter key triggers OK
+                scanInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        processOtherScan();
+                    }
+                });
+            }
+
+            if (qtyInput) {
+                // Enter key triggers OK
+                qtyInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        processOtherScan();
+                    }
+                });
+
+                // Ensure integer values only
+                qtyInput.addEventListener('input', function() {
+                    const val = parseInt(this.value);
+                    if (isNaN(val) || val < 1) {
+                        this.value = 1;
+                    } else {
+                        this.value = val;
+                    }
+                });
+            }
+        }
+
+        // Update scanner controls based on Day Status
+        function updateOtherScannerControls() {
+            const dayStatusValue = otherProductionDayStatus[currentOtherProductionDate] || 'Open';
+            const isEditable = dayStatusValue === 'Open' || currentRole === 'admin';
+
+            const scanInput = document.getElementById('otherScanInput');
+            const qtyInput = document.getElementById('otherScanQty');
+            const okBtn = document.getElementById('otherScanOkBtn');
+            const cameraBtn = document.getElementById('otherScanCameraBtn');
+            const addProductBtn = document.querySelector('[onclick="addOtherProductToEntry()"]');
+
+            if (scanInput) scanInput.disabled = !isEditable;
+            if (qtyInput) qtyInput.disabled = !isEditable;
+            if (okBtn) okBtn.disabled = !isEditable;
+            if (cameraBtn) cameraBtn.disabled = !isEditable;
+            if (addProductBtn) addProductBtn.disabled = !isEditable;
+        }
+
+        // Resolve barcode to product mapping
+        // Returns: { productId, unit, defaultBatch, defaultQC } or null if not found
+        function resolveOtherBarcode(code) {
+            // 1. Check barcodeMap first
+            if (otherBarcodeMap[code]) {
+                const mapping = otherBarcodeMap[code];
+                const product = products.find(p => p.id === mapping.productId);
+                if (product) {
+                    return {
+                        productId: mapping.productId,
+                        unit: mapping.unit || product.unit,
+                        defaultBatch: mapping.defaultBatch || '',
+                        defaultQC: mapping.defaultQC || 'Pending',
+                        productName: product.nameThai
+                    };
+                }
+            }
+
+            // 2. Fallback: Try to match by SKU/EAN/GTIN fields if they exist in product master
+            // (Check if products have sku, ean, or gtin fields)
+            for (const product of products) {
+                if (product.departmentId === 1) continue; // Skip dumpling products
+
+                if (product.sku && product.sku === code) {
+                    return {
+                        productId: product.id,
+                        unit: product.unit,
+                        defaultBatch: '',
+                        defaultQC: 'Pending',
+                        productName: product.nameThai
+                    };
+                }
+                if (product.ean && product.ean === code) {
+                    return {
+                        productId: product.id,
+                        unit: product.unit,
+                        defaultBatch: '',
+                        defaultQC: 'Pending',
+                        productName: product.nameThai
+                    };
+                }
+                if (product.gtin && product.gtin === code) {
+                    return {
+                        productId: product.id,
+                        unit: product.unit,
+                        defaultBatch: '',
+                        defaultQC: 'Pending',
+                        productName: product.nameThai
+                    };
+                }
+                if (product.barcode && product.barcode === code) {
+                    return {
+                        productId: product.id,
+                        unit: product.unit,
+                        defaultBatch: '',
+                        defaultQC: 'Pending',
+                        productName: product.nameThai
+                    };
+                }
+            }
+
+            // Not found
+            return null;
+        }
+
+        // Process a scanned barcode for Other Production
+        function processOtherScan() {
+            const scanInput = document.getElementById('otherScanInput');
+            const qtyInput = document.getElementById('otherScanQty');
+            const productDisplay = document.getElementById('otherScanProduct');
+            const unitDisplay = document.getElementById('otherScanUnit');
+            const statusDisplay = document.getElementById('otherScanStatus');
+
+            const dayStatusValue = otherProductionDayStatus[currentOtherProductionDate] || 'Open';
+            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
+                if (statusDisplay) {
+                    statusDisplay.textContent = 'Day is closed';
+                    statusDisplay.className = 'other-scanner-detected-value error';
+                }
+                return;
+            }
+
+            const code = scanInput ? scanInput.value.trim() : '';
+            const qty = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
+
+            if (!code) {
+                if (statusDisplay) {
+                    statusDisplay.textContent = 'Enter a barcode';
+                    statusDisplay.className = 'other-scanner-detected-value warning';
+                }
+                if (scanInput) scanInput.focus();
+                return;
+            }
+
+            // Try to resolve the barcode
+            const resolved = resolveOtherBarcode(code);
+
+            if (!resolved) {
+                // Unknown barcode - show in status and open mapping modal
+                if (productDisplay) productDisplay.textContent = '—';
+                if (unitDisplay) unitDisplay.textContent = '—';
+                if (statusDisplay) {
+                    statusDisplay.textContent = '⚠️ Unknown barcode';
+                    statusDisplay.className = 'other-scanner-detected-value warning';
+                }
+
+                // Store pending scan code and open mapping modal
+                pendingScanCode = code;
+                openMapBarcodeModal(code);
+                return;
+            }
+
+            // Display resolved product/unit
+            if (productDisplay) productDisplay.textContent = resolved.productName;
+            if (unitDisplay) unitDisplay.textContent = resolved.unit;
+
+            // Add or merge the row
+            const result = addOrMergeOtherProductionRow(
+                resolved.productId,
+                resolved.unit,
+                resolved.defaultBatch,
+                resolved.defaultQC,
+                qty
+            );
+
+            // Update status
+            if (statusDisplay) {
+                statusDisplay.textContent = `✅ ${result.action} ${resolved.productName} +${qty}`;
+                statusDisplay.className = 'other-scanner-detected-value success';
+            }
+
+            // Clear inputs and refocus
+            if (scanInput) {
+                scanInput.value = '';
+                scanInput.focus();
+            }
+            if (qtyInput) {
+                qtyInput.value = 1;
+            }
+        }
+
+        // Add or merge a row in the Other Production table
+        // Merge key: productId + unit + batch + qualityCheck
+        // Returns: { action: 'Added' | 'Updated' }
+        function addOrMergeOtherProductionRow(productId, unit, batch, quality, qty) {
+            const draftKey = currentOtherProductionDate;
+            const draftEntries = getOtherProductionDraftEntries(draftKey);
+
+            // Find existing row with same productId + batch + quality
+            // (unit is derived from product, so we match by productId)
+            const existingEntry = draftEntries.find(entry => {
+                return entry.productId === productId &&
+                       (entry.batch || '') === (batch || '') &&
+                       (entry.quality || 'Pending') === (quality || 'Pending');
+            });
+
+            if (existingEntry) {
+                // Merge: increment amount
+                existingEntry.count = (existingEntry.count || 0) + qty;
+
+                // Save to localStorage
+                otherProductionDraft[draftKey] = draftEntries;
+                saveOtherProductionDraft();
+
+                // Re-render table
+                renderOtherProductionTable(draftEntries);
+
+                // Mark as dirty
+                otherIsDirty = true;
+                updateOtherProductionStatusUI();
+
+                return { action: 'Updated' };
+            } else {
+                // Add new row
+                draftEntries.push({
+                    id: Date.now() + Math.random(),
+                    productId: productId,
+                    batch: batch || '',
+                    count: qty,
+                    quality: quality || 'Pending',
+                    notes: '',
+                    recordId: null,
+                    isSaved: false
+                });
+
+                // Save to localStorage
+                otherProductionDraft[draftKey] = draftEntries;
+                saveOtherProductionDraft();
+
+                // Re-render table
+                renderOtherProductionTable(draftEntries);
+
+                // Mark as dirty
+                otherIsDirty = true;
+                updateOtherProductionStatusUI();
+
+                return { action: 'Added' };
+            }
+        }
+
+        // Open the Map Barcode modal
+        function openMapBarcodeModal(code) {
+            const rawInput = document.getElementById('mapBarcodeRaw');
+            const productSelect = document.getElementById('mapBarcodeProduct');
+            const unitInput = document.getElementById('mapBarcodeUnit');
+            const batchInput = document.getElementById('mapBarcodeBatch');
+            const qcSelect = document.getElementById('mapBarcodeQC');
+
+            // Set the raw barcode
+            if (rawInput) rawInput.value = code;
+
+            // Populate product dropdown with eligible products
+            if (productSelect) {
+                const eligibleProducts = getOtherProductionEligibleProducts();
+                productSelect.innerHTML = '<option value="">-- Select Product --</option>' +
+                    eligibleProducts.map(p => `<option value="${p.id}">${p.nameThai} (${p.nameEn})</option>`).join('');
+                productSelect.value = '';
+            }
+
+            // Reset other fields
+            if (unitInput) unitInput.value = '';
+            if (batchInput) batchInput.value = '';
+            if (qcSelect) qcSelect.value = 'Pending';
+
+            // Show modal
+            showModal('otherMapBarcodeModal');
+        }
+
+        // Save barcode mapping from modal
+        function saveBarcodeMapping() {
+            const rawInput = document.getElementById('mapBarcodeRaw');
+            const productSelect = document.getElementById('mapBarcodeProduct');
+            const unitInput = document.getElementById('mapBarcodeUnit');
+            const batchInput = document.getElementById('mapBarcodeBatch');
+            const qcSelect = document.getElementById('mapBarcodeQC');
+
+            const code = rawInput ? rawInput.value.trim() : '';
+            const productId = productSelect ? parseInt(productSelect.value) : null;
+            const unit = unitInput ? unitInput.value.trim() : '';
+            const batch = batchInput ? batchInput.value.trim() : '';
+            const qc = qcSelect ? qcSelect.value : 'Pending';
+
+            if (!code) {
+                alert('No barcode to map.');
+                return;
+            }
+
+            if (!productId) {
+                alert('Please select a product.');
+                return;
+            }
+
+            // Get product for default unit
+            const product = products.find(p => p.id === productId);
+            if (!product) {
+                alert('Product not found.');
+                return;
+            }
+
+            // Save mapping
+            otherBarcodeMap[code] = {
+                productId: productId,
+                unit: unit || product.unit,
+                defaultBatch: batch,
+                defaultQC: qc
+            };
+            saveOtherBarcodeMap();
+
+            // Hide modal
+            hideModal('otherMapBarcodeModal');
+
+            // Re-process the pending scan if it matches
+            if (pendingScanCode === code) {
+                const scanInput = document.getElementById('otherScanInput');
+                const qtyInput = document.getElementById('otherScanQty');
+
+                // Set the code back and process
+                if (scanInput) scanInput.value = code;
+                processOtherScan();
+
+                pendingScanCode = null;
+            }
+        }
+
+        // ========== OTHER PRODUCTION CAMERA SCANNING ==========
+
+        // Open camera scan modal for Other Production
+        function openOtherCameraScan() {
+            const modal = document.getElementById('otherCameraScanModal');
+            const video = document.getElementById('otherCameraPreview');
+            const status = document.getElementById('otherCameraStatus');
+
+            if (!modal || !video || !status) return;
+
+            // Check day status
+            const dayStatusValue = otherProductionDayStatus[currentOtherProductionDate] || 'Open';
+            if (dayStatusValue === 'Closed' && currentRole !== 'admin') {
+                alert('Day is closed. Only admins can scan.');
+                return;
+            }
+
+            // Show modal
+            showModal('otherCameraScanModal');
+
+            // Check for BarcodeDetector support
+            if (!('BarcodeDetector' in window)) {
+                status.textContent = 'Camera scanning not supported on this browser. Use hardware scanner or type code.';
+                status.style.color = '#F44336';
+                video.style.display = 'none';
+                return;
+            }
+
+            // Reset status
+            status.textContent = 'Initializing camera...';
+            status.style.color = '#666';
+            video.style.display = 'block';
+
+            // Request camera access
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' }
+            })
+            .then(function(stream) {
+                otherCameraStream = stream;
+                video.srcObject = stream;
+                status.textContent = 'Scanning for barcode...';
+
+                // Create barcode detector
+                otherBarcodeDetector = new BarcodeDetector();
+
+                // Start polling for barcodes
+                otherDetectionInterval = setInterval(function() {
+                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                        otherBarcodeDetector.detect(video)
+                            .then(function(barcodes) {
+                                if (barcodes.length > 0) {
+                                    const rawValue = barcodes[0].rawValue;
+                                    handleOtherBarcodeDetected(rawValue);
+                                }
+                            })
+                            .catch(function(err) {
+                                console.error('Barcode detection error:', err);
+                            });
+                    }
+                }, 200);
+            })
+            .catch(function(err) {
+                console.error('Camera access error:', err);
+                status.textContent = 'Could not access camera. Please check permissions.';
+                status.style.color = '#F44336';
+                video.style.display = 'none';
+            });
+        }
+
+        // Handle detected barcode from camera for Other Production
+        function handleOtherBarcodeDetected(rawValue) {
+            // Don't filter/sanitize the code - accept any barcode format
+            const code = rawValue.trim();
+
+            if (!code) return;
+
+            // Valid code detected - stop camera and close modal
+            closeOtherCameraScan();
+
+            // Set the code in the input field and process
+            const scanInput = document.getElementById('otherScanInput');
+            if (scanInput) {
+                scanInput.value = code;
+            }
+
+            // Process the scan
+            processOtherScan();
+        }
+
+        // Close camera scan modal for Other Production
+        function closeOtherCameraScan() {
+            // Stop detection interval
+            if (otherDetectionInterval) {
+                clearInterval(otherDetectionInterval);
+                otherDetectionInterval = null;
+            }
+
+            // Stop camera tracks
+            if (otherCameraStream) {
+                otherCameraStream.getTracks().forEach(function(track) {
+                    track.stop();
+                });
+                otherCameraStream = null;
+            }
+
+            // Reset video element
+            const video = document.getElementById('otherCameraPreview');
+            if (video) {
+                video.srcObject = null;
+            }
+
+            // Reset barcode detector
+            otherBarcodeDetector = null;
+
+            // Hide modal
+            hideModal('otherCameraScanModal');
         }
 
         // Get eligible products for other production (all except Dept 01)
@@ -7454,6 +8244,9 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('otherProductionDate').value = today;
             currentOtherProductionDate = today;
+
+            // Initialize scanner inputs and event handlers
+            initOtherScannerInputs();
 
             // Load the production day
             loadOtherProductionDay();
@@ -7911,6 +8704,9 @@
             dayActions.style.display = currentRole === 'admin' ? 'flex' : 'none';
             saveBtn.disabled = dayStatusValue === 'Closed' && currentRole !== 'admin';
             selector.disabled = dayStatusValue === 'Closed' && currentRole !== 'admin';
+
+            // Update scanner controls based on day status
+            updateOtherScannerControls();
         }
 
         // Save other production
